@@ -6,6 +6,16 @@
 }
 <script src="~/js/BMED/RepCreate.js" asp-append-version="true"></script>
 
+<style>
+    /* Style the scale of checkbox. */
+    input[type=checkbox] {
+        -ms-transform: scale(1.5); /* IE */
+        -moz-transform: scale(1.5); /* FireFox */
+        -webkit-transform: scale(1.5); /* Safari and Chrome */
+        -o-transform: scale(1.5); /* Opera */
+    }
+</style>
+
 <h2>新增</h2>
 
 <h4>請修單 - 醫療儀器</h4>
@@ -103,7 +113,7 @@
             <div class=form-inline>
                 <div class="form-group">
                     <label class="control-title"></label>
-                    <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" />
+                    <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" value="@Model.AccDpt" />
                 </div>
             </div>
         </div>
@@ -112,6 +122,14 @@
                 <div class="form-group">
                     <label class="control-title"></label>
                     <input type="text" placeholder="輸入保管部門代號查詢" class="form-control" id="AssetDelivDptQry" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label class="control-title"></label>
+                    <input type="checkbox" value="N" name="hasAssetNo" id="hasAssetNo" style="margin: 7px 0px 0px 7px;"><span>   無財產編號</span>
                 </div>
             </div>
         </div>
@@ -129,7 +147,7 @@
             <div class=form-inline>
                 <div class="form-group">
                     <label asp-for="Amt" class="control-title"></label>
-                    <input asp-for="Amt" class="form-control"/>
+                    <input asp-for="Amt" class="form-control" />
                     <span asp-validation-for="Amt" class="text-danger"></span>
                 </div>
             </div>
@@ -138,7 +156,7 @@
             <div class=form-inline>
                 <div class="form-group">
                     <label asp-for="PlantDoc" class="control-title"></label>
-                    <input asp-for="PlantDoc" class="form-control"/>
+                    <input asp-for="PlantDoc" class="form-control" />
                     <span asp-validation-for="PlantDoc" class="text-danger"></span>
                 </div>
             </div>
@@ -148,16 +166,17 @@
                 <label asp-for="RepType" class="control-title"></label>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="RepType" id="RepType1" value="送修">
+                        <input type="radio" asp-for="RepType" id="RepType1" value="送修">
                         送修
                     </label>
                 </div>
                 <div class="radio">
                     <label>
-                        <input type="radio" name="RepType" id="RepType2" value="請修" checked>
+                        <input type="radio" asp-for="RepType" id="RepType2" value="請修">
                         請修
                     </label>
                 </div>
+                <span asp-validation-for="RepType" class="text-danger"></span>
             </div>
         </div>
         <div class="row">

@@ -39,7 +39,7 @@ namespace EDIS.Models
         public string Ext { get; set; }
         [Display(Name = "MVPN")]
         public string Mvpn { get; set; }
-        [Required]
+        [Required(ErrorMessage = "必填寫欄位")]
         [Display(Name = "維修別")]
         public string RepType { get; set; }
         [Required(ErrorMessage = "必填寫欄位")]

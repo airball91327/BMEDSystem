@@ -117,6 +117,22 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 throw new Exception("財產編號不可空白!!");
             }
+            //尚有未結案的單號
+            var bmedkp = _context.BMEDKeeps.Where(k => k.AssetNo == keep.AssetNo).ToList();
+            if (bmedkp.Count() > 0)
+            {
+                var kf = bmedkp.Join(_context.BMEDKeepFlows, k => k.DocId, f => f.DocId,
+                    (k, f) => new
+                    {
+                        keep = k,
+                        keepflow = f
+                    }).Where(f => f.keepflow.Status == "?").ToList();
+                if (kf.Count() > 0)
+                {
+                    throw new Exception("尚有未結案的保養單需處理!");
+                }
+            }
+                                                 
             string msg = "";
             try
             {

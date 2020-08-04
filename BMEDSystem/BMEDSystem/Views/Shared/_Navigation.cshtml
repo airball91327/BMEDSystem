@@ -5,35 +5,10 @@
 @using EDIS.Extensions;
 
 
-@*<nav class="navbar navbar-inverse navbar-fixed-top mobileNavBar">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-        </div>
-        <div class="navbar-collapse collapse">
-            <ul class="nav navbar-nav navbar-layout-content">
-                <li>
-                    <a href="@Url.Action("Index", "Home", new { Area = "" })">個人首頁</a>
-                </li>
-                <li>
-                    <a href="@Url.Action("Create", "Repair", new { Area = "" })">請修單</a>
-                </li>
-                <li></li>
-            </ul>
-            @Html.Partial("_LoginPartial")
-        </div>
-    </div>
-</nav>*@
 
 <nav class="navbar-default navbar-static-side" role="navigation" style="padding-top:0px; width:11%">
     <img src="~/images/logo.png" style="width:97%" />
-    @*<div class="navbar-brand" style="padding-left:0px; ">
-            @Html.Partial("_LoginPartial")
-        </div>*@
+
     <div class="sidebar-collapse">
         <ul class="nav" id="side-menu">
             <li class="nav-header">
@@ -79,9 +54,15 @@
                         </ul>
                     </li>
 
-                    <li class="@Html.IsSelected(controller: "Budget", area: "BMED")">
-                        <a href="@Url.Action("Index", "Budget", new { Area = "BMED" })"><span class="nav-label">預算</span></a>
-                    </li>
+                    @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                        UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                        UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                        UserManager.IsInRole(User, "MedToDo"))
+                    {
+                        <li class="@Html.IsSelected(controller: "Budget", area: "BMED")">
+                            <a href="@Url.Action("Index", "Budget", new { Area = "BMED" })"><span class="nav-label">預算</span></a>
+                        </li>
+                    }
 
                     <li class="@Html.IsSelected(controller: "Search", area: "BMED")">
                         <a href="#"><span class="nav-label">全院案件查詢</span><span class="fa arrow"></span></a>
@@ -126,7 +107,9 @@
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })"><span class="nav-label">設備保養排程年報</span></a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                                 UserManager.IsInRole(User, "MedEngineer"))
+                                UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                                UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                                UserManager.IsInRole(User, "MedToDo"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })"><span class="nav-label">月故障率統計表</span></a>
@@ -217,14 +200,6 @@
                                             </li>
                                         </ul>
                                     </li>
-                                    @*<li class="">
-                            <a href="#"><span class="nav-label">財務</span><span class="fa arrow"></span></a>
-                            <ul class="nav nav-fourth-level collapse">
-                                <li>
-                                    <a href="@Url.Action("Index", "Ticket", new { Area = "BMED" })">發票作業</a>
-                                </li>
-                            </ul>
-                        </li>*@
 
                                 </ul>
                             </li>

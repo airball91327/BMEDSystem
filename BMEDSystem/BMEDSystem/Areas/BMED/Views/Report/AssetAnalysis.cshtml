@@ -1,7 +1,18 @@
 ﻿@model EDIS.Models.AssetAnalysis
+
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
 @{
     Layout = null;
+    var userDpt = "";
+    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+    if (ur != null)
+    {
+        userDpt = ur.DptId;
+    }
 }
+
 <div>
     <h4>總計</h4>
 </div>
@@ -12,12 +23,27 @@
         <td>保養時數</td>
         <td>@Model.KeepHour</td>
     </tr>
-    <tr>
-        <td>維修金額</td>
-        <td>@Model.RepCost</td>
-        <td>保養金額</td>
-        <td>@Model.KeepCost</td>
-    </tr>
+    @if (userDpt == "8420") //醫工部與相關人員才顯示金額
+    {
+        <tr>
+            <td>維修金額</td>
+            <td>@Model.RepCost</td>
+            <td>保養金額</td>
+            <td>@Model.KeepCost</td>
+        </tr>
+    }
+    else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+            UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+            UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+            UserManager.IsInRole(User, "MedToDo"))
+    {
+        <tr>
+            <td>維修金額</td>
+            <td>@Model.RepCost</td>
+            <td>保養金額</td>
+            <td>@Model.KeepCost</td>
+        </tr>
+    }
     <tr>
         <td>妥 善 率</td>
         <td>@Model.ProperRate</td>

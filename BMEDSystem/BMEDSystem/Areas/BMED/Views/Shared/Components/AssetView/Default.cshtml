@@ -1,5 +1,17 @@
 ﻿@model EDIS.Models.AssetModel
 
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+@{
+    var userDpt = "";
+    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+    if (ur != null)
+    {
+        userDpt = ur.DptId;
+    }
+}
+
 <div>
     <h4>儀器基本資料</h4>
 </div>
@@ -20,7 +32,21 @@
         <td>中文名稱</td>
         <td>@Model.Cname</td>
         <td>取得金額</td>
-        <td>@Model.Cost</td>
+        @if (userDpt == "8420") //醫工部與相關人員才顯示設備取得金額
+        {
+            <td>@Model.Cost</td>
+        }
+        else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                UserManager.IsInRole(User, "MedToDo"))
+        {
+            <td>@Model.Cost</td>
+        }
+        else
+        {
+            <td>******</td>
+        }
     </tr>
     <tr>
         <td>取得日期</td>
