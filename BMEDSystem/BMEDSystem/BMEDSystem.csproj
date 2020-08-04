@@ -1,0 +1,60 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>EDIS</AssemblyName>
+    <RootNamespace>EDIS</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Views\Components\**" />
+    <Content Remove="Views\Components\**" />
+    <EmbeddedResource Remove="Views\Components\**" />
+    <None Remove="Views\Components\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.94.2" />
+    <PackageReference Include="EPPlus" Version="4.5.3.3" />
+    <PackageReference Include="Microsoft.AspNetCore.All" Version="2.1.9" />
+    <PackageReference Include="Microsoft.AspNetCore.Razor.Design" Version="2.1.2" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="2.1.14">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Ajax" Version="3.2.6" />
+    <PackageReference Include="Microsoft.jQuery.Unobtrusive.Validation" Version="3.2.11" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.9" />
+    <PackageReference Include="PagedList.Core.Mvc" Version="1.2.0" />
+    <PackageReference Include="System.ServiceModel.Duplex" Version="4.4.0" />
+    <PackageReference Include="System.ServiceModel.Http" Version="4.4.0" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="4.4.0" />
+    <PackageReference Include="System.ServiceModel.Security" Version="4.4.0" />
+    <PackageReference Include="X.PagedList.Mvc.Core" Version="7.6.0" />
+    <PackageReference Include="Zen.Barcode.Rendering.Framework.Web" Version="3.1.10729.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Areas\BMED\Controllers\" />
+    <Folder Include="Areas\BMED\Data\" />
+    <Folder Include="Areas\BMED\Models\" />
+    <Folder Include="Areas\BMED\Repositories\" />
+    <Folder Include="Areas\BMED\Views\" />
+    <Folder Include="Areas\BMED\Views\Repair\Components\Preview\" />
+    <Folder Include="Components\" />
+    <Folder Include="Extensions\" />
+    <Folder Include="Fliters\" />
+    <Folder Include="Services\" />
+    <Folder Include="wwwroot\Files\BMED\Asset\" />
+    <Folder Include="wwwroot\Files\BMED\Budget\" />
+    <Folder Include="wwwroot\Files\BMED\BuyEvaluate\" />
+    <Folder Include="wwwroot\Files\BMED\Delivery\" />
+    <Folder Include="wwwroot\Files\BMED\Keep\" />
+    <Folder Include="wwwroot\Files\BMED\Repair\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+</Project>

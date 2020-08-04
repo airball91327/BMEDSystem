@@ -1,0 +1,238 @@
+﻿@model EDIS.Models.BuyEvaluateModel
+
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewBag.Title = "採購評估/編輯";
+}
+
+<style>
+    /* Style the scale of checkbox. */
+    input[type=checkbox] {
+        -ms-transform: scale(2); /* IE */
+        -moz-transform: scale(2); /* FireFox */
+        -webkit-transform: scale(2); /* Safari and Chrome */
+        -o-transform: scale(2); /* Opera */
+    }
+</style>
+
+<h2>採購評估/編輯</h2>
+
+<fieldset>
+
+    <div style="margin-bottom: 10px">
+        @await Html.PartialAsync("_AttainFile", Model)
+    </div>
+    <div class="display-label">
+        <label asp-for="DocId" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.DocId)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="UserName" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.UserName)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Company" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Company)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Contact" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Contact)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="AccDpt" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.AccDpt)
+        @Html.DisplayFor(model => model.AccDptNam)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="PlantType" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PlantType)
+    </div>
+    <div class="display-label">
+        <label asp-for="BudgetId" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.BudgetId)
+    </div>
+    <div class="display-label">
+        <label asp-for="PlantCnam" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PlantCnam)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="PlantEnam" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.PlantEnam)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Amt" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Amt)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Unit" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Unit)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Price" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Price)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="TotalPrice" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.TotalPrice)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="Place" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.Place)
+    </div>
+
+    <div class="display-label">
+        <label asp-for="EngId" class="control-title"></label>
+    </div>
+    <div class="display-field">
+        @Html.DisplayFor(model => model.EngName)
+    </div>
+    <div id="pnlUSUAL">
+        <div class="display-label">
+            <label asp-for="Standard" class="control-title"></label>
+        </div>
+        <div class="display-field form-inline">
+            <textarea asp-for="Standard" class="form-control" rows="3" id="Standard3" disabled></textarea>
+        </div>
+    </div>
+    <div id="pnlMEDMGR">
+        <div class="display-label">
+            <label asp-for="Standard" class="control-title"></label>
+        </div>
+        <div class="display-field">
+            <textarea asp-for="Standard" class="form-control" rows="3" id="Standard2" readonly></textarea>
+        </div>
+        <div class="display-label">
+            <label asp-for="IsAgree" class="control-title"></label>
+        </div>
+        <div class="display-field">
+            <input asp-for="IsAgree" type="checkbox" style="margin-left: 1.2em;"/>
+        </div>
+    </div>
+    <div id="pnlMEDENG">
+        <h2>
+            設備工程師專區
+        </h2>
+        <div style="margin-left: 20px">
+            <div class="editor-label">
+                <label asp-for="GrpOpin" class="control-title"></label>
+            </div>
+            <div class="editor-field form-inline">
+                <textarea asp-for="GrpOpin" class="form-control" rows="3" disabled></textarea>
+            </div>
+            <div class="editor-label">
+                <label asp-for="Opinion" class="control-title"></label>
+            </div>
+            <div class="editor-field form-inline">
+                <textarea asp-for="Opinion" class="form-control" rows="3" disabled></textarea>
+            </div>
+            <div class="editor-label">
+                <label asp-for="Standard" class="control-title"></label>
+            </div>
+            <div class="editor-field form-inline">
+                <textarea asp-for="Standard" class="form-control" rows="3"></textarea>
+                <span asp-validation-for="Standard" class="text-danger"></span>
+            </div>
+            <div style="padding-top:7px;">
+                <input id="btnSTANDARD" type="button" value="儲存" class="btn btn-primary" />
+            </div>
+
+            <table class="table">
+                <tr>
+                    <th>
+                        序號
+                    </th>
+                    <th>
+                        摘要
+                    </th>
+                    <th></th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>評核表</td>
+                    <td>
+                        <a class="button" href="@Url.Content("~/BMED/AttainFile/Create?id=" + Model.DocId + "&typ=3&title=評核表")"
+                           id="FileChooseLink1">夾帶檔案</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>議價規範</td>
+                    <td>
+                        <a class="button" href="@Url.Content("~/BMED/AttainFile/Create?id=" + Model.DocId + "&typ=3&title=議價規範")"
+                           id="FileChooseLink2">夾帶檔案</a>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    <div id="pnlBUYVENDOR">
+        <div>
+            @Html.ActionLink("修改資料", "Update", new { id = Model.DocId }, new { @class = "button", target = "_blank" })
+        </div>
+        <div>
+            @await Component.InvokeAsync("BuyVendorEdit", new { id = Model.DocId })
+        </div>
+        <div id="BuyVendorPanel">
+            @await Component.InvokeAsync("BuyVendorIndex", new { id = Model.DocId })
+        </div>
+    </div>
+    <div>
+        @await Component.InvokeAsync("BuyFlowList", new { id = Model.DocId, sid = Model.DocSid })
+    </div>
+    <div id="pnlSList">
+        @await Component.InvokeAsync("BuyFlowSList", new { id = Model.DocId })
+    </div>
+    <div>
+        @await Component.InvokeAsync("BuyFlowNextFlow", new { id = Model.DocId, sid = Model.DocSid })
+    </div>
+</fieldset>
+
+<div style="padding-top: 7px;">
+    @Html.ActionLink("回到列表", "Index", "Home", new { Area = "" })
+</div>
+
+@section Scripts {
+    <script src="https://code.jquery.com/ui/1.10.3/jquery-ui.js"></script>
+    <script src="~/js/BMED/VendorChoose.js" asp-append-version="true"></script>
+    <script src="~/js/BMED/BuyNextFlow.js" asp-append-version="true"></script>
+    <script src="~/js/BMED/FileChoose2.js" asp-append-version="true"></script>
+}
