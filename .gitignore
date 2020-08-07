@@ -4,3 +4,7 @@
 
 /.vs
 /BMEDSystem/.vs
+/BMEDSystem/BMEDSystem/obj/Debug
+/BMEDSystem/BMEDSystem/obj/Release
+/BMEDSystem/BMEDSystem/bin/Release
+/BMEDSystem/BMEDSystem/bin/Debug
