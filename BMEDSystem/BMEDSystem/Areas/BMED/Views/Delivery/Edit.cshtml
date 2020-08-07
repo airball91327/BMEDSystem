@@ -5,26 +5,10 @@
     ViewBag.Title = "驗收單/編輯";
 }
 
-<style>
-    /*fieldset{
-        border-style:solid;
-        border-width:2px;
-        border-color:white;
-    }*/
-    .setWhiteColor {
-        color: white;
-        /*width:auto;*/
-    }
-
-    a {
-        color: deepskyblue;
-    }
-</style>
-
 <h2>編輯</h2>
 
 <fieldset>
-    <legend class="setWhiteColor">驗收單</legend>
+    <legend>驗收單</legend>
 
     @Html.HiddenFor(model => model.DocId)
     <div style="margin-bottom: 10px">
@@ -161,7 +145,7 @@
         <div class="editor-label">
             <label class="control-title">儀器列表</label>
         </div>
-        <div style="padding-left: 20px; color: whitesmoke">
+        <div style="padding-left: 20px; color: black">
             @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = Model.DocId })
         </div>
     </div>
@@ -169,7 +153,7 @@
         <div class="editor-label">
             <label class="control-title">儀器列表</label>
         </div>
-        <div style="padding-left: 20px; color: whitesmoke">
+        <div style="padding-left: 20px; color: black">
             @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = Model.DocId, upload = "查看" })
         </div>
     </div>
@@ -181,7 +165,7 @@
             @Html.ActionLink("新增儀器", "New", "Asset", new { docid = Model.DocId, rdate = Model.DelivDateR },
                   new { id = "btnAddAsset", target = "_blank" })
         </div>
-        <div id="gvASSETLIST" style="padding-left: 20px; color: whitesmoke">
+        <div id="gvASSETLIST" style="padding-left: 20px; color: black">
             @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = Model.DocId, upload = "得標廠商" })
         </div>
         <img src="~/images/opc-ajax-loader.gif" id="imgLOAD_VENDOR" />
@@ -190,7 +174,7 @@
         <h2>
             設備工程師專區
         </h2>
-        <div id="gvASSETLIST" style="padding-left: 20px; color: whitesmoke">
+        <div id="gvASSETLIST" style="padding-left: 20px; color: black">
             @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = Model.DocId, upload = "設備工程師" })
         </div>
     </div>

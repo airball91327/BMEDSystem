@@ -4,9 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using EDIS.Models;
-
-
-
 using EDIS.Models.Identity;
 using EDIS.Repositories;
 using EDIS.Services;
@@ -16,7 +13,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System.IO;
-
 using OfficeOpenXml;
 
 namespace EDIS.Areas.BMED.Controllers

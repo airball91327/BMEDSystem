@@ -58,7 +58,7 @@
             {
                 s = "#ffffff";
             }
-            <tr @*style="background-color: @s"*@>
+            <tr style="background-color: @s">
                 <td>
                     @if (item.Flg == "?" && UserManager.GetCurrentUserId(User) == item.FlowUid)
                     {
@@ -88,7 +88,7 @@
                 <td>
                     @Html.DisplayFor(modelItem => item.DocId)
                 </td>
-                <td style="color: lightblue">
+                <td style="color: blue">
                     @Html.DisplayFor(modelItem => item.BudgetId)
                 </td>
                 <td>

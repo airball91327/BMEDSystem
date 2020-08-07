@@ -6,9 +6,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using EDIS.Models;
-
 using EDIS.Models.Identity;
-
 using EDIS.Areas.BMED.Repositories;
 using EDIS.Repositories;
 using Microsoft.EntityFrameworkCore;

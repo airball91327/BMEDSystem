@@ -29,13 +29,13 @@
                 @if (item.DocType == "2")
                 {
                     <td>
-                        <a href='@Url.Content("~/Files/BMED/")@item.FileLink' target="_blank" style="color:deepskyblue">下載</a>
+                        <a href='@Url.Content("~/Files/BMED/")@item.FileLink' target="_blank">下載</a>
                     </td>
                 }
                 else
                 {
                     <td>
-                        <a href='@Url.Content("~/Files/BMED/")@item.FileLink' target="_blank" style="color:deepskyblue">下載</a>
+                        <a href='@Url.Content("~/Files/BMED/")@item.FileLink' target="_blank">下載</a>
                     </td>
                 }
                 <td>@Html.DisplayFor(modelItem => item.UserName)</td>
@@ -45,8 +45,7 @@
                                                                    {
                                                                        data_ajax = "true",
                                                                        data_ajax_method = "GET",
-                                                                       data_ajax_update = "#pnlFILES",
-                                                                       style = "color:deepskyblue"
+                                                                       data_ajax_update = "#pnlFILES"
                                                                    })
                 </td>
             </tr>

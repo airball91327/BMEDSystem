@@ -187,6 +187,36 @@ $(function () {
         $("#AssetName").val(assetName);
     });
 
+    $("#hasAssetNo").click(function () {
+        if ($('input[name="hasAssetNo"]').is(':checked')) {
+            // checked
+            $.ajax({
+                url: '../Repair/QueryAssets',
+                type: "GET",
+                data: { QueryStr: 99999 },
+                success: function (data) {
+                    var select = $('#AssetNo');
+                    $('option', select).remove();
+                    if (data.length == 0) {
+                        $("#AssetNoErrorMsg").html("查無資料!");
+                    }
+                    else if (data.length == 1) {
+                        select.addItems(data);
+                        $('#AssetNo').trigger("change");
+                        $("#AssetNoErrorMsg").html("");
+                    }
+                    else {
+                        select.append($('<option selected="selected" disabled="disabled"></option>').text("請選擇").val(""));
+                        select.addItems(data);
+                        $("#AssetNoErrorMsg").html("");
+                    }
+                }
+            });
+        } else {
+            // unchecked
+        }
+    });
+
     $("#CheckerQryBtn").click(function () {
         var queryStr = $("#CheckerQry").val();
         $.ajax({

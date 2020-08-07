@@ -61,6 +61,10 @@ namespace EDIS.Areas.BMED.Controllers
             r.AccDptName = d == null ? "" : d.Name_C;
             r.Ext = ur.Ext == null ? "" : ur.Ext;
             r.CheckerId = ur.Id;
+            r.Cycle = 0;
+            r.AssetName = "";
+            r.AssetNo = "";
+            r.EngId = 0;
             //
             _context.BMEDKeeps.Add(r);
             _context.SaveChanges();

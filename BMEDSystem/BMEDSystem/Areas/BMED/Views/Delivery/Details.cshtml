@@ -5,20 +5,10 @@
     ViewBag.Title = "驗收/查看";
 }
 
-<style>
-    .setWhiteColor {
-        color: white;
-        /*width:auto;*/
-    }
-    a {
-        color: deepskyblue;
-    }
-</style>
-
 <h2>驗收/查看</h2>
 
 <fieldset>
-    <legend class="setWhiteColor">驗收單</legend>
+    <legend>驗收單</legend>
 
     <div style="margin-bottom: 10px">
         @await Component.InvokeAsync("BMEDAttainFileList", new { id = Model.DocId, typ = "4", viewType = "View" })

@@ -54,6 +54,40 @@
     }
 }
 
+/* Custom CSS. */
 td a, a {
-    color: deepskyblue;
+    color: blue;
+}
+
+.nav-pills > li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: #fff;
+    background-color: #199C59;
+}
+
+.nav > li > a:hover, .nav > li > a:focus {
+    color: #fff !important;
+    background-color: #62c894;
+}
+
+ul.nav-second-level {
+    background: #199C59 !important;
+}
+
+.nav > li[role=presentation] > a {
+    color: #199C59;
+}
+
+.nav-tabs > li > a {
+    color: #808080 !important;
+}
+
+.nav-tabs > li.active > a, .nav-tabs > li.active > a:hover, .nav-tabs > li.active > a:focus {
+    background: none;
+    border-color: #dddddd #dddddd rgba(0, 0, 0, 0);
+    border-bottom: #f3f3f4;
+    border-image: none;
+    border-style: solid;
+    border-width: 1px;
+    color: #555555 !important;
+    cursor: default;
 }

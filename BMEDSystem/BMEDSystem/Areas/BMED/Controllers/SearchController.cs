@@ -15,7 +15,6 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
 
-
 namespace EDIS.Areas.BMED.Controllers
 {
     [Area("BMED")]

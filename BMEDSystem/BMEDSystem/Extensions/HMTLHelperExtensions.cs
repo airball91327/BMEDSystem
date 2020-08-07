@@ -26,5 +26,11 @@ namespace EDIS.Extensions
             return controller == currentController && action == currentAction && area == currentArea ?
                 cssClass : String.Empty;
         }
+
+        public static string PageClass(this IHtmlHelper html)
+        {
+            string currentAction = (string)html.ViewContext.RouteData.Values["action"];
+            return currentAction;
+        }
     }
 }

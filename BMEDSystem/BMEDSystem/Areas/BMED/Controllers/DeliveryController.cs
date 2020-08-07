@@ -4,10 +4,6 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using EDIS.Models;
-
-
-
-
 using EDIS.Models.Identity;
 using EDIS.Repositories;
 using EDIS.Services;
@@ -436,6 +432,11 @@ namespace EDIS.Areas.BMED.Controllers
             r.PurchaseNo = id;
             r.WartyMon = 0;
             r.DelivDateR = DateTime.Now;
+            r.PurchaserId = 0;
+            if (r.EngId == null)
+            {
+                r.EngId = 0;
+            }
             _context.Deliveries.Add(r);
             _context.SaveChanges();
             List<SelectListItem> listItem = new List<SelectListItem>();
@@ -648,12 +649,12 @@ namespace EDIS.Areas.BMED.Controllers
                 case "已處理":
                     rf2 = _context.DelivFlows.FromSql("SELECT * FROM BMEDDELIVFLOWS WHERE STATUS ='?'")
                                              .Where(m => m.UserId != ur.Id).ToList();
-                    if (userManager.IsInRole(User, "MedToDo"))
-                    {
-                        rf.AddRange(rf2);
-                    }
-                    else
-                    {
+                    //if (userManager.IsInRole(User, "MedToDo"))
+                    //{
+                    //    rf.AddRange(rf2);
+                    //}
+                    //else
+                    //{
                         foreach (DelivFlowModel f in rf2)
                         {
                             if (_context.DelivFlows.Where(m => m.DocId == f.DocId).Where(m => m.UserId == ur.Id).Count() > 0)
@@ -661,17 +662,16 @@ namespace EDIS.Areas.BMED.Controllers
                                 rf.Add(f);
                             }
                         }
-                    }
-
+                    //}
                     break;
                 case "已結案":
                     rf2 = _context.DelivFlows.FromSql("SELECT * FROM BMEDDELIVFLOWS WHERE STATUS ='2'").ToList();
-                    if (userManager.IsInRole(User, "MedToDo"))
-                    {
-                        rf.AddRange(rf2);
-                    }
-                    else
-                    {
+                    //if (userManager.IsInRole(User, "MedToDo"))
+                    //{
+                    //    rf.AddRange(rf2);
+                    //}
+                    //else
+                    //{
                         foreach (DelivFlowModel f in rf2)
                         {
                             if (_context.DelivFlows.Where(m => m.DocId == f.DocId).Where(m => m.UserId == ur.Id).Count() > 0)
@@ -679,7 +679,7 @@ namespace EDIS.Areas.BMED.Controllers
                                 rf.Add(f);
                             }
                         }
-                    }
+                    //}
                     break;
                 case "查詢":
                     rf2 = _context.DelivFlows.FromSql("SELECT * FROM BMEDDELIVFLOWS WHERE STATUS ='?'").ToList();
@@ -702,7 +702,7 @@ namespace EDIS.Areas.BMED.Controllers
                 DeliveryModel r = _context.Deliveries.Find(f.DocId);
                 AppUserModel p = _context.AppUsers.Find(r.UserId);
                 DepartmentModel c = _context.Departments.Find(p.DptId);
-                BuyEvaluateModel b = _context.BuyEvaluates.Find(r.PurchaseNo);
+                //BuyEvaluateModel b = _context.BuyEvaluates.Find(r.PurchaseNo);
                 i = new DeliveryListVModel();
                 i.DocType = "驗收";
                 i.DocId = r.DocId;
