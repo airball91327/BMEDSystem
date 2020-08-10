@@ -1,8 +1,18 @@
 ﻿@model IEnumerable<EDIS.Models.RpKpHistoryVModel>
 @using Newtonsoft.Json
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+
 @{
     Layout = null;
     var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+    var userDpt = "";
+    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+    if (ur != null)
+    {
+        userDpt = ur.DptId;
+    }
 }
 
 <p>
@@ -88,9 +98,21 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Hours)
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cost)
-            </td>
+            @if (userDpt == "8420") //醫工部與相關人員才顯示設備取得金額
+            {
+                <td>@Html.DisplayFor(modelItem => item.Cost)</td>
+            }
+            else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                    UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                    UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                    UserManager.IsInRole(User, "MedToDo"))
+            {
+                <td>@Html.DisplayFor(modelItem => item.Cost)</td>
+            }
+            else
+            {
+                <td>******</td>
+            }
             <td>
                 @Html.DisplayFor(modelItem => item.TroubleDes)
             </td>

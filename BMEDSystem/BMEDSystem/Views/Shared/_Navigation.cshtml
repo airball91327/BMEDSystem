@@ -57,12 +57,18 @@
                             <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                 <a href="@Url.Action("Create", "Keep", new { Area = "BMED" })">保養單</a>
                             </li>
-                            <li class="@Html.IsSelected(action: "Create", area: "BMED")">
-                                <a href="@Url.Action("Create", "Delivery", new { Area = "BMED" })">驗收單</a>
-                            </li>
-                            <li class="@Html.IsSelected(action: "Create", area: "BMED")">
-                                <a href="@Url.Action("Create", "BuyEvaluate", new { Area = "BMED" })">採購評估單</a>
-                            </li>
+                            @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                               UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                               UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                               UserManager.IsInRole(User, "MedToDo"))
+                            {
+                                <li class="@Html.IsSelected(action: "Create", area: "BMED")">
+                                    <a href="@Url.Action("Create", "Delivery", new { Area = "BMED" })">驗收單</a>
+                                </li>
+                                <li class="@Html.IsSelected(action: "Create", area: "BMED")">
+                                    <a href="@Url.Action("Create", "BuyEvaluate", new { Area = "BMED" })">採購評估單</a>
+                                </li>
+                            }
                         </ul>
                     </li>
 
