@@ -187,20 +187,27 @@ $(function () {
         $("#AssetName").val(assetName);
     });
 
-    $("#hasAssetNo").click(function () {
-        if ($('input[name="hasAssetNo"]').is(':checked')) {
-            // checked
+    $("input[type=radio][name=hasAssetNo]").change(function () {
+        /* While has assetNo, show search fields. */
+        var select = $('#AssetNo');
+        if (this.value === 'Y') {
+            $("#pnlAsset").show();
+            select.html($('<option selected="selected" disabled="disabled"></option>').text("請選擇").val(""));
+            $("#AssetNoErrorMsg").html("");
+            $("#AssetName").val('');
+        }
+        else if (this.value === 'N') {
+            $("#pnlAsset").hide();
             $.ajax({
                 url: '../Repair/QueryAssets',
                 type: "GET",
                 data: { QueryStr: 99999 },
                 success: function (data) {
-                    var select = $('#AssetNo');
                     $('option', select).remove();
-                    if (data.length == 0) {
+                    if (data.length === 0) {
                         $("#AssetNoErrorMsg").html("查無資料!");
                     }
-                    else if (data.length == 1) {
+                    else if (data.length === 1) {
                         select.addItems(data);
                         $('#AssetNo').trigger("change");
                         $("#AssetNoErrorMsg").html("");
@@ -212,8 +219,6 @@ $(function () {
                     }
                 }
             });
-        } else {
-            // unchecked
         }
     });
 

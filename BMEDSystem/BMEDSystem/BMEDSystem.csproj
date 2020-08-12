@@ -39,7 +39,6 @@
     <Folder Include="Areas\BMED\Data\" />
     <Folder Include="Areas\BMED\Models\" />
     <Folder Include="Areas\BMED\Repositories\" />
-    <Folder Include="Areas\BMED\Views\" />
     <Folder Include="Areas\BMED\Views\Repair\Components\Preview\" />
     <Folder Include="Components\" />
     <Folder Include="Extensions\" />
@@ -55,6 +54,12 @@
 
   <ItemGroup>
     <WCFMetadata Include="Connected Services" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="Areas\BMED\Views\Repair\Create2.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
   </ItemGroup>
 
 </Project>

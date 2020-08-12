@@ -19,6 +19,10 @@ namespace EDIS.Models.AccountViewModels
         public string Password { get; set; }
 
         [Required]
+        [Display(Name = "院區")]
+        public string LoginLoc { get; set; }
+
+        [Required]
         [Display(Name = "登入角色")]
         public string LoginType { get; set; }
 

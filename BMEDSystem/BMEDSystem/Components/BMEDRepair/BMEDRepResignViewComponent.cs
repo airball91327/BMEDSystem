@@ -29,7 +29,7 @@ namespace EDIS.Components.BMEDRepair
             roleManager = customRoleManager;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync()
+        public async Task<IViewComponentResult> InvokeAsync(string role)
         {
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
@@ -99,6 +99,15 @@ namespace EDIS.Components.BMEDRepair
                 {
                     item.AssetName = item.repdata.AssetName;
                 }
+            }
+            //
+            if (role == "MedAssetMgr")
+            {
+                rv = rv.Where(r => r.repdata.Loc == "總院").ToList();
+            }
+            else if (role == "MedBranchMgr")
+            {
+                rv = rv.Where(r => r.repdata.Loc == "分院").ToList();
             }
 
             return View(rv);

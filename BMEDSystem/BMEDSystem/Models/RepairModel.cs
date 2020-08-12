@@ -73,6 +73,10 @@ namespace EDIS.Models
         public string PlantClass { get; set; }
         [Display(Name = "銷貨單號")]
         public string SalesDocId { get; set; }
+        [Display(Name = "設備查詢碼")]
+        public string QryKeyName { get; set; }
+        [Display(Name = "申請院區")]
+        public string Loc { get; set; }
         [NotMapped]
         public string EngName { get; set; }
         [NotMapped]

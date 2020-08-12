@@ -490,15 +490,15 @@ namespace EDIS.Areas.BMED.Controllers
             var test = _context.BMEDRepairs.ToList();
             RepairModel repair = new RepairModel();
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            var dpt = _dptRepo.FindById(ur.DptId);
+            var userDpt = _dptRepo.FindById(ur.DptId);
             repair.DocId = GetID2();
             repair.UserId = ur.Id;
             repair.UserName = ur.FullName;
             repair.UserAccount = ur.UserName;
             repair.DptId = ur.DptId;
-            repair.DptName = dpt.Name_C;
+            repair.DptName = userDpt.Name_C;
             repair.AccDpt = ur.DptId;
-            repair.AccDptName = dpt.Name_C;
+            repair.AccDptName = userDpt.Name_C;
             repair.ApplyDate = DateTime.Now;
 
             /* 擷取該使用者單位底下所有人員 */
@@ -531,7 +531,18 @@ namespace EDIS.Areas.BMED.Controllers
             }
             ViewData["AllEngs"] = new SelectList(list, "Value", "Text");
             repair.CheckerId = ur.Id;
+            repair.Loc = "總院";
 
+            //
+            if (userDpt != null)
+            {
+                //分院人員
+                if (userDpt.Loc != "K" && userDpt.Loc != "P" && userDpt.Loc != "C")
+                {
+                    repair.Loc = "分院";
+                    return View("Create2", repair);
+                }
+            }
             return View(repair);
         }
 

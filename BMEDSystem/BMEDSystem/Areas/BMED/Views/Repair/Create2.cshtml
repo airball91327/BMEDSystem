@@ -96,7 +96,30 @@
                 </div>
             </div>
         </div>
-
+        <div class="row">
+            <div class="form-inline">
+                <label asp-for="PlantClass" class="control-title"></label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="PlantClass" value="醫療儀器" checked>
+                        醫療儀器
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="PlantClass" value="工程設施">
+                        工程設施
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" asp-for="PlantClass" value="資訊設備">
+                        資訊設備
+                    </label>
+                </div>
+                <span asp-validation-for="PlantClass" class="text-danger"></span>
+            </div>
+        </div>
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -148,7 +171,15 @@
                 </div>
             </div>
         </div>
-        <input type="hidden" asp-for="PlantClass" value="醫療儀器" />
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label asp-for="QryKeyName" class="control-title"></label>
+                    <input asp-for="QryKeyName" class="form-control" />
+                    <span asp-validation-for="QryKeyName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -225,6 +256,35 @@
                     <label asp-for="PlaceLoc" class="control-title"></label>
                     <input asp-for="PlaceLoc" class="form-control" />
                     <span asp-validation-for="PlaceLoc" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="form-inline">
+                <div class="form-group">
+                    <label class="control-title">故障描述<br />常用語</label>
+                    <select class="form-control" id="troubleDesList">
+                        <option value="" selected>請選擇</option>
+                        <option value="BLOOD PUMP SHOW E12">BLOOD PUMP SHOW E12</option>
+                        <option value="Blood pump不良">Blood pump不良</option>
+                        <option value="condutvity 上不來">condutvity 上不來</option>
+                        <option value="conductivity不準">conductivity不準</option>
+                        <option value="conductivity太高">conductivity太高</option>
+                        <option value="condutvty 不穩">condutvty 不穩</option>
+                        <option value="positive & negative pressure">positive & negative pressure</option>
+                        <option value="Positive pressure error">Positive pressure error</option>
+                        <option value="Test不過">Test不過</option>
+                        <option value="TMP not stable">TMP not stable</option>
+                        <option value="TMP test 不過">TMP test 不過</option>
+                        <option value="TMP太高">TMP太高</option>
+                        <option value="有異聲">有異聲</option>
+                        <option value="假性blood leak alarm">假性blood leak alarm</option>
+                        <option value="異音">異音</option>
+                        <option value="當機">當機</option>
+                        <option value="漂白水管斷">漂白水管斷</option>
+                        <option value="漏水">漏水</option>
+                        <option value="營幕暗">營幕暗</option>
+                    </select>
                 </div>
             </div>
         </div>
@@ -316,5 +376,12 @@
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-
+    <script>
+        $(function () {
+            $("#troubleDesList").change(function () {
+                var originText = $("#TroubleDes").val();
+                $("#TroubleDes").val($(this).val() + originText);
+            });
+        });
+    </script>
 }
