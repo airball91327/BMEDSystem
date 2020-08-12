@@ -36,7 +36,7 @@ namespace EDIS.Components.BMEDRepair
             List<SelectListItem> listItem1 = new List<SelectListItem>();
             foreach (string l in engs)
             {
-                var u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                var u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
                 if (u != null)
                 {
                     listItem1.Add(new SelectListItem
