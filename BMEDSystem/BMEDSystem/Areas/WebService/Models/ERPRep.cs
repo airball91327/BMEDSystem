@@ -16,12 +16,14 @@ namespace EDIS.Areas.WebService.Models
         public string SAL_NO { get; set; } //工程師代號
         public DateTime PS_DD { get; set; }
         public string CUS_NO { get; set; }
+        public string ZHANG_ID { get; set; } //立帳方式(1.單張立帳，2.不立帳，3.收到發票才立帳)
         public string INV_CUS_NO { get; set; } //進貨廠商代號(有進貨廠商代號，則產生進貨單。)
         public string ISPAY { get; set; } //是否立即付款
 
         public ERPRepHead()
         {
             CUS_NO = "A0280"; //彰化基督教醫療財團法人彰化基督教醫院
+            ZHANG_ID = "2";
         }
 
     }

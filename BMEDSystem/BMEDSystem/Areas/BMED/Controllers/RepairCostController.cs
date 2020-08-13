@@ -12,6 +12,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
+using EDIS.Areas.WebService.Models;
+using WebService;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -47,7 +52,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(RepairCostModel repairCost)
+        public async Task<IActionResult> Edit(RepairCostModel repairCost)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
 
@@ -65,7 +70,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 try
                 {
-                    if (repairCost.StockType == "2")
+                    if (repairCost.StockType == "2")    //發票
                     {
                         var dupData = _context.BMEDRepairCosts.Include(c => c.TicketDtl)
                                                               .Where(c => c.DocId == repairCost.DocId &&
@@ -95,7 +100,7 @@ namespace EDIS.Areas.BMED.Controllers
                     int seqno = _context.BMEDRepairCosts.Where(c => c.DocId == repairCost.DocId)
                                                         .Select(c => c.SeqNo).DefaultIfEmpty().Max();
                     repairCost.SeqNo = seqno + 1;
-                    if (repairCost.StockType == "2")
+                    if (repairCost.StockType == "2")    //發票
                     {
                         if (string.IsNullOrEmpty(repairCost.TicketDtl.TicketDtlNo))
                         {
@@ -108,6 +113,26 @@ namespace EDIS.Areas.BMED.Controllers
                             //throw new Exception("發票日期不可空白!!");
                             string msg = "發票日期不可空白!!";
                             return BadRequest(msg);
+                        }
+                        // check vendor from ERP
+                        if (repairCost.VendorId == null)
+                        {
+                            string msg = "廠商尚未選擇!!";
+                            return BadRequest(msg);
+                        }
+                        else
+                        {
+                            var vendor = _context.BMEDVendors.Find(repairCost.VendorId);
+                            var checkResult = await new ERPVendors().CheckERPVendorAsync(vendor.UniteNo, vendor.VendorName);
+                            if (checkResult != null)
+                            {
+                                repairCost.ERPVendorId = checkResult;
+                            }
+                            else
+                            {
+                                string msg = "於ERP系統查無此廠商，請先建立廠商!!";
+                                return BadRequest(msg);
+                            }
                         }
                         int i = _context.BMEDTicketDtls.Where(d => d.TicketDtlNo == repairCost.TicketDtl.TicketDtlNo)
                                                        .Select(d => d.SeqNo).DefaultIfEmpty().Max();
@@ -210,5 +235,6 @@ namespace EDIS.Areas.BMED.Controllers
             }
 
         }
+
     }
 }

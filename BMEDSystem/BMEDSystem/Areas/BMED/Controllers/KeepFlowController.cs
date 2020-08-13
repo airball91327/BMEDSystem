@@ -101,7 +101,7 @@ namespace EDIS.Areas.BMED.Controllers
 
                     _context.SaveChanges();
                     // Save stock to ERP system.
-                    //var ERPreponse = await SaveToERPAsync(assign.DocId);
+                    var ERPreponse = await SaveToERPAsync(assign.DocId);
 
                     //Send Mail
                     //To all users in this keep's flow.
@@ -451,17 +451,23 @@ namespace EDIS.Areas.BMED.Controllers
             ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
             string msg = "";
             //
+            var keep = _context.BMEDKeeps.Find(docId);
             ERPRepHead hd = new ERPRepHead();
+            if (keep != null)
+            {
+                hd.CUS_NO = keep.AccDpt;
+            }
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
 #if DEBUG
             hd.SAL_NO = "344033";
 #endif
-            //Get keep doc's stock.
+            //Get keep doc's costs.
             var keepCosts = _context.BMEDKeepCosts.Where(rc => rc.DocId == docId).ToList();
             if (keepCosts.Count() > 0)
             {
+                // 讀取庫存明細
                 var stocks = keepCosts.Where(rc => rc.StockType == "0").OrderBy(rc => rc.SeqNo).ToList();
                 if (stocks.Count() > 0)
                 {
@@ -486,6 +492,65 @@ namespace EDIS.Areas.BMED.Controllers
                     string bf = JsonConvert.SerializeObject(body);
                     var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
                     msg = response.Body.PostRepStuffResult;
+                    //回傳銷貨單號，回寫至請修單主檔
+                    if (keep != null)
+                    {
+                        keep.SalesDocId = msg;
+                        _context.Entry(keep).State = EntityState.Modified;
+                        _context.SaveChanges();
+                    }
+                }
+                // 讀取發票
+                var tickets = keepCosts.Where(rc => rc.StockType == "2").OrderBy(rc => rc.SeqNo).ToList();
+                if (tickets.Count() > 0)
+                {
+                    foreach (var item in tickets)
+                    {
+                        // Header
+                        ERPRepHead hdt = new ERPRepHead();
+                        if (keep != null)
+                        {
+                            hdt.CUS_NO = keep.AccDpt;
+                        }
+                        hdt.BIL_NO = docId;
+                        hdt.PS_DD = DateTime.Now.Date;
+                        hdt.INV_CUS_NO = item.ERPVendorId;
+                        hdt.SAL_NO = User.Identity.Name;
+#if DEBUG
+                        hdt.SAL_NO = "344033";
+                        hdt.CUS_NO = "5300";
+#endif
+                        // Body
+                        List<ERPRepBody> bodyt = new List<ERPRepBody>();
+                        bodyt.Add(new ERPRepBody
+                        {
+                            ITM = 1,
+                            PRD_NO = item.PartNo.ToString(),
+                            PRD_NAME = item.PartName.ToString(),
+                            QTY = Convert.ToDecimal(item.Qty),
+                            UP = Convert.ToDecimal(item.Price),
+                            AMT = Convert.ToDecimal(item.TotalCost)
+                        });
+                        //
+                        string mf = JsonConvert.SerializeObject(hdt);
+                        string bf = JsonConvert.SerializeObject(bodyt);
+                        var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
+                        msg = response.Body.PostRepStuffResult;
+                        //回傳銷貨單號，回寫至請修單主檔
+                        if (keep != null)
+                        {
+                            if (string.IsNullOrEmpty(keep.SalesDocId))
+                            {
+                                keep.SalesDocId = msg;
+                            }
+                            else
+                            {
+                                keep.SalesDocId = keep.SalesDocId + ";" + msg;
+                            }
+                            _context.Entry(keep).State = EntityState.Modified;
+                            _context.SaveChanges();
+                        }
+                    }
                 }
             }
             return msg;

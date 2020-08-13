@@ -280,14 +280,14 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (did != "")
             {
-                if (Convert.ToInt64(did) / 10000 == yymm)
+                if (Convert.ToInt64(did) / 100000 == yymm)
                     did = Convert.ToString(Convert.ToInt64(did) + 1);
                 else
-                    did = Convert.ToString(yymm * 10000 + 1);
+                    did = Convert.ToString(yymm * 100000 + 1);
             }
             else
             {
-                did = Convert.ToString(yymm * 10000 + 1);
+                did = Convert.ToString(yymm * 100000 + 1);
             }
             return did;
         }

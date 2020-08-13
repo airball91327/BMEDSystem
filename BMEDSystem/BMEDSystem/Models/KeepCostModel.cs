@@ -53,6 +53,9 @@ namespace EDIS.Models
         public string TicketDtlNo { get; set; }
         public int? TicketDtlSeqNo { get; set; }
 
+        [Display(Name = "ERP廠商代號")]
+        public string ERPVendorId { get; set; }
+
         public TicketDtlModel TicketDtl { get; set; }
     }
 }

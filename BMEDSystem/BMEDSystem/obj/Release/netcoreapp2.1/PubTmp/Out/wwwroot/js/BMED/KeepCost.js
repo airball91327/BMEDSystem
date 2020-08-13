@@ -54,6 +54,7 @@ $(function () {
             $("#pnlTICKET").show();
             $("#pnlPETTY").show();
             $('label[for="AccountDate"]').text("發票日期");
+            $("#pnlVENDOR").show();
         }
         else if (item === "3") {        // 點選"簽單"
             $('#btnQtyStock').hide();
@@ -70,13 +71,14 @@ $(function () {
         else {
             $('#btnQtyStock').show();    // 點選"庫存"
             $('#PartName').attr('readonly', true);
-            $('#Price').attr('readonly', true);
+            //$('#Price').attr('readonly', true);
             $("#CVendor").hide();
             $("#pnlTICKET").hide();
             $("#pnlPETTY").hide();
             $('#IsPettyN').prop("checked", true);
             $("#pnlSIGN").hide();
             $("#pnlACCDATE").hide();
+            $("#pnlVENDOR").hide();
         }
     });
 

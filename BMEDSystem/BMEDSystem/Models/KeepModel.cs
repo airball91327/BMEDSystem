@@ -67,5 +67,7 @@ namespace EDIS.Models
         [Display(Name = "送單日期")]
         public DateTime? SentDate { get; set; }
         public string Src { get; set; }
+        [Display(Name = "銷貨單號")]
+        public string SalesDocId { get; set; }
     }
 }

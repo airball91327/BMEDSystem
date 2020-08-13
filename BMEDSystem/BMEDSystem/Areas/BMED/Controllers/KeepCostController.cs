@@ -12,7 +12,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-
+using WebService;
+using Newtonsoft.Json;
+using EDIS.Areas.WebService.Models;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -37,7 +39,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(KeepCostModel keepCost)
+        public async Task<IActionResult> Edit(KeepCostModel keepCost)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
 
@@ -98,6 +100,26 @@ namespace EDIS.Areas.BMED.Controllers
                             //throw new Exception("發票日期不可空白!!");
                             string msg = "發票日期不可空白!!";
                             return BadRequest(msg);
+                        }
+                        // check vendor from ERP
+                        if (keepCost.VendorId == null)
+                        {
+                            string msg = "廠商尚未選擇!!";
+                            return BadRequest(msg);
+                        }
+                        else
+                        {
+                            var vendor = _context.BMEDVendors.Find(keepCost.VendorId);
+                            var checkResult = await new ERPVendors().CheckERPVendorAsync(vendor.UniteNo, vendor.VendorName);
+                            if (checkResult != null)
+                            {
+                                keepCost.ERPVendorId = checkResult;
+                            }
+                            else
+                            {
+                                string msg = "於ERP系統查無此廠商!!";
+                                return BadRequest(msg);
+                            }
                         }
                         int i = _context.BMEDTicketDtls.Where(d => d.TicketDtlNo == keepCost.TicketDtl.TicketDtlNo)
                                                        .Select(d => d.SeqNo).DefaultIfEmpty().Max();
@@ -200,5 +222,6 @@ namespace EDIS.Areas.BMED.Controllers
             }
 
         }
+
     }
 }
