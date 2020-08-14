@@ -500,6 +500,7 @@ namespace EDIS.Areas.BMED.Controllers
             repair.AccDpt = ur.DptId;
             repair.AccDptName = userDpt.Name_C;
             repair.ApplyDate = DateTime.Now;
+            repair.Amt = 1;
 
             /* 擷取該使用者單位底下所有人員 */
             var dptUsers = _context.AppUsers.Where(a => a.DptId == ur.DptId).ToList();
@@ -1676,7 +1677,12 @@ namespace EDIS.Areas.BMED.Controllers
                 var eng = new { EngId = tempEng.EngId, UserName = tempEng.UserName, FullName = tempEng.AppUsers.FullName };
                 return Json(eng);
             }
-            return Json("");
+            else
+            {
+                var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                var eng = new { EngId = tempEng.EngId, UserName = tempEng.UserName, FullName = tempEng.FullName };
+                return Json(eng);
+            }
         }
 
         protected override void Dispose(bool disposing)
