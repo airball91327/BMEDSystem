@@ -68,10 +68,10 @@ namespace EDIS.Areas.BMED.Controllers
                 try
                 {
 
-                    string s = "/Files/BMED";
-//#if DEBUG
-//                    s = "/App_Data";
-//#endif
+                    string s = "~/Files/BMED";
+#if DEBUG
+                    s = "/Files/BMED";
+#endif
                     switch (attainFile.DocType)
                     {
                         case "0":
@@ -97,10 +97,14 @@ namespace EDIS.Areas.BMED.Controllers
                                     .Where(a => a.DocType == attainFile.DocType)
                                     .Where(a => a.DocId == attainFile.DocId).ToList();
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
-
-                    string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    string path = Path.Combine(s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
+
+#if DEBUG
+                    string WebRootPath = _hostingEnvironment.WebRootPath;
+                    path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
+#endif 
                     // Upload files.
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
@@ -180,10 +184,10 @@ namespace EDIS.Areas.BMED.Controllers
                 try
                 {
 
-                    string s = "/Files/BMED";
-                    //#if DEBUG
-                    //                    s = "/App_Data";
-                    //#endif
+                    string s = "~/Files/BMED";
+#if DEBUG
+                    s = "/Files/BMED";
+#endif
                     switch (attainFile.DocType)
                     {
                         case "0":
@@ -209,10 +213,13 @@ namespace EDIS.Areas.BMED.Controllers
                                     .Where(a => a.DocType == attainFile.DocType)
                                     .Where(a => a.DocId == attainFile.DocId).ToList();
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
-
-                    string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    string path = Path.Combine(s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
+#if DEBUG
+                    string WebRootPath = _hostingEnvironment.WebRootPath;
+                    path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
+#endif
                     // Upload files.
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
@@ -272,8 +279,11 @@ namespace EDIS.Areas.BMED.Controllers
 
         public IActionResult Delete(string id = null, int seq = 0, string typ = null)
         {
+            string path1 = "~/Files/BMED/";
+#if DEBUG
             string WebRootPath = _hostingEnvironment.WebRootPath;
-            string path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+            path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+#endif
             AttainFileModel attainfiles = _context.BMEDAttainFiles.Find(typ, id, seq);
             if (attainfiles != null)
             {
@@ -307,8 +317,11 @@ namespace EDIS.Areas.BMED.Controllers
         /* For Create View's scale.*/
         public IActionResult Delete3(string id = null, int seq = 0, string typ = null)
         {
+            string path1 = "~/Files/BMED/";
+#if DEBUG
             string WebRootPath = _hostingEnvironment.WebRootPath;
-            string path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+            path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+#endif
             AttainFileModel attainfiles = _context.BMEDAttainFiles.Find(typ, id, seq);
             if (attainfiles != null)
             {
@@ -359,7 +372,10 @@ namespace EDIS.Areas.BMED.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(AttainFileModel attainFile, IEnumerable<IFormFile> file)
         {
-            string s = "/Files/BMED";
+            string s = "~/Files/BMED";
+#if DEBUG
+            s = "/Files/BMED";
+#endif
 
             switch (attainFile.DocType)
             {
@@ -406,8 +422,12 @@ namespace EDIS.Areas.BMED.Controllers
                 attainFile.SeqNo = 1;
             else
                 attainFile.SeqNo = Convert.ToInt32(i + 1);
-            string path = Path.Combine(WebRootPath + s, attainFile.DocId + "_"
+            string path = Path.Combine(s, attainFile.DocId + "_"
                 + attainFile.SeqNo.ToString() + Path.GetExtension(Request.Form.Files[0].FileName));
+#if DEBUG
+            path = Path.Combine(WebRootPath + s, attainFile.DocId + "_"
+                + attainFile.SeqNo.ToString() + Path.GetExtension(Request.Form.Files[0].FileName));
+#endif
             string filelink = attainFile.DocId + "_"
                 + attainFile.SeqNo.ToString() + Path.GetExtension(Request.Form.Files[0].FileName);
             try
@@ -488,9 +508,13 @@ namespace EDIS.Areas.BMED.Controllers
 
         public string ReadBudgetExcel(AttainFileModel attainfile)
         {
+            string s2 = "~/Files/BMED/";
+            string filepath = Path.Combine(s2, attainfile.FileLink);
+#if DEBUG
             string WebRootPath = _hostingEnvironment.WebRootPath;
-            string s2 = "/Files/BMED/";
-            string filepath = Path.Combine(WebRootPath + s2, attainfile.FileLink);
+            s2 = "/Files/BMED/";
+            filepath = Path.Combine(WebRootPath + s2, attainfile.FileLink);
+#endif
 
             string s = "";
             BudgetModel bg;
