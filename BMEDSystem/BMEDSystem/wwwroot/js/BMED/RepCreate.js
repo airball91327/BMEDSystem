@@ -86,16 +86,6 @@ $(function () {
                 $("#AccDptName").val(data);  
             }
         });
-        $.ajax({
-            url: '../Repair/GetAccEngs',
-            type: "POST",
-            dataType: "json",
-            data: { dptId: AccDptId },
-            success: function (data) {
-                $('#EngId').val(data.engId);
-                $('#EngName').val(data.fullName);
-            }
-        });
     });
 
     /* If user select "本單位" */

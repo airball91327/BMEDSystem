@@ -2356,3 +2356,4 @@ C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Deb
 C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.dll
 C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.pdb
 C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csproj.CopyComplete
+J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Repair\Create2.g.cshtml.cs

@@ -891,15 +891,30 @@ namespace EDIS.Areas.BMED.Controllers
             var engineer = _context.AppUsers.Find(asset.AssetEngId);
 
             /* 擷取預設負責工程師 */
-            if (engineer == null)  //該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
+            if (engineer == null)  //該設備無預設工程師，改為擷取保管部門所對應工程師
             {
-                var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
-                return Json(tempEng);
+                if (asset != null)
+                {
+                    var dptid = asset.DelivDpt;
+                    var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
+                    engineer = _context.AppUsers.Find(eid.EngId);
+                    if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
+                    {
+                        var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                        return Json(tempEng);
+                    }
+                    var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
+                    return Json(eng);
+                }
+                else  //查無設備
+                {
+                    var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                    return Json(tempEng);
+                }
             }
             else
             {
                 var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
-
                 return Json(eng);
             }
         }
@@ -1530,10 +1545,17 @@ namespace EDIS.Areas.BMED.Controllers
                     var asset = _context.BMEDAssets.Where(a => a.AssetNo == item.repdata.AssetNo).FirstOrDefault();
                     if (asset != null)
                     {
-                        item.AssetNo = asset.AssetNo;
-                        item.AssetName = asset.Cname;
-                        item.Brand = asset.Brand;
-                        item.Type = asset.Type;
+                        if (asset.AssetNo == "99999")
+                        {
+                            item.AssetName = item.repdata.AssetName;
+                        }
+                        else
+                        {
+                            item.AssetNo = asset.AssetNo;
+                            item.AssetName = asset.Cname;
+                            item.Brand = asset.Brand;
+                            item.Type = asset.Type;
+                        }
                     }
                 }
                 else

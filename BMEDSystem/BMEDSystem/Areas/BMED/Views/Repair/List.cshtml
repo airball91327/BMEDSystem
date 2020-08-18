@@ -158,11 +158,21 @@ else
                     @Html.DisplayFor(modelItem => item.AccDptName)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.AssetNo)<br />
-                    @Html.DisplayFor(modelItem => item.AssetName)<br />
-                    @Html.DisplayFor(modelItem => item.Brand)<br />
-                    @Html.DisplayFor(modelItem => item.Type)<br />
-
+                    @if (item.AssetNo == "99999")
+                    {
+                        @Html.DisplayFor(modelItem => item.repdata.AssetName)
+                    }
+                    else
+                    {
+                        @Html.DisplayFor(modelItem => item.AssetNo)
+                        <br />
+                        @Html.DisplayFor(modelItem => item.AssetName)
+                        <br />
+                        @Html.DisplayFor(modelItem => item.Brand)
+                        <br />
+                        @Html.DisplayFor(modelItem => item.Type)
+                        <br />
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.PlaceLoc)
