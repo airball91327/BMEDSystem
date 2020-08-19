@@ -96,7 +96,13 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyEngCode = qdata.BMEDqtyEngCode;
             string qtyTicketNo = qdata.BMEDqtyTicketNo;
             string qtyVendor = qdata.BMEDqtyVendor;
-
+            //至少輸入一個搜尋條件
+            if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
+                dptid == null && qtyDate1 == null && qtyDate2 == null && qtyDealStatus == null &&
+                qtyIsCharged == null && qtyEngCode == null && qtyTicketNo == null && qtyVendor == null)
+            {
+                return BadRequest("請至少輸入一個查詢條件!");
+            }
             if (qtyEngCode != null)
             {
                 searchAllDoc = true;
@@ -426,7 +432,10 @@ namespace EDIS.Areas.BMED.Controllers
                 /* 不分流程的所有案件 */
                 case "請選擇":
                     /* Get all dealing repair docs. */
-                    _context.BMEDRepairFlows.Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
+                    _context.BMEDRepairFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
+                                            .Select(group => group.Last()).ToList()
+                                            .Where(f => f.Status != "3")
+                    .Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
                     (f, r) => new
                     {
                         repair = r,
@@ -481,7 +490,11 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = f
                     }).ToList();
                     /* search all RepairDocs which flowCls is in engineer. */
-                    repairFlows2 = repairFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
+                    repairFlows2 = repairFlows2.GroupBy(f => f.flow.DocId)
+                                               .Where(group => group.Last().flow.Status == "?" || group.Last().flow.Status == "2")
+                                               .Where(group => group.Last().flow.Cls.Contains("工程師"))
+                                               .Where(group => group.Last().flow.UserId != 0).Select(group => group.Last()).ToList();
+                    //repairFlows2 = repairFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                     {
                         repairFlows2 = repairFlows2.Where(f => f.repair.EngId == Convert.ToInt32(qtyEngCode)).ToList();

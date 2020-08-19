@@ -311,10 +311,21 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyEngCode = qdata.BMEDKqtyEngCode;
             string qtyTicketNo = qdata.BMEDKqtyTicketNo;
             string qtyVendor = qdata.BMEDKqtyVendor;
+            //至少輸入一個搜尋條件
+            if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
+                dptid == null && qtyDate1 == null && qtyDate2 == null && qtyKeepResult == null &&
+                qtyIsCharged == null && qtyEngCode == null && qtyTicketNo == null && qtyVendor == null)
+            {
+                return BadRequest("請至少輸入一個查詢條件!");
+            }
 
             if (qtyEngCode != null)
             {
                 searchAllDoc = true;
+            }
+            if (searchAllDoc == true)
+            {
+                ftype = "其他工程師案件";
             }
 
             DateTime applyDateFrom = DateTime.Now;
@@ -674,13 +685,90 @@ namespace EDIS.Areas.BMED.Controllers
                     break;
                 case "請選擇":
                     /* Get all dealing repair docs. */
-                    _context.BMEDKeepFlows.Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
+                    _context.BMEDKeepFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
+                                          .Select(group => group.Last()).ToList()
+                                          .Where(f => f.Status != "3")
+                    .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                     (f, k) => new
                     {
                         keep = k,
                         flow = f
                     })
                     .Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
+                    (r, a) => new
+                    {
+                        keep = r.keep,
+                        asset = a,
+                        flow = r.flow
+                    })
+                    .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        keep = m.keep,
+                        flow = m.flow,
+                        asset = m.asset,
+                        keepdtl = d
+                    })
+                    .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        keep = j.keep,
+                        flow = j.flow,
+                        asset = j.asset,
+                        keepdtl = j.keepdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => kv.Add(new KeepListVModel
+                    {
+                        DocType = "醫工保養",
+                        DocId = j.keep.DocId,
+                        AssetNo = j.keep.AssetNo,
+                        AssetName = j.keep.AssetName,
+                        Brand = j.asset.Brand,
+                        Type = j.asset.Type,
+                        PlaceLoc = j.keep.PlaceLoc,
+                        ApplyDpt = j.keep.DptId,
+                        AccDpt = j.keep.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        Result = (j.keepdtl.Result == null || j.keepdtl.Result == 0) ? "" : _context.BMEDKeepResults.Find(j.keepdtl.Result).Title,
+                        InOut = j.keepdtl.InOut == "0" ? "自行" :
+                        j.keepdtl.InOut == "1" ? "委外" :
+                        j.keepdtl.InOut == "2" ? "租賃" :
+                        j.keepdtl.InOut == "3" ? "保固" : "",
+                        Memo = j.keepdtl.Memo,
+                        Cost = j.keepdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        Src = j.keep.Src,
+                        SentDate = j.keep.SentDate,
+                        EndDate = j.keepdtl.EndDate,
+                        IsCharged = j.keepdtl.IsCharged,
+                        keepdata = j.keep
+                    }));
+                    break;
+                /* 其他工程師的案件 */
+                case "其他工程師案件":
+                    /* Get all dealing repair docs. */
+                    var keepFlows2 = _context.BMEDKeepFlows.Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
+                    (f, k) => new
+                    {
+                        keep = k,
+                        flow = f
+                    }).ToList();
+                    /* search all KeepDocs which flowCls is in engineer. */
+                    keepFlows2 = keepFlows2.GroupBy(f => f.flow.DocId)
+                                           .Where(group => group.Last().flow.Status == "?" || group.Last().flow.Status == "2")
+                                           .Where(group => group.Last().flow.Cls.Contains("工程師"))
+                                           .Where(group => group.Last().flow.UserId != 0).Select(group => group.Last()).ToList();
+                    //keepFlows2 = keepFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
+                    if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
+                    {
+                        keepFlows2 = keepFlows2.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                    }
+
+                    keepFlows2.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
                     (r, a) => new
                     {
                         keep = r.keep,

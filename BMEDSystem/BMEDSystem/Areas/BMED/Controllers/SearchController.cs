@@ -233,6 +233,17 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
+            /* 擷取所有人員 */
+            List<SelectListItem> userList = new List<SelectListItem>();
+            foreach (var item in _context.AppUsers.ToList())
+            {
+                userList.Add(new SelectListItem
+                {
+                    Text = item.FullName,
+                    Value = item.Id.ToString()
+                });
+            }
+            ViewData["BMEDUsers"] = new SelectList(userList, "Value", "Text");
 
             QryKeepListData data = new QryKeepListData();
 
@@ -604,6 +615,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyEngCode = qdata.BMEDKqtyEngCode;
             string qtyTicketNo = qdata.BMEDKqtyTicketNo;
             string qtyVendor = qdata.BMEDKqtyVendor;
+            string qtyClsUser = qdata.BMEDKqtyClsUser;
 
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
@@ -720,6 +732,11 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status != "3")
                                                            .Select(group => group.Last()).ToList(); ;
+            }
+            if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
+            {
+                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().UserId == Convert.ToInt32(qtyClsUser))
+                                     .Select(group => group.Last()).ToList();
             }
 
             /* If no search result. */

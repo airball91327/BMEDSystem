@@ -30,7 +30,7 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('.BMEDcombobox').combobox();
-        $("#BMEDrepSearchForm").submit();
+        //$("#BMEDrepSearchForm").submit();
         /* Only first visit the page, will submit the form. */
         var count = 0;
         $('.nav-tabs a[href="#menu1"]').on('shown.bs.tab', function (event) {
@@ -112,7 +112,8 @@
       'icon':'loading',
       'duration':0
       })"
-      data-ajax-complete="$.Toast.hideToast()">
+      data-ajax-complete="$.Toast.hideToast()"
+      data-ajax-failure="onFailed">
 
     <h4>查詢條件 - 個人案件</h4>
 

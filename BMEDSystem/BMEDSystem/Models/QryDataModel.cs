@@ -28,6 +28,7 @@ namespace EDIS.Models
         public string BMEDKqtyEngCode { get; set; }
         public string BMEDKqtyTicketNo { get; set; }
         public string BMEDKqtyVendor { get; set; }
+        public string BMEDKqtyClsUser { get; set; }
     }
 
     public class QryRepListData
