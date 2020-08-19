@@ -28,6 +28,7 @@ namespace EDIS.Components.BMEDRepair
             FlowlistItem.Add(new SelectListItem { Text = "待簽核", Value = "待簽核" });
             FlowlistItem.Add(new SelectListItem { Text = "流程中", Value = "流程中" });
             FlowlistItem.Add(new SelectListItem { Text = "已結案", Value = "已結案" });
+            FlowlistItem.Add(new SelectListItem { Text = "請選擇", Value = "請選擇" });
             ViewData["BMEDFlowType"] = new SelectList(FlowlistItem, "Value", "Text", "待簽核");
 
             /* 成本中心 & 申請部門的下拉選單資料 */

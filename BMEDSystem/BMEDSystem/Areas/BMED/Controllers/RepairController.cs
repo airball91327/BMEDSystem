@@ -77,7 +77,7 @@ namespace EDIS.Areas.BMED.Controllers
             return View();
         }
 
-        // POST: BMED/Keep/Index
+        // POST: BMED/Repair/Index
         [HttpPost]
         public IActionResult Index(QryRepListData qdata)
         {
@@ -100,6 +100,10 @@ namespace EDIS.Areas.BMED.Controllers
             if (qtyEngCode != null)
             {
                 searchAllDoc = true;
+            }
+            if (searchAllDoc == true)
+            {
+                ftype = "其他工程師案件";
             }
 
             DateTime applyDateFrom = DateTime.Now;
@@ -419,6 +423,108 @@ namespace EDIS.Areas.BMED.Controllers
                         repdata = j.repair
                     }));
                     break;
+                /* 不分流程的所有案件 */
+                case "請選擇":
+                    /* Get all dealing repair docs. */
+                    _context.BMEDRepairFlows.Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
+                    (f, r) => new
+                    {
+                        repair = r,
+                        flow = f
+                    })
+                    .Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => rv.Add(new RepairListVModel
+                    {
+                        DocType = "醫工請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                        DealDes = j.repdtl.DealDes,
+                        Cost = j.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
+                        EndDate = j.repdtl.EndDate,
+                        IsCharged = j.repdtl.IsCharged,
+                        repdata = j.repair
+                    }));
+                    break;
+                /* 其他工程師的案件 */
+                case "其他工程師案件":
+                    /* Get all dealing repair docs. */
+                    var repairFlows2 = _context.BMEDRepairFlows.Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
+                    (f, r) => new
+                    {
+                        repair = r,
+                        flow = f
+                    }).ToList();
+                    /* search all RepairDocs which flowCls is in engineer. */
+                    repairFlows2 = repairFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
+                    if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
+                    {
+                        repairFlows2 = repairFlows2.Where(f => f.repair.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                    }
+                    repairFlows2.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => rv.Add(new RepairListVModel
+                    {
+                        DocType = "醫工請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                        DealDes = j.repdtl.DealDes,
+                        Cost = j.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
+                        EndDate = j.repdtl.EndDate,
+                        IsCharged = j.repdtl.IsCharged,
+                        repdata = j.repair
+                    }));
+                    break;
             };
 
             /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
@@ -481,7 +587,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 rv = rv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
-
+            //
             return View("List", rv);
         }
         [Authorize]

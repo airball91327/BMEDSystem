@@ -126,6 +126,16 @@
                     <input asp-for="BMEDqtyVendor" class="form-control-s" />
                 </div>
                 <div class="form-group">
+                    <label for="BMEDqtyClsUser" class="control-title">目前關卡人員</label>
+                    <select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDUsers"] as SelectList" class="form-control combobox">
+                        <option value="">請選擇</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
                     <label for="BMEDqtyTROBLEDES" class="control-title">故障描述<br />(關鍵字)</label>
                     <input asp-for="BMEDqtyTROUBLEDES" class="form-control" />
                 </div>

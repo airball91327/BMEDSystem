@@ -16,8 +16,9 @@
             }
         });
     }
-    else
-        alert("儲存成功!");
+    else {
+        //alert("儲存成功!");
+    }
 }
 
 $(function () {

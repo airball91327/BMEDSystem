@@ -120,6 +120,17 @@ namespace EDIS.Areas.BMED.Controllers
                 });
             }
             ViewData["DptMembers"] = new SelectList(dptMemberList, "Value", "Text");
+            /* 擷取所有人員 */
+            List<SelectListItem> userList = new List<SelectListItem>();
+            foreach (var item in _context.AppUsers.ToList())
+            {
+                userList.Add(new SelectListItem
+                {
+                    Text = item.FullName,
+                    Value = item.Id.ToString()
+                });
+            }
+            ViewData["BMEDUsers"] = new SelectList(userList, "Value", "Text");
             QryRepListData data = new QryRepListData();
 
             return View(data);
@@ -324,6 +335,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyVendor = qdata.BMEDqtyVendor;
             string qtyTroubledes = qdata.BMEDqtyTROUBLEDES;
             string qtyUserId = qdata.BMEDqtyUserId;
+            string qtyClsUser = qdata.BMEDqtyClsUser;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -454,6 +466,11 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyIsCharged))    //有無費用
             {
                 repairDtls = repairDtls.Where(r => r.IsCharged == qtyIsCharged).ToList();
+            }
+            if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
+            {
+                repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().UserId == Convert.ToInt32(qtyClsUser))
+                                         .Select(group => group.Last()).ToList();
             }
 
             /* If no search result. */

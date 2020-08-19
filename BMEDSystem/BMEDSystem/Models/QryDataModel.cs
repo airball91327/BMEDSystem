@@ -53,5 +53,6 @@ namespace EDIS.Models
         public string BMEDqtyEngCode { get; set; }
         public string BMEDqtyTicketNo { get; set; }
         public string BMEDqtyVendor { get; set; }
+        public string BMEDqtyClsUser { get; set; }
     }
 }

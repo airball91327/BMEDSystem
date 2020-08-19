@@ -1,7 +1,12 @@
 ﻿@model EDIS.Models.QryRepListData
 @using EDIS.Models.Identity
+@using EDIS.Models
 
 @inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+@{
+    var user = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+}
 <link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
 <script src="~/js/bootstrap-combobox.js"></script>
 
@@ -178,7 +183,7 @@
                     <label for="BMEDqtyVendor" class="control-title">廠商(關鍵字)</label>
                     <input asp-for="BMEDqtyVendor" class="form-control-s" />
                 </div>
-                @if (UserManager.IsInRole(User, "MedEngineer") == true) /* Only MedEngineer can search all engineer docs. */
+                @if (user.DptId == "8420" || user.DptId == "7084") /* Only MedEngineer can search all engineer docs. */
                 {
                     <div class="form-group">
                         <label class="control-title">查詢其他<br />工程師案件</label>
