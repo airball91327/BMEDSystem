@@ -50,12 +50,14 @@ namespace EDIS.Areas.BMED.Components.KeepCost
             cost.SeqNo = seqno + 1;
             KeepFlowModel rf = _context.BMEDKeepFlows.Where(f => f.DocId == id)
                                                      .Where(f => f.Status == "?").FirstOrDefault();
-            var isEngineer = _context.UsersInRoles.Where(u => u.AppRoles.RoleName == "MedEngineer" &&
-                                                              u.UserId == ur.Id).FirstOrDefault();
+            var isEngineer = false;
+            if (ur.DptId == "8420" || ur.DptId == "7084")
+            {
+                isEngineer = true;
+            }
             if (!(rf.Cls.Contains("工程師") && rf.UserId == ur.Id))    /* 流程 => 其他 */
             {
-
-                if (rf.Cls.Contains("工程師") && isEngineer != null)   /* 流程 => 工程師，Login User => 非負責之工程師 */
+                if (rf.Cls.Contains("工程師") && isEngineer == true)   /* 流程 => 工程師，Login User => 非負責之工程師 */
                 {
                     return View(cost);
                 }

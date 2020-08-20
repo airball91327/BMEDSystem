@@ -226,7 +226,7 @@
 <div id="BMEDpnlREPLIST"></div>
 
 
-@if (UserManager.IsInRole(User, "MedAssetMgr"))
+@*@if (UserManager.IsInRole(User, "MedAssetMgr"))
 {
     <hr />
     <h4>未分派案件</h4>
@@ -252,4 +252,4 @@ else if (UserManager.IsInRole(User, "Admin"))
     <div id="unsignListDiv">
         @await Component.InvokeAsync("BMEDRepResign", new { role = "Admin" })
     </div>
-}
+}*@
