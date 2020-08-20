@@ -1,4 +1,6 @@
 ﻿@model EDIS.Models.UnsignCounts
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
 @{
     Layout = "~/Views/Shared/_PassedLayout.cshtml";
 }
@@ -17,6 +19,11 @@
     <li><a data-toggle="tab" href="#menu2">保養 <span class="badge" id="BMEDkeepCount">@Model.KeepCount</span></a></li>
     <li><a data-toggle="tab" href="#menu3">驗收 <span class="badge" id="BMEDdelivCount">@Model.DeliveryCount</span></a></li>
     <li><a data-toggle="tab" href="#menu4">採購評估 <span class="badge" id="BMEDbuyCount">@Model.BuyEvalateCount</span></a></li>
+    @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr") ||
+       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
+    {
+        <li><a data-toggle="tab" href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
+    }
 </ul>
 
 <div class="tab-content">
@@ -39,6 +46,11 @@
     <div id="menu4" class="tab-pane fade">
         <div>
             @await Component.InvokeAsync("BuyEvaluateIndex")
+        </div>
+    </div>
+    <div id="menu5" class="tab-pane fade">
+        <div>
+            @await Component.InvokeAsync("RepResignIndex")
         </div>
     </div>
 

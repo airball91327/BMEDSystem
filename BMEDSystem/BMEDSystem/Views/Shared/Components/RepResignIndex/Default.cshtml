@@ -1,0 +1,53 @@
+﻿
+@using EDIS.Models.Identity
+@using EDIS.Models
+
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+@{
+    string role = null;
+    var user = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+    if (UserManager.IsInRole(User, "MedAssetMgr"))
+    {
+        role = "MedAssetMgr";
+    }
+    else if (UserManager.IsInRole(User, "MedBranchMgr"))
+    {
+        role = "MedBranchMgr";
+    }
+    else if (UserManager.IsInRole(User, "Admin"))
+    {
+        role = "Admin";
+    }
+}
+
+<script type="text/javascript">
+    $(function () {
+        /* Only first visit the page, will submit the form. */
+        var count = 0;
+        $('.nav-tabs a[href="#menu5"]').on('shown.bs.tab', function (event) {
+            if (count == 0) {
+                $("#RepResignForm").submit();
+                count++;
+            };
+        });
+    });
+</script>
+
+<form asp-controller="Repair" asp-action="GetResignList" asp-area="BMED" data-ajax="true"
+      data-ajax-update="#pnlUnSignList" data-ajax-method="GET" id="RepResignForm"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'查詢中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-complete="$.Toast.hideToast()"
+      data-ajax-failure="onFailed">
+
+    <input name="role" type="text" value="@role" hidden />
+</form>
+
+<h4>未分派案件</h4>
+<br />
+<div id="pnlUnSignList"></div>
+

@@ -185,6 +185,25 @@ namespace EDIS.Areas.BMED.Controllers
             return PartialView(qryVendor);
         }
 
+        [HttpGet]
+        public JsonResult GetVendorByKeyName(string keyWord)
+        {
+            List<SelectListItem> items = new List<SelectListItem>();
+            if (!string.IsNullOrEmpty(keyWord))
+            {
+                _context.BMEDVendors.Where(v => v.VendorName.Contains(keyWord.Trim()) ||
+                                                v.UniteNo.Contains(keyWord.Trim())).ToList()
+                                    .ForEach(v => {
+                                        items.Add(new SelectListItem()
+                                        {
+                                            Text = v.VendorName + "(" + v.UniteNo + ")",
+                                            Value = v.VendorId.ToString()
+                                        });
+                                    });
+            }
+            return Json(items);
+        }
+
         private bool VendorModelExists(int id)
         {
             return _context.BMEDVendors.Any(e => e.VendorId == id);

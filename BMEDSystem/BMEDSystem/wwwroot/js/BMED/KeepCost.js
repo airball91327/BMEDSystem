@@ -112,13 +112,14 @@ $(function () {
 
     });
 
+    /* Search vendors on modal, and insert value to text field. */
     $("#modalVENDOR").on("hidden.bs.modal", function () {
         var vendorName = $("#Vno option:selected").text();
         var vendorId = $("#Vno option:selected").val();
 
         /* includes is not support in IE, so need to use indexOf. */
-        if ($("#Vno option:selected").text() == "請選擇" || $("#Vno option:selected").text() == "查無廠商" ||
-            $("#Vno option:selected").text().indexOf("請選擇廠商") != -1) {
+        if ($("#Vno option:selected").text() === "請選擇" || $("#Vno option:selected").text() === "查無廠商" ||
+            $("#Vno option:selected").text().indexOf("請選擇廠商") !== -1) {
             $("#VendorName").val("");
             $("#VendorId").val("");
         }
@@ -126,6 +127,38 @@ $(function () {
             $("#VendorName").val(vendorName);
             $("#VendorId").val(vendorId);
         }
+    });
+
+    /* Get Vendors by query string. */
+    $("#btnQryVendor").click(function () {
+        var queryStr = $("#keyWordVendor").val();
+        $.ajax({
+            url: '../../Vendor/GetVendorByKeyName',
+            type: "GET",
+            data: { keyWord: queryStr },
+            success: function (data) {
+                //console.log(data);
+                var select = $('#VendorId');
+                $('option', select).remove();
+                if (data.length === 0) {
+                    $("#QryVendorErrorMsg").html("查無資料!");
+                }
+                else if (data.length === 1) {
+                    select.addItems(data);
+                    $('#VendorId').trigger("change");
+                    $("#QryVendorErrorMsg").html("");
+                }
+                else {
+                    select.append($('<option selected="selected" disabled="disabled"></option>').text("請選擇").val(""));
+                    select.addItems(data);
+                    $("#QryVendorErrorMsg").html("");
+                }
+            }
+        });
+    });
+    $("#VendorId").change(function () {
+        var vendorName = $('#VendorId option:selected').text().split("(", 1);
+        $("#VendorName").val(vendorName);
     });
 
     /* Default settings.*/

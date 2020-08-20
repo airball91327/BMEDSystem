@@ -553,6 +553,11 @@ namespace EDIS.Areas.BMED.Controllers
                         item.Brand = asset.Brand;
                         item.Type = asset.Type;
                     }
+                    else
+                    {
+                        item.AssetNo = item.repdata.AssetNo;
+                        item.AssetName = item.repdata.AssetName;
+                    }
                 }
                 else
                 {
@@ -650,6 +655,18 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             ViewData["AllEngs"] = new SelectList(list, "Value", "Text");
+            /* Get default assets by user's dpt. */
+            var dptAssets = _context.BMEDAssets.Where(a => a.AccDpt == ur.DptId).ToList();
+            List<SelectListItem> list2 = new List<SelectListItem>();
+            foreach (var item in dptAssets)
+            {
+                li = new SelectListItem();
+                li.Text = item.Cname + "(" + item.AssetNo + ")";
+                li.Value = item.AssetNo;
+                list2.Add(li);
+            }
+            ViewData["DefaultAssets"] = new SelectList(list2, "Value", "Text");
+            //
             repair.CheckerId = ur.Id;
             repair.Loc = "總院";
 
@@ -751,7 +768,7 @@ namespace EDIS.Areas.BMED.Controllers
                     mailToUser = _context.AppUsers.Find(flow.UserId);
                     mail.to = new System.Net.Mail.MailAddress(mailToUser.Email); //u.Email
                     //mail.cc = new System.Net.Mail.MailAddress("344027@cch.org.tw");
-                    mail.message.Subject = "醫工工務智能保修系統[醫工請修案]：設備名稱： " + repair.AssetName;
+                    mail.message.Subject = "醫工智能保修系統[請修案]：設備名稱： " + repair.AssetName;
                     body += "<p>表單編號：" + repair.DocId + "</p>";
                     body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
                     body += "<p>申請人：" + repair.UserName + "</p>";
@@ -760,7 +777,7 @@ namespace EDIS.Areas.BMED.Controllers
                     body += "<p>故障描述：" + repair.TroubleDes + "</p>";
                     //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
                     body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/EDIS/Account/Login'" + "?docId=" + repair.DocId + "&dealType=BMEDRepEdit" + ">處理案件</a></p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?docId=" + repair.DocId + "&dealType=BMEDRepEdit" + ">處理案件</a></p>";
                     body += "<br/>";
                     body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                     body += "<br/>";
@@ -917,7 +934,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         [HttpPost]
-        public IActionResult ResignEng(List<RepairListVModel> data, string BMEDassignEngId)
+        public IActionResult ResignEng(List<RepairListVModel> data, string BMEDassignEngId, string role)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             int assignEngId = Convert.ToInt32(BMEDassignEngId);
@@ -953,7 +970,7 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.SaveChanges();
                 }
             }
-             return View();
+             return RedirectToAction("GetResignList", new { role = role });
         }
 
         [HttpPost]
@@ -1016,7 +1033,10 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     var dptid = asset.DelivDpt;
                     var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
-                    engineer = _context.AppUsers.Find(eid.EngId);
+                    if (eid != null)
+                    {
+                        engineer = _context.AppUsers.Find(eid.EngId);
+                    }
                     if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
                     {
                         var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
@@ -1824,6 +1844,92 @@ namespace EDIS.Areas.BMED.Controllers
                 var eng = new { EngId = tempEng.EngId, UserName = tempEng.UserName, FullName = tempEng.FullName };
                 return Json(eng);
             }
+        }
+
+        //[HttpPost]
+        public IActionResult GetResignList(string role)
+        {
+            /* 處理工程師查詢的下拉選單 */
+            var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
+            List<SelectListItem> listItem1 = new List<SelectListItem>();
+            foreach (string l in engs)
+            {
+                var u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
+                if (u != null)
+                {
+                    listItem1.Add(new SelectListItem
+                    {
+                        Text = u.FullName + "(" + u.UserName + ")",
+                        Value = u.Id.ToString()
+                    });
+                }
+            }
+            ViewData["BMEDassignEngId"] = new SelectList(listItem1, "Value", "Text");
+
+            /* 所有尚未指派工程師的案件 */
+            var rps = _context.BMEDRepairs.Where(r => r.EngId == 0);
+
+            List<RepairListVModel> rv = new List<RepairListVModel>();
+            rps.Join(_context.BMEDRepairDtls, r => r.DocId, d => d.DocId,
+                    (r, d) => new
+                    {
+                        repair = r,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    })
+                    .ToList()
+                    .ForEach(j => rv.Add(new RepairListVModel
+                    {
+                        DocType = "醫工請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        repdata = j.repair
+                    }));
+
+            /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
+            foreach (var item in rv)
+            {
+                if (!string.IsNullOrEmpty(item.repdata.AssetNo))
+                {
+                    var asset = _context.BMEDAssets.Where(a => a.AssetNo == item.repdata.AssetNo).FirstOrDefault();
+                    if (asset != null)
+                    {
+                        item.AssetNo = asset.AssetNo;
+                        item.AssetName = asset.Cname;
+                        item.Brand = asset.Brand;
+                        item.Type = asset.Type;
+                    }
+                }
+                else
+                {
+                    item.AssetName = item.repdata.AssetName;
+                }
+            }
+            //
+            if (role == "MedAssetMgr")
+            {
+                rv = rv.Where(r => r.repdata.Loc == "總院").ToList();
+            }
+            else if (role == "MedBranchMgr")
+            {
+                rv = rv.Where(r => r.repdata.Loc == "分院").ToList();
+            }
+            //
+            ViewBag.Role = role;
+            return PartialView(rv);
         }
 
         protected override void Dispose(bool disposing)

@@ -108,7 +108,10 @@ namespace EDIS.Areas.BMED.Controllers
                     var tempAsset = _context.BMEDAssets.Where(a => a.AssetNo == repairDtl.AssetNo).FirstOrDefault();
                     if (tempAsset != null)
                     {
-                        repairModel.AssetName = tempAsset.Cname;
+                        if (tempAsset.AssetNo != "99999")
+                        {
+                            repairModel.AssetName = tempAsset.Cname;
+                        }
                     }
                     _context.Entry(repairModel).State = EntityState.Modified;
 
