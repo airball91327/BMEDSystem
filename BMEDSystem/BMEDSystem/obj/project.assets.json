@@ -16115,24 +16115,25 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Inori\\.nuget\\packages\\": {},
-    "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
+    "C:\\Users\\mac\\.nuget\\packages\\": {},
+    "C:\\Microsoft\\Xamarin\\NuGet\\": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectUniqueName": "X:\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "projectName": "EDIS",
-      "projectPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-      "packagesPath": "C:\\Users\\Inori\\.nuget\\packages\\",
-      "outputPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+      "projectPath": "X:\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
+      "outputPath": "X:\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
-        "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+        "C:\\Microsoft\\Xamarin\\NuGet\\"
       ],
       "configFilePaths": [
-        "C:\\Users\\Inori\\AppData\\Roaming\\NuGet\\NuGet.Config",
-        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+        "C:\\Users\\mac\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+        "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
       ],
       "originalTargetFrameworks": [
         "netcoreapp2.1"
@@ -16183,6 +16184,7 @@
             "version": "[2.1.14, )"
           },
           "Microsoft.NETCore.App": {
+            "suppressParent": "All",
             "target": "Package",
             "version": "[2.1.0, )",
             "autoReferenced": true
@@ -16229,10 +16231,16 @@
           }
         },
         "imports": [
-          "net461"
+          "net461",
+          "net462",
+          "net47",
+          "net471",
+          "net472",
+          "net48"
         ],
         "assetTargetFallback": true,
-        "warn": true
+        "warn": true,
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
       }
     }
   },
@@ -16241,7 +16249,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "已使用 '.NETFramework,Version=v4.6.1' 而非專案目標架構 '.NETCoreApp,Version=v2.1' 還原了套件 'Zen.Barcode.Rendering.Framework 3.1.10729.1'。此套件與您的專案並非完全相容。",
+      "message": "已使用 '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' 而非專案目標架構 '.NETCoreApp,Version=v2.1' 還原了套件 'Zen.Barcode.Rendering.Framework 3.1.10729.1'。此套件與您的專案並非完全相容。",
       "libraryId": "Zen.Barcode.Rendering.Framework",
       "targetGraphs": [
         ".NETCoreApp,Version=v2.1"
@@ -16251,7 +16259,7 @@
       "code": "NU1701",
       "level": "Warning",
       "warningLevel": 1,
-      "message": "已使用 '.NETFramework,Version=v4.6.1' 而非專案目標架構 '.NETCoreApp,Version=v2.1' 還原了套件 'Zen.Barcode.Rendering.Framework.Web 3.1.10729.1'。此套件與您的專案並非完全相容。",
+      "message": "已使用 '.NETFramework,Version=v4.6.1, .NETFramework,Version=v4.6.2, .NETFramework,Version=v4.7, .NETFramework,Version=v4.7.1, .NETFramework,Version=v4.7.2, .NETFramework,Version=v4.8' 而非專案目標架構 '.NETCoreApp,Version=v2.1' 還原了套件 'Zen.Barcode.Rendering.Framework.Web 3.1.10729.1'。此套件與您的專案並非完全相容。",
       "libraryId": "Zen.Barcode.Rendering.Framework.Web",
       "targetGraphs": [
         ".NETCoreApp,Version=v2.1"

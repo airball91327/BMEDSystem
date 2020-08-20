@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp2.1</TargetFramework>
     <AssemblyName>EDIS</AssemblyName>
     <RootNamespace>EDIS</RootNamespace>
+    <UserSecretsId>1195d4b1-656f-4891-8b40-b415b41b4691</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -42,7 +43,6 @@
     <Folder Include="Areas\BMED\Repositories\" />
     <Folder Include="Areas\BMED\Views\Repair\Components\Preview\" />
     <Folder Include="Components\" />
-    <Folder Include="Extensions\" />
     <Folder Include="Fliters\" />
     <Folder Include="Services\" />
     <Folder Include="wwwroot\Files\BMED\Asset\" />

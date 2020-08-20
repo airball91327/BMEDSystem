@@ -99,7 +99,7 @@ namespace EDIS.Areas.BMED.Controllers
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
 
                     string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    string path = Path.Combine(@"D:\" + s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
                     // Upload files.
                     using (var stream = new FileStream(path, FileMode.Create))
@@ -211,7 +211,7 @@ namespace EDIS.Areas.BMED.Controllers
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
 
                     string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string path = Path.Combine(WebRootPath + s + attainFile.DocId + "_"
+                    string path = Path.Combine(@"D:\" + s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
                     // Upload files.
                     using (var stream = new FileStream(path, FileMode.Create))
@@ -273,7 +273,7 @@ namespace EDIS.Areas.BMED.Controllers
         public IActionResult Delete(string id = null, int seq = 0, string typ = null)
         {
             string WebRootPath = _hostingEnvironment.WebRootPath;
-            string path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+            string path1 = Path.Combine(@"D:\" + "/Files/BMED/");
 
             AttainFileModel attainfiles = _context.BMEDAttainFiles.Find(typ, id, seq);
             if (attainfiles != null)
@@ -309,7 +309,7 @@ namespace EDIS.Areas.BMED.Controllers
         public IActionResult Delete3(string id = null, int seq = 0, string typ = null)
         {
             string WebRootPath = _hostingEnvironment.WebRootPath;
-            string path1 = Path.Combine(WebRootPath + "/Files/BMED/");
+            string path1 = Path.Combine(@"D:\" + "/Files/BMED/");
 
             AttainFileModel attainfiles = _context.BMEDAttainFiles.Find(typ, id, seq);
             if (attainfiles != null)
@@ -409,7 +409,7 @@ namespace EDIS.Areas.BMED.Controllers
             else
                 attainFile.SeqNo = Convert.ToInt32(i + 1);
 
-            string path = Path.Combine(WebRootPath + s, attainFile.DocId + "_"
+            string path = Path.Combine(@"D:\" + s, attainFile.DocId + "_"
                 + attainFile.SeqNo.ToString() + Path.GetExtension(Request.Form.Files[0].FileName));
             string filelink = attainFile.DocId + "_"
                 + attainFile.SeqNo.ToString() + Path.GetExtension(Request.Form.Files[0].FileName);
@@ -493,7 +493,7 @@ namespace EDIS.Areas.BMED.Controllers
         {
             string WebRootPath = _hostingEnvironment.WebRootPath;
             string s2 = "/Files/BMED/";
-            string filepath = Path.Combine(WebRootPath + s2, attainfile.FileLink);
+            string filepath = Path.Combine(@"D:\" + s2, attainfile.FileLink);
 
             string s = "";
             BudgetModel bg;

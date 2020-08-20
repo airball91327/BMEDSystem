@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EDIS.Areas.BMED.Repositories;
+using EDIS.Extensions;
 using EDIS.Fliters;
 using EDIS.Models;
 using EDIS.Models.Identity;
@@ -94,6 +95,7 @@ namespace EDIS
             {
                 app.UseExceptionHandler("/Home/Error");
             }
+            app.UseVirtualDirectory("Files", @"D:\Files");
             app.UseStaticFiles();
             //app.UseStaticFiles(new StaticFileOptions
             //{

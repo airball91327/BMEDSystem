@@ -1,5 +1,5 @@
 ﻿function showMsg(data) {
-    alert("儲存成功!");
+    //alert("儲存成功!");
 }
 
 var onFailed = function (data) {

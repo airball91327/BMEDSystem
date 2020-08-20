@@ -1,10 +1,5 @@
 ﻿function showMsgAndPrint() {
-    alert("儲存成功!");
-    var stockType = $('input:radio[name="StockType"]:checked').val();
-    /* If stock type is 庫存, print before submit. */
-    //if (stockType == 0) {
-    //    window.printStockDtl();
-    //}
+    //alert("儲存成功!");
 }
 
 var onFailed = function (data) {
