@@ -46,6 +46,7 @@ namespace EDIS.Areas.BMED.Components.KeepCost
             int seqno = _context.BMEDKeepCosts.Where(c => c.DocId == id)
                                               .Select(c => c.SeqNo).DefaultIfEmpty().Max();
             cost.DocId = id;
+            cost.Qty = 1;   //Default value.
             cost.SeqNo = seqno + 1;
             KeepFlowModel rf = _context.BMEDKeepFlows.Where(f => f.DocId == id)
                                                      .Where(f => f.Status == "?").FirstOrDefault();

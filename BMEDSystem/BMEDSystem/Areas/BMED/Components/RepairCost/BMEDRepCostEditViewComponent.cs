@@ -50,6 +50,7 @@ namespace EDIS.Areas.BMED.Components.RepairCost
             int seqno = _context.BMEDRepairCosts.Where(c => c.DocId == id)
                                                 .Select(c => c.SeqNo).DefaultIfEmpty().Max();
             cost.DocId = id;
+            cost.Qty = 1;   //Default value.
             cost.SeqNo = seqno + 1;
             RepairFlowModel rf = _context.BMEDRepairFlows.Where(f => f.DocId == id)
                                                          .Where(f => f.Status == "?").FirstOrDefault();
