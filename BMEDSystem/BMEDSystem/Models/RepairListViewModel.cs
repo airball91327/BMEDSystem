@@ -62,5 +62,7 @@ namespace EDIS.Models
         public RepairModel repdata { get; set; }
         public int? ExFlowUid { get; set; }
         public string ExFlowCls { get; set; }
+        [Display(Name = "到件時間")]
+        public DateTime? FlowRtt { get; set; }
     }
 }

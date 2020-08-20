@@ -426,6 +426,7 @@ namespace EDIS.Areas.BMED.Controllers
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
                         IsCharged = j.repdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         repdata = j.repair
                     }));
                     break;
@@ -535,6 +536,7 @@ namespace EDIS.Areas.BMED.Controllers
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
                         IsCharged = j.repdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         repdata = j.repair
                     }));
                     break;
@@ -591,7 +593,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 else
                 {
-                    rv = rv.OrderByDescending(r => r.ApplyDate).ThenByDescending(r => r.DocId).ToList();
+                    rv = rv.OrderBy(r => r.FlowRtt).ThenByDescending(r => r.DocId).ToList();
                 }
             }
 
