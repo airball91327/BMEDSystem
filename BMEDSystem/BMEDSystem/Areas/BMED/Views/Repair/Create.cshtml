@@ -113,8 +113,8 @@
                         <label asp-for="AssetNo" class="control-title"></label>
                         <input type="text" placeholder="輸入財編或關鍵字查詢" class="form-control" id="AssetQry" />
                         <button type="button" class="btn btn-default" id="AssetQryBtn">查詢</button>
-                        <select asp-for="AssetNo" class="form-control" id="AssetNo">
-                            <option disabled selected>無</option>
+                        <select asp-for="AssetNo" asp-items="@ViewData["DefaultAssets"] as SelectList" class="form-control" id="AssetNo">
+                            <option disabled selected>請選擇</option>
                         </select>
                         <span asp-validation-for="AssetNo" class="text-danger"></span>
                         <span style="color:red" id="AssetNoErrorMsg"></span>
@@ -125,7 +125,7 @@
                 <div class=form-inline>
                     <div class="form-group">
                         <label class="control-title"></label>
-                        <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" value="@Model.AccDpt" />
+                        <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" />
                     </div>
                 </div>
             </div>

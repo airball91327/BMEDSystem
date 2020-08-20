@@ -178,14 +178,14 @@ namespace EDIS.Areas.BMED.Controllers
                     u = _context.AppUsers.Find(flow.UserId);
                     mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
                                                                         //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
-                    mail.message.Subject = "醫工工務智能保修系統[醫工保養案]：設備名稱： " + keep.AssetName;
+                    mail.message.Subject = "醫工智能保修系統[保養案]：設備名稱： " + keep.AssetName;
                     body += "<p>表單編號：" + keep.DocId + "</p>";
                     body += "<p>送單日期：" + keep.SentDate.Value.ToString("yyyy/MM/dd") + "</p>";
                     body += "<p>申請人：" + keep.UserName + "</p>";
                     body += "<p>財產編號：" + keep.AssetNo + "</p>";
                     body += "<p>設備名稱：" + keep.AssetName + "</p>";
                     body += "<p>放置地點：" + keep.PlaceLoc + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/EDIS/Account/Login'" + "?docId=" + keep.DocId + "&dealType=BMEDKeepEdit" + ">處理案件</a></p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?docId=" + keep.DocId + "&dealType=BMEDKeepEdit" + ">處理案件</a></p>";
                     body += "<br/>";
                     body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                     body += "<br/>";

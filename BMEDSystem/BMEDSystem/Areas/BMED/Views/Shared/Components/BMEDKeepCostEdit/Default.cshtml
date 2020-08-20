@@ -58,13 +58,17 @@
             </div>
         </div>
         <div id="pnlVENDOR" class="row">
-            @Html.HiddenFor(model => model.VendorId)
             <div class=form-inline>
                 <div class="form-group">
                     <label asp-for="VendorName" class="control-title"></label>
-                    <input asp-for="VendorName" class="form-control" />
-                    <input type="button" value="選擇" class="btn btn-default" data-toggle="modal" data-target="#modalVENDOR" />
-                    <span asp-validation-for="VendorName" class="text-danger"></span>
+                    <input type="text" placeholder="輸入統編或關鍵字查詢" class="form-control" id="keyWordVendor" />
+                    <button type="button" class="btn btn-default" id="btnQryVendor">查詢</button>
+                    <select asp-for="VendorId" class="form-control" id="VendorId">
+                        <option disabled selected>請選擇</option>
+                    </select>
+                    <input asp-for="VendorName" hidden />
+                    <span asp-validation-for="VendorId" class="text-danger"></span>
+                    <span style="color:red" id="QryVendorErrorMsg"></span>
                 </div>
             </div>
         </div>
@@ -183,7 +187,7 @@
 </div>
 
 <!-- 廠商 Modal -->
-<div id="modalVENDOR" class="modal fade" role="dialog">
+@*<div id="modalVENDOR" class="modal fade" role="dialog">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
@@ -198,4 +202,4 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
