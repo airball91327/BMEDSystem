@@ -2626,3 +2626,5 @@ X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.pdb
 X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.genruntimeconfig.cache
 X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csproj.CopyComplete
 X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
+X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Repair\GetResignList.cshtml.g.cs
+X:\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Views\Shared\Components\RepResignIndex\Default.cshtml.g.cs
