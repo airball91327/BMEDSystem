@@ -1,4 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.RepairSearchListVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.RepairSearchListVModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
 @using EDIS.Models.Identity
@@ -19,42 +22,42 @@ else
         <tr>
             <th></th>
             <th>
-                @Html.DisplayNameFor(model => model.RepType)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().RepType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DocId)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
                 <br />
-                @Html.DisplayNameFor(model => model.ApplyDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().ApplyDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlaceLoc)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
             </th>
             <th style="width: 300px;">
-                @Html.DisplayNameFor(model => model.TroubleDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealState)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealState)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Days)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
             </th>
             <th>
                 文件狀態
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FlowUidName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().FlowUidName)
             </th>
         </tr>
         @foreach (var item in Model)
@@ -137,3 +140,8 @@ else
 
     </table>
 }
+
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("GetRepQryList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

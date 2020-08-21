@@ -14,6 +14,7 @@ using System.Net.Http.Headers;
 using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
+using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -25,6 +26,7 @@ namespace EDIS.Areas.BMED.Controllers
         private readonly IRepository<AppUserModel, int> _userRepo;
         private readonly CustomUserManager userManager;
         private readonly CustomRoleManager roleManager;
+        private int pageSize = 50;
 
         public SearchController(ApplicationDbContext context,
                                 IRepository<AppUserModel, int> userRepo,
@@ -328,7 +330,7 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         // POST: BMED/Search/GetRepQryList
         [HttpPost]
-        public IActionResult GetRepQryList(QryRepListData qdata)
+        public IActionResult GetRepQryList(QryRepListData qdata, int page = 1)
         {
             string docid = qdata.BMEDqtyDOCID;
             string ano = qdata.BMEDqtyASSETNO;
@@ -587,8 +589,11 @@ namespace EDIS.Areas.BMED.Controllers
                     rv = rv.OrderByDescending(r => r.ApplyDate).ThenByDescending(r => r.DocId).ToList();
                 }
             }
-
-            return View("RepQryList", rv);
+            //
+            if (rv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView("RepQryList", rv.ToPagedList(1, pageSize));
+            return PartialView("RepQryList", rv.ToPagedList(page, pageSize));
+            //return View("RepQryList", rv);
         }
 
         /// <summary>
@@ -598,7 +603,7 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         // POST: BMED/Search/GetKeepQryList
         [HttpPost]
-        public IActionResult GetKeepQryList(QryKeepListData qdata)
+        public IActionResult GetKeepQryList(QryKeepListData qdata, int page = 1)
         {
             string docid = qdata.BMEDKqtyDOCID;
             string ano = qdata.BMEDKqtyASSETNO;
@@ -852,8 +857,11 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
-
-            return View("KeepQryList", kv);
+            //
+            if (kv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView("KeepQryList", kv.ToPagedList(1, pageSize));
+            return PartialView("KeepQryList", kv.ToPagedList(page, pageSize));
+            //return View("KeepQryList", kv);
         }
 
         /// <summary>

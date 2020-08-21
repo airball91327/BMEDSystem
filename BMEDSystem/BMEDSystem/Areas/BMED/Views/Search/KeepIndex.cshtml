@@ -10,8 +10,48 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+        $('#keepSearchForm').submit(function () {
+            fetchPage(1);
+            event.preventDefault();
+            return false;
+        });
+        //
         $('.combobox').combobox();
     });
+    // Use ajax to fetch page.
+    var fetchPage = function (page) {
+        var pagedPartialUrl = '@Url.Action("GetKeepQryList", "Search", new { Area = "BMED" })';
+        var s = $('#keepSearchForm').serialize();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlKEEPLIST').html(data);
+
+                $('#pnlKEEPLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPage(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            }
+        });
+    };
 </script>
 
 <h3>保養單查詢 - 全院</h3>

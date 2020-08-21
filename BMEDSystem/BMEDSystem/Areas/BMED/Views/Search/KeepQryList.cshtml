@@ -1,4 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.KeepSearchListViewModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.KeepSearchListViewModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
 @using EDIS.Models.Identity
@@ -22,39 +25,39 @@ else
                     @Html.DisplayNameFor(model => model.DocType)
                 </th>*@
             <th>
-                @Html.DisplayNameFor(model => model.DocId)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
                 <br />
-                @Html.DisplayNameFor(model => model.SentDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().SentDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlaceLoc)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.InOut)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().InOut)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Result)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Memo)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Memo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Days)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
             </th>
             <th>
                 文件狀態
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FlowUidName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().FlowUidName)
             </th>
         </tr>
 
@@ -127,3 +130,8 @@ else
 
     </table>
 }
+
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("GetKeepQryList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

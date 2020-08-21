@@ -22,6 +22,12 @@
 
     };
     $(document).ready(function () {
+        $('#repSearchForm').submit(function () {
+            fetchPage(1);
+            event.preventDefault();
+            return false;
+        });
+        //
         $('.combobox').combobox();
 
         $("#UserIdQryBtn").click(function () {
@@ -38,6 +44,40 @@
             });
         });
     });
+    // Use ajax to fetch page.
+    var fetchPage = function (page) {
+        var pagedPartialUrl = '@Url.Action("GetRepQryList", "Search", new { Area = "BMED" })';
+        var s = $('#repSearchForm').serialize();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlREPLIST').html(data);
+
+                $('#pnlREPLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPage(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            }
+        });
+    };
 </script>
 
 <h3>請修單查詢 - 全院</h3>
