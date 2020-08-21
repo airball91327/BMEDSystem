@@ -751,19 +751,11 @@ namespace EDIS.Areas.BMED.Controllers
                     keep = k,
                     flow = f
                 })
-                .Join(_context.BMEDAssets, k => k.keep.AssetNo, a => a.AssetNo,
-                (k, a) => new
-                {
-                    keep = k.keep,
-                    asset = a,
-                    flow = k.flow
-                })
                 .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                 (m, d) => new
                 {
                     keep = m.keep,
                     flow = m.flow,
-                    asset = m.asset,
                     keepdtl = d
                 })
                 .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -771,7 +763,6 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     keep = j.keep,
                     flow = j.flow,
-                    asset = j.asset,
                     keepdtl = j.keepdtl,
                     dpt = d
                 }).ToList()
@@ -781,8 +772,8 @@ namespace EDIS.Areas.BMED.Controllers
                     DocId = j.keep.DocId,
                     AssetNo = j.keep.AssetNo,
                     AssetName = j.keep.AssetName,
-                    Brand = j.asset.Brand,
-                    Type = j.asset.Type,
+                    //Brand = j.asset.Brand,
+                    //Type = j.asset.Type,
                     PlaceLoc = j.keep.PlaceLoc,
                     ApplyDpt = j.keep.DptId,
                     AccDpt = j.keep.AccDpt,
@@ -806,7 +797,21 @@ namespace EDIS.Areas.BMED.Controllers
                     IsCharged = j.keepdtl.IsCharged,
                     keepdata = j.keep
                 }));
-
+            /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
+            foreach (var item in kv)
+            {
+                if (item.AssetNo != null)
+                {
+                    var asset = _context.BMEDAssets.Where(a => a.AssetNo == item.AssetNo).FirstOrDefault();
+                    if (asset != null)
+                    {
+                        item.AssetNo = asset.AssetNo;
+                        item.AssetName = asset.Cname;
+                        item.Brand = asset.Brand;
+                        item.Type = asset.Type;
+                    }
+                }
+            }
             /* Search date by DateType. */
             if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false)
             {
