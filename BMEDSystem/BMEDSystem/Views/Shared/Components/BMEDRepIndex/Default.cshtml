@@ -29,6 +29,7 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
+
         $('.BMEDcombobox').combobox();
         //$("#BMEDrepSearchForm").submit();
         /* Only first visit the page, will submit the form. */
@@ -103,6 +104,42 @@
             }
         });
     }
+
+    // Use ajax to fetch page.
+    var fetchPageREP = function (page) {
+        var pagedPartialUrl = '@Url.Action("Index", "Repair", new { Area = "BMED" })';
+        var s = $('#BMEDrepSearchForm').serialize();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#BMEDpnlREPLIST').html(data);
+
+                $('#BMEDpnlREPLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPageREP(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            }
+        });
+
+    };
 </script>
 
 <form asp-controller="Repair" asp-action="Index" asp-area="BMED" data-ajax="true"

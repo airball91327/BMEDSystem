@@ -1,4 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.RepairListVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.RepairListVModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
 @using EDIS.Models.Identity
@@ -76,35 +79,35 @@ else
         <tr>
             <th></th>
             <th>
-                @Html.DisplayNameFor(model => model.DocType)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DocId)<br />
-                @Html.DisplayNameFor(model => model.ApplyDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)<br />
+                @Html.DisplayNameFor(model => model.FirstOrDefault().ApplyDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlaceLoc)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TroubleDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealState)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealState)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Days)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
             </th>
         </tr>
 
@@ -123,10 +126,10 @@ else
                         }
                     }
                     else if ((item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "7084") ||
-                             (item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "8420") ) //其他工程師案件
+                             (item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "8420")) //其他工程師案件
                     {
-                            @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
-                            @Html.Raw(" |")
+                        @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                        @Html.Raw(" |")
                     }
                     else
                     {
@@ -201,3 +204,8 @@ else
 
     </table>
 }
+
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

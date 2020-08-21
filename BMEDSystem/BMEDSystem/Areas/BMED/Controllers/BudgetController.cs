@@ -293,15 +293,15 @@ namespace EDIS.Areas.BMED.Controllers
                     u = _context.AppUsers.Find(rf.UserId);
                     mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
                     //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
-                    mail.message.Subject = "醫療儀器管理資訊系統[採購評估案]：儀器名稱： " + r.PlantCnam;
+                    mail.message.Subject = "醫工智能保修系統[採購評估案]：儀器名稱： " + r.PlantCnam;
                     body += "<p>申請人：" + r.UserName + "</p>";
                     body += "<p>儀器名稱：" + r.PlantCnam + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/MvcMedEngMgr'>處理案件</a></p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'>處理案件</a></p>";
                     body += "<br/>";
-                    body += "<h3>this is a inform letter from system manager.Do not reply for it.</h3>";
+                    body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                     mail.message.Body = body;
                     mail.message.IsBodyHtml = true;
-                    //mail.SendMail();
+                    mail.SendMail();
                 }
                 catch (Exception e)
                 {

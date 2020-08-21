@@ -1,4 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.KeepListVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.KeepListVModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
 @using EDIS.Models.Identity
@@ -44,35 +47,35 @@ else
         <tr>
             <th></th>
             <th>
-                @Html.DisplayNameFor(model => model.DocType)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DocId)<br />
-                @Html.DisplayNameFor(model => model.SentDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)<br />
+                @Html.DisplayNameFor(model => model.FirstOrDefault().SentDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.PlaceLoc)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.InOut)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().InOut)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Result)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Result)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Memo)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Memo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Cost)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Days)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
             </th>
         </tr>
 
@@ -150,3 +153,8 @@ else
 
     </table>
 }
+
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

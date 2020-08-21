@@ -159,7 +159,7 @@ namespace EDIS.Areas.BMED.Controllers
                             });
                     mail.sto = sto.TrimEnd(new char[] { ',' });
 
-                    mail.message.Subject = "醫工工務智能保修系統[醫工請修案-結案通知]：設備名稱： " + repair.AssetName;
+                    mail.message.Subject = "醫工智能保修系統[醫工請修案-結案通知]：設備名稱： " + repair.AssetName;
                     body += "<p>表單編號：" + repair.DocId + "</p>";
                     body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
                     body += "<p>申請人：" + repair.UserName + "</p>";
@@ -169,7 +169,7 @@ namespace EDIS.Areas.BMED.Controllers
                     body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
                     body += "<p>故障描述：" + repair.TroubleDes + "</p>";
                     body += "<p>處理描述：" + rd.DealDes + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/EDIS/Account/Login'" + "?DocId=" + repair.DocId + "&dealType=BMEDRepViews" + ">檢視案件</a></p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?DocId=" + repair.DocId + "&dealType=BMEDRepViews" + ">檢視案件</a></p>";
                     body += "<br/>";
                     body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                     body += "<br/>";

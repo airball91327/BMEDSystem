@@ -24,7 +24,7 @@ namespace EDIS.Areas.BMED.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly IRepository<AppUserModel, int> _userRepo;
-        private int pageSize = 100;
+        private int pageSize = 20;
 
         public DeptStockController(ApplicationDbContext context,
                                    IRepository<AppUserModel, int> userRepo)

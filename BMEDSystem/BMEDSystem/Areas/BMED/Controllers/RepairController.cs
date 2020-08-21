@@ -14,6 +14,7 @@ using ClosedXML.Excel;
 using System.IO;
 using EDIS.Models;
 using Zen.Barcode;
+using X.PagedList;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -33,6 +34,7 @@ namespace EDIS.Areas.BMED.Controllers
         private readonly IEmailSender _emailSender;
         private readonly CustomUserManager userManager;
         private readonly CustomRoleManager roleManager;
+        private int pageSize = 50;
 
         public RepairController(ApplicationDbContext context,
                                 IRepository<RepairModel, string> repairRepo,
@@ -79,7 +81,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         // POST: BMED/Repair/Index
         [HttpPost]
-        public IActionResult Index(QryRepListData qdata)
+        public IActionResult Index(QryRepListData qdata, int page = 1)
         {
             string docid = qdata.BMEDqtyDOCID;
             string ano = qdata.BMEDqtyASSETNO;
@@ -608,7 +610,10 @@ namespace EDIS.Areas.BMED.Controllers
                 rv = rv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
             //
-            return View("List", rv);
+            if (rv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView("List", rv.ToPagedList(1, pageSize));
+            return PartialView("List", rv.ToPagedList(page, pageSize));
+            //return View("List", rv);
         }
         [Authorize]
         public IActionResult Create()

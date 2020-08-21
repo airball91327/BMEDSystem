@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -24,6 +25,7 @@ namespace EDIS.Areas.BMED.Controllers
         private readonly IEmailSender _emailSender;
         private readonly CustomUserManager userManager;
         private readonly CustomRoleManager roleManager;
+        private int pageSize = 50;
 
         public KeepController(ApplicationDbContext context,
                               IRepository<AppUserModel, int> userRepo,
@@ -294,7 +296,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         // POST: BMED/Keep/Index
         [HttpPost]
-        public IActionResult Index(QryKeepListData qdata)
+        public IActionResult Index(QryKeepListData qdata, int page = 1)
         {
             string docid = qdata.BMEDKqtyDOCID;
             string ano = qdata.BMEDKqtyASSETNO;
@@ -864,8 +866,11 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
-
-            return View("List", kv);
+            //
+            if (kv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView("List", kv.ToPagedList(1, pageSize));
+            return PartialView("List", kv.ToPagedList(page, pageSize));
+            //return View("List", kv);
         }
 
         // GET: BMED/Keep/QueryAssets

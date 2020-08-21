@@ -46,9 +46,6 @@
 
 <script>
     $(function () {
-        var page = window.location.hash
-            ? window.location.hash.slice(1) : 1;
-        fetchPage(page); // Default display all stocks.
         $('#btnQTY').click(function () {
             fetchPage(1);
         });
@@ -68,17 +65,17 @@
 
                 $('#pnlDEPTSTOCKLIST').html(data);
 
-                //$('#pnlDEPTSTOCKLIST .pagination li a').each(function (i, item) {
-                //    var hyperLinkUrl = $(item).attr('href');
-                //    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
-                //        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
-                //        $(item).attr('href', '#').click(function (event) {
-                //            event.preventDefault();
-                //            $(event.target).attr('href');
-                //            fetchPage(pageNumber);
-                //        });
-                //    }
-                //});
+                $('#pnlDEPTSTOCKLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPage(pageNumber);
+                        });
+                    }
+                });
                 $('#imgLOADING_STOCK').hide();
             }
         });

@@ -142,16 +142,16 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     mail.sto = sto.TrimEnd(new char[] { ',' });
                     //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
-                    mail.message.Subject = "醫療儀器管理資訊系統[驗收案-結案通知]：採購案號： " + r.PurchaseNo;
+                    mail.message.Subject = "醫工智能保修系統[驗收案-結案通知]：採購案號： " + r.PurchaseNo;
                     body += "<p>申請人：" + r.UserName + "</p>";
                     body += "<p>合約號碼：" + r.ContractNo + "</p>";
                     body += "<p>採購案號：" + r.PurchaseNo + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/MvcMedEngMgr'>前往網站檢視</a></p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'>前往網站檢視</a></p>";
                     body += "<br/>";
-                    body += "<h3>this is a inform letter from system manager.Do not reply for it.</h3>";
+                    body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                     mail.message.Body = body;
                     mail.message.IsBodyHtml = true;
-                    //mail.SendMail();
+                    mail.SendMail();
                     return new JsonResult(DelivFlow)
                     {
                         Value = new { success = true, error = "" },
@@ -183,17 +183,17 @@ namespace EDIS.Areas.BMED.Controllers
                 u = _context.AppUsers.Find(DelivFlow.UserId);
                 mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
                 //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
-                mail.message.Subject = "醫療儀器管理資訊系統[驗收案]：採購案號： " + r.PurchaseNo;
+                mail.message.Subject = "醫工智能保修系統[驗收案]：採購案號： " + r.PurchaseNo;
                 body += "<p>申請人：" + r.UserName + "</p>";
                 body += "<p>合約號碼：" + r.ContractNo + "</p>";
                 body += "<p>採購案號：" + r.PurchaseNo + "</p>";
-                body += "<p><a href='http://dms.cch.org.tw/MvcMedEngMgr'>處理案件</a></p>";
+                body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'>處理案件</a></p>";
                 body += "<br/>";
                 body += "<p>若有任何問題，請與驗收工程師(" + _context.AppUsers.Find(r.EngId).FullName + ")聯絡</p>";
-                body += "<h3>this is a inform letter from system manager.Do not reply for it.</h3>";
+                body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                 mail.message.Body = body;
                 mail.message.IsBodyHtml = true;
-                //mail.SendMail();
+                mail.SendMail();
                 return new JsonResult(DelivFlow)
                 {
                     Value = new { success = true, error = "" }
