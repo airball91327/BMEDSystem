@@ -12,7 +12,6 @@
     $(document).ready(function () {
         $('#keepSearchForm').submit(function () {
             fetchPage(1);
-            event.preventDefault();
             return false;
         });
         //
@@ -48,6 +47,10 @@
                         });
                     }
                 });
+                $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
                 $.Toast.hideToast();
             }
         });

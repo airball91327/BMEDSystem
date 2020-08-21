@@ -442,19 +442,20 @@ namespace EDIS.Areas.BMED.Controllers
                         {
                             keep = r,
                             flow = f
-                        }).Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
-                        (r, a) => new
-                        {
-                            keep = r.keep,
-                            asset = a,
-                            flow = r.flow
                         })
+                        //.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
+                        //(r, a) => new
+                        //{
+                        //    keep = r.keep,
+                        //    asset = a,
+                        //    flow = r.flow
+                        //})
                         .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                         (m, d) => new
                         {
                             keep = m.keep,
                             flow = m.flow,
-                            asset = m.asset,
+                            //asset = m.asset,
                             keepdtl = d
                         })
                         .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -462,7 +463,7 @@ namespace EDIS.Areas.BMED.Controllers
                         {
                             keep = j.keep,
                             flow = j.flow,
-                            asset = j.asset,
+                            //asset = j.asset,
                             keepdtl = j.keepdtl,
                             dpt = d
                         }).ToList()
@@ -472,8 +473,8 @@ namespace EDIS.Areas.BMED.Controllers
                             DocId = j.keep.DocId,
                             AssetNo = j.keep.AssetNo,
                             AssetName = j.keep.AssetName,
-                            Brand = j.asset.Brand,
-                            Type = j.asset.Type,
+                            //Brand = j.asset.Brand,
+                            //Type = j.asset.Type,
                             PlaceLoc = j.keep.PlaceLoc,
                             ApplyDpt = j.keep.DptId,
                             AccDpt = j.keep.AccDpt,
@@ -532,19 +533,20 @@ namespace EDIS.Areas.BMED.Controllers
                       {
                           keep = k,
                           flow = f
-                      }).Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
-                      (r, a) => new
-                      {
-                          keep = r.keep,
-                          asset = a,
-                          flow = r.flow
                       })
+                      //.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
+                      //(r, a) => new
+                      //{
+                      //    keep = r.keep,
+                      //    asset = a,
+                      //    flow = r.flow
+                      //})
                       .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                       (m, d) => new
                       {
                           keep = m.keep,
                           flow = m.flow,
-                          asset = m.asset,
+                          //asset = m.asset,
                           keepdtl = d
                       })
                       .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -552,7 +554,7 @@ namespace EDIS.Areas.BMED.Controllers
                       {
                           keep = j.keep,
                           flow = j.flow,
-                          asset = j.asset,
+                          //asset = j.asset,
                           keepdtl = j.keepdtl,
                           dpt = d
                       }).ToList()
@@ -562,8 +564,8 @@ namespace EDIS.Areas.BMED.Controllers
                           DocId = j.keep.DocId,
                           AssetNo = j.keep.AssetNo,
                           AssetName = j.keep.AssetName,
-                          Brand = j.asset.Brand,
-                          Type = j.asset.Type,
+                          //Brand = j.asset.Brand,
+                          //Type = j.asset.Type,
                           PlaceLoc = j.keep.PlaceLoc,
                           ApplyDpt = j.keep.DptId,
                           AccDpt = j.keep.AccDpt,
@@ -631,19 +633,12 @@ namespace EDIS.Areas.BMED.Controllers
                         keepFlows = keepFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id)).ToList();
                     }
 
-                    keepFlows.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
-                    (r, a) => new
-                    {
-                        keep = r.keep,
-                        asset = a,
-                        flow = r.flow
-                    })
-                    .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
+                    keepFlows.Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                     (m, d) => new
                     {
                         keep = m.keep,
                         flow = m.flow,
-                        asset = m.asset,
+                        //asset = m.asset,
                         keepdtl = d
                     })
                     .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -651,7 +646,7 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         keep = j.keep,
                         flow = j.flow,
-                        asset = j.asset,
+                        //asset = j.asset,
                         keepdtl = j.keepdtl,
                         dpt = d
                     }).ToList()
@@ -661,8 +656,8 @@ namespace EDIS.Areas.BMED.Controllers
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,
-                        Brand = j.asset.Brand,
-                        Type = j.asset.Type,
+                        //Brand = j.asset.Brand,
+                        //Type = j.asset.Type,
                         PlaceLoc = j.keep.PlaceLoc,
                         ApplyDpt = j.keep.DptId,
                         AccDpt = j.keep.AccDpt,
@@ -696,19 +691,19 @@ namespace EDIS.Areas.BMED.Controllers
                         keep = k,
                         flow = f
                     })
-                    .Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
-                    (r, a) => new
-                    {
-                        keep = r.keep,
-                        asset = a,
-                        flow = r.flow
-                    })
+                    //.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
+                    //(r, a) => new
+                    //{
+                    //    keep = r.keep,
+                    //    asset = a,
+                    //    flow = r.flow
+                    //})
                     .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                     (m, d) => new
                     {
                         keep = m.keep,
                         flow = m.flow,
-                        asset = m.asset,
+                        //asset = m.asset,
                         keepdtl = d
                     })
                     .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -716,7 +711,7 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         keep = j.keep,
                         flow = j.flow,
-                        asset = j.asset,
+                        //asset = j.asset,
                         keepdtl = j.keepdtl,
                         dpt = d
                     }).ToList()
@@ -726,8 +721,8 @@ namespace EDIS.Areas.BMED.Controllers
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,
-                        Brand = j.asset.Brand,
-                        Type = j.asset.Type,
+                        //Brand = j.asset.Brand,
+                        //Type = j.asset.Type,
                         PlaceLoc = j.keep.PlaceLoc,
                         ApplyDpt = j.keep.DptId,
                         AccDpt = j.keep.AccDpt,
@@ -770,19 +765,12 @@ namespace EDIS.Areas.BMED.Controllers
                         keepFlows2 = keepFlows2.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode)).ToList();
                     }
 
-                    keepFlows2.Join(_context.BMEDAssets, r => r.keep.AssetNo, a => a.AssetNo,
-                    (r, a) => new
-                    {
-                        keep = r.keep,
-                        asset = a,
-                        flow = r.flow
-                    })
-                    .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
+                    keepFlows2.Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
                     (m, d) => new
                     {
                         keep = m.keep,
                         flow = m.flow,
-                        asset = m.asset,
+                        //asset = m.asset,
                         keepdtl = d
                     })
                     .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
@@ -790,7 +778,7 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         keep = j.keep,
                         flow = j.flow,
-                        asset = j.asset,
+                        //asset = j.asset,
                         keepdtl = j.keepdtl,
                         dpt = d
                     }).ToList()
@@ -800,8 +788,8 @@ namespace EDIS.Areas.BMED.Controllers
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,
-                        Brand = j.asset.Brand,
-                        Type = j.asset.Type,
+                        //Brand = j.asset.Brand,
+                        //Type = j.asset.Type,
                         PlaceLoc = j.keep.PlaceLoc,
                         ApplyDpt = j.keep.DptId,
                         AccDpt = j.keep.AccDpt,
@@ -865,6 +853,21 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyIsCharged))
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
+            }
+            /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
+            foreach (var item in kv)
+            {
+                if (item.AssetNo != null)
+                {
+                    var asset = _context.BMEDAssets.Where(a => a.AssetNo == item.AssetNo).FirstOrDefault();
+                    if (asset != null)
+                    {
+                        item.AssetNo = asset.AssetNo;
+                        item.AssetName = asset.Cname;
+                        item.Brand = asset.Brand;
+                        item.Type = asset.Type;
+                    }
+                }
             }
             //
             if (kv.ToPagedList(page, pageSize).Count <= 0)

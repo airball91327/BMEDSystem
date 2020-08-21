@@ -136,6 +136,10 @@
                     }
                 });
                 $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
             }
         });
 
