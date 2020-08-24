@@ -114,7 +114,10 @@ else
                     @Html.DisplayFor(modelItem => item.DealDes)
                 </td>
                 <td>
-                    @Html.DisplayFor(modelItem => item.Cost)
+                    @if (UserManager.GetCurrentUserDptId(User) == "7084" || UserManager.GetCurrentUserDptId(User) == "8420")
+                    {
+                        @Html.DisplayFor(modelItem => item.Cost)
+                    }
                 </td>
                 <td>
                     @if (item.Flg != "2")
