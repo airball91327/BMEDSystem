@@ -27,7 +27,11 @@ $(function () {
     });
 
     $('#AssetNo').change(function () {
-        /* Get engineers. */
+    /* Get engineers. */
+        var assetName = $('#AssetNo option:selected').text().split("(", 1);
+        $("#AssetName").val(assetName);
+        if ($(this).val() == "99999")
+            $("#AssetName").val('');
         $.ajax({
             url: '../Repair/GetAssetEngId',
             type: "POST",
@@ -172,11 +176,7 @@ $(function () {
             }
         });
     });
-    $("#AssetNo").change(function () {
-        var assetName = $('#AssetNo option:selected').text().split("(", 1);
-        $("#AssetName").val(assetName);
-    });
-
+   
     $("input[type=radio][name=hasAssetNo]").change(function () {
         /* While has assetNo, show search fields. */
         var select = $('#AssetNo');

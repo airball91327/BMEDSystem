@@ -56,4 +56,11 @@ namespace EDIS.Models
         public string BMEDqtyVendor { get; set; }
         public string BMEDqtyClsUser { get; set; }
     }
+    public class AssetQryResult
+    {
+        public string ASSET_NO { get; set; }
+        public string NAME_C { get; set; }
+        public string ACC_DPT { get; set; }
+        public string DELIV_DPT { get; set; }
+    }
 }

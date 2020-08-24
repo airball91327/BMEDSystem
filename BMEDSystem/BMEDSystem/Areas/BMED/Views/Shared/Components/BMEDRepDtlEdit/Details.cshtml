@@ -3,8 +3,8 @@
 @{
     ViewBag.Title = "Details";
 }
-
-
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
 <div>
     <h3>請修明細</h3>
     <hr />
@@ -63,15 +63,16 @@
                 @Html.Raw("有")
             }
         </dd>
+        @if (UserManager.GetCurrentUserDptId(User) == "7084" || UserManager.GetCurrentUserDptId(User) == "8420")
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.Cost)
+            </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Cost)
-        </dt>
-
-        <dd>
-            @Html.DisplayFor(model => model.Cost)
-        </dd>
-
+            <dd>
+                @Html.DisplayFor(model => model.Cost)
+            </dd>
+        }
         <dt>
             @Html.DisplayNameFor(model => model.NotInExceptDevice)
         </dt>
@@ -122,26 +123,26 @@
         </dd>
 
         @*<dt>
-            @Html.DisplayNameFor(model => model.CloseDate)
-        </dt>
+                @Html.DisplayNameFor(model => model.CloseDate)
+            </dt>
 
-        <dd>
-            @if (@Model.CloseDate != null)
-            {
-                @Model.CloseDate.Value.ToString("yyyy/MM/dd");
-            }
-        </dd>
+            <dd>
+                @if (@Model.CloseDate != null)
+                {
+                    @Model.CloseDate.Value.ToString("yyyy/MM/dd");
+                }
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.ShutDate)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.ShutDate)
+            </dt>
 
-        <dd>
-            @if (@Model.ShutDate != null)
-            {
-                @Model.ShutDate.Value.ToString("yyyy/MM/dd");
-            }
-        </dd>*@
+            <dd>
+                @if (@Model.ShutDate != null)
+                {
+                    @Model.ShutDate.Value.ToString("yyyy/MM/dd");
+                }
+            </dd>*@
 
     </dl>
 </div>

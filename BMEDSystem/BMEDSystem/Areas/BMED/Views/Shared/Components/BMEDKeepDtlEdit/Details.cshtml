@@ -1,5 +1,8 @@
 ﻿@model EDIS.Models.KeepDtlModel
 
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+
 <div>
     <dl class="dl-horizontal">
         <dt>
@@ -49,13 +52,16 @@
             @Html.DisplayFor(model => model.Hours)
         </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Cost)
-        </dt>
+        @if (UserManager.GetCurrentUserDptId(User) == "7084" || UserManager.GetCurrentUserDptId(User) == "8420")
+        {
+            <dt>
+                @Html.DisplayNameFor(model => model.Cost)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Cost)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Cost)
+            </dd>
+        }
 
         <dt>
             @Html.DisplayNameFor(model => model.NotInExceptDevice)

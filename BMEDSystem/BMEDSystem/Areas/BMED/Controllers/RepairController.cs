@@ -15,6 +15,9 @@ using System.IO;
 using EDIS.Models;
 using Zen.Barcode;
 using X.PagedList;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using Newtonsoft.Json;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -618,7 +621,7 @@ namespace EDIS.Areas.BMED.Controllers
         [Authorize]
         public IActionResult Create()
         {
-            var test = _context.BMEDRepairs.ToList();
+            //var test = _context.BMEDRepairs.ToList();
             RepairModel repair = new RepairModel();
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             var userDpt = _dptRepo.FindById(ur.DptId);
@@ -791,7 +794,7 @@ namespace EDIS.Areas.BMED.Controllers
                     //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
                     mail.message.Body = body;
                     mail.message.IsBodyHtml = true;
-                    mail.SendMail();
+                    //mail.SendMail();
 
                     return Ok(repair);
                 }
@@ -1031,7 +1034,11 @@ namespace EDIS.Areas.BMED.Controllers
         public JsonResult GetAssetEngId(string AssetNo)
         {
             AssetModel asset = _context.BMEDAssets.Find(AssetNo);
-            var engineer = _context.AppUsers.Find(asset.AssetEngId);
+            AppUserModel engineer = null;
+            if (asset != null)
+            {
+                engineer = _context.AppUsers.Find(asset.AssetEngId);
+            }
 
             /* 擷取預設負責工程師 */
             if (engineer == null)  //該設備無預設工程師，改為擷取保管部門所對應工程師
@@ -1147,7 +1154,28 @@ namespace EDIS.Areas.BMED.Controllers
 
         public JsonResult QueryAssets(string QueryStr, string QueryAccDpt, string QueryDelivDpt)
         {
-            List<AssetModel> assets = new List<AssetModel>();
+            List<AssetModel> assets = null;
+            List<AssetQryResult> objs = new List<AssetQryResult>();
+            List<SelectListItem> list = new List<SelectListItem>();
+            if (QueryStr == "99999")
+            {
+                assets = _context.BMEDAssets.Where(a => !string.IsNullOrEmpty(a.AssetNo))
+                                   .Where(a => !string.IsNullOrEmpty(a.Cname))
+                                   .Where(a => a.AssetNo.Contains(QueryStr) ||
+                                               a.Cname.Contains(QueryStr)).ToList();
+                if (assets.Count() != 0)
+                {
+                    assets.ForEach(asset =>
+                    {
+                        list.Add(new SelectListItem
+                        {
+                            Text = asset.Cname + "(" + asset.AssetNo + ")",
+                            Value = asset.AssetNo.ToString()
+                        });
+                    });
+                }
+                return Json(list);
+            }
             // No query string.
             if (string.IsNullOrEmpty(QueryStr) && string.IsNullOrEmpty(QueryAccDpt) && string.IsNullOrEmpty(QueryDelivDpt))
             {
@@ -1156,38 +1184,40 @@ namespace EDIS.Areas.BMED.Controllers
             }
             else
             {
-                assets = _context.BMEDAssets.ToList();
-                if (!string.IsNullOrEmpty(QueryStr))     /* Search assets by assetNo or Cname. */
+                //
+                string responseString = "";
+                
+                using (var client = new HttpClient())
                 {
-                    assets = assets.Where(a => !string.IsNullOrEmpty(a.AssetNo))
-                                   .Where(a => !string.IsNullOrEmpty(a.Cname))
-                                   .Where(a => a.AssetNo.Contains(QueryStr) ||
-                                               a.Cname.Contains(QueryStr)).ToList();
-                }
-                if (!string.IsNullOrEmpty(QueryAccDpt))    /* Search assets by AccDpt. */
-                {
-                    assets = assets.Where(a => a.AccDpt == QueryAccDpt).ToList();
-                }
-                if (!string.IsNullOrEmpty(QueryDelivDpt))   /* Search assets by DelivDpt. */
-                {
-                    assets = assets.Where(a => a.DelivDpt == QueryDelivDpt).ToList();
-                }
-            }
-
-            List<SelectListItem> list = new List<SelectListItem>();
-            if (assets.Count() != 0)
-            {
-                assets.ForEach(asset => {
-                    list.Add(new SelectListItem
+                    string urlstr = "http://dms.cch.org.tw/CchWebApi/api/AssetData";
+                    urlstr += "?keyword=" + QueryStr + "&accdpt=" + QueryAccDpt + "&delivdpt=" + QueryDelivDpt;
+                    var url = new Uri(urlstr, UriKind.Absolute);
+                    //string json = JsonConvert.SerializeObject(apps);
+                    //HttpContent contentPost = new StringContent(json);
+                    //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    try
                     {
-                        Text = asset.Cname + "(" + asset.AssetNo + ")",
-                        Value = asset.AssetNo.ToString()
-                    });
-                });
+                        var response = client.GetAsync(url); //
+                        responseString = response.Result.Content.ReadAsStringAsync().Result;
+                        objs = JsonConvert.DeserializeObject<List<AssetQryResult>>(responseString);
+                        objs.ForEach(x =>
+                        {
+                            list.Add(new SelectListItem
+                            {
+                                Text = x.NAME_C + "(" + x.ASSET_NO + ")",
+                                Value = x.ASSET_NO
+                            });
+                        });
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+                }
             }
             return Json(list);
         }
-
+        
         // POST: BMED/Repair/UpdateChecker
         [HttpPost]
         public IActionResult UpdateChecker(string DocId, string UpdChecker)
