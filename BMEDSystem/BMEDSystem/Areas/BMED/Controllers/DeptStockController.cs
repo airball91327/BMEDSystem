@@ -43,18 +43,28 @@ namespace EDIS.Areas.BMED.Controllers
             string brand = fm["qtyBRAND"];
             //List<DeptStockModel> dv = _context.BMEDDeptStocks.ToList();
             List<DeptStockModel> dv = await GetERPDptStokAsync(ur.UserName);
-            if (!string.IsNullOrEmpty(stockno))
+            if (string.IsNullOrEmpty(stockno) && string.IsNullOrEmpty(dname) && string.IsNullOrEmpty(brand))
             {
-                dv = dv.Where(d => d.StockNo.Contains(stockno)).ToList();
+                dv = dv.Where(d => d.Qty > 0).ToList();
             }
-            if (!string.IsNullOrEmpty(dname))
+            else
             {
-                dv = dv.Where(d => d.StockName.Contains(dname)).ToList();
+                if (!string.IsNullOrEmpty(stockno))
+                {
+                    dv = dv.Where(d => d.StockNo.Contains(stockno)).ToList();
+                }
+                if (!string.IsNullOrEmpty(dname))
+                {
+                    dv = dv.Where(d => d.StockName.Contains(dname)).ToList();
+                }
+                if (!string.IsNullOrEmpty(brand))
+                {
+                    dv = dv.Where(d => d.Brand == brand.ToUpper()).ToList();
+                }
+
             }
-            if (!string.IsNullOrEmpty(brand))
-            {
-                dv = dv.Where(d => d.Brand == brand.ToUpper()).ToList();
-            }
+            
+            
             if (dv.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("List", dv.ToPagedList(1, pageSize));
 
