@@ -49,7 +49,7 @@ namespace EDIS.Areas.BMED.Components.KeepEmp
             SelectListItem li = new SelectListItem();
             foreach (string l in allEngs)
             {
-                var u = _context.AppUsers.Where(a => a.UserName == l).FirstOrDefault();
+                var u = _context.AppUsers.Where(a => a.UserName == l && a.Status == "Y").FirstOrDefault();
                 if (u != null)
                 {
                     li = new SelectListItem();

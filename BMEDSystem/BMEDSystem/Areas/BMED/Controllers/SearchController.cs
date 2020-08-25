@@ -98,7 +98,7 @@ namespace EDIS.Areas.BMED.Controllers
             List<SelectListItem> listItem5 = new List<SelectListItem>();
             foreach (string l in engs)
             {
-                var u = _context.AppUsers.Where(r => r.UserName == l).FirstOrDefault();
+                var u = _context.AppUsers.Where(r => r.UserName == l && r.Status == "Y").FirstOrDefault();
                 if (u != null)
                 {
                     listItem5.Add(new SelectListItem
@@ -111,7 +111,7 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
             /* 擷取該使用者單位底下所有人員 */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            var dptUsers = _context.AppUsers.Where(a => a.DptId == ur.DptId).ToList();
+            var dptUsers = _context.AppUsers.Where(a => a.DptId == ur.DptId && a.Status == "Y").ToList();
             List<SelectListItem> dptMemberList = new List<SelectListItem>();
             foreach (var item in dptUsers)
             {
@@ -124,7 +124,7 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["DptMembers"] = new SelectList(dptMemberList, "Value", "Text");
             /* 擷取所有人員 */
             List<SelectListItem> userList = new List<SelectListItem>();
-            foreach (var item in _context.AppUsers.ToList())
+            foreach (var item in _context.AppUsers.Where(a => a.Status == "Y").ToList())
             {
                 userList.Add(new SelectListItem
                 {
@@ -224,7 +224,7 @@ namespace EDIS.Areas.BMED.Controllers
             List<SelectListItem> listItem5 = new List<SelectListItem>();
             foreach (string l in engs)
             {
-                var u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                var u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
                 if (u != null)
                 {
                     listItem5.Add(new SelectListItem
@@ -237,7 +237,7 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
             /* 擷取所有人員 */
             List<SelectListItem> userList = new List<SelectListItem>();
-            foreach (var item in _context.AppUsers.ToList())
+            foreach (var item in _context.AppUsers.Where(a => a.Status == "Y").ToList())
             {
                 userList.Add(new SelectListItem
                 {

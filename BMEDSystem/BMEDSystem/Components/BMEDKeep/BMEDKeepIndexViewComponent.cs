@@ -77,7 +77,7 @@ namespace EDIS.Components.BMEDKeep
             List<SelectListItem> listItem5 = new List<SelectListItem>();
             foreach (string l in engs)
             {
-                var u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                var u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
                 if (u != null)
                 {
                     listItem5.Add(new SelectListItem

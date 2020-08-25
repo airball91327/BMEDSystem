@@ -444,7 +444,7 @@ namespace EDIS.Areas.BMED.Controllers
                     /* 其他工程師 */
                     foreach (string l in s)
                     {
-                        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                        u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
                         if (u != null && l != repEngId)
                         {
                             li = new SelectListItem();
