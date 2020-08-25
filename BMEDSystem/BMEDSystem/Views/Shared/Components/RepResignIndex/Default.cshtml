@@ -23,6 +23,10 @@
 
 <script type="text/javascript">
     $(function () {
+        $('#RepResignForm').submit(function () {
+            fetchPageRESIGN(1);
+            return false;
+        });
         /* Only first visit the page, will submit the form. */
         var count = 0;
         $('.nav-tabs a[href="#menu5"]').on('shown.bs.tab', function (event) {
@@ -31,6 +35,46 @@
                 count++;
             };
         });
+        //
+        // Use ajax to fetch page.
+    var fetchPageRESIGN = function (page) {
+        var pagedPartialUrl = '@Url.Action("GetResignList", "Repair", new { Area = "BMED" })';
+        var s = $('#RepResignForm').serialize();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlUnSignList').html(data);
+
+                $('#pnlUnSignList .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPageRESIGN(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
+            }
+        });
+
+    };
     });
 </script>
 

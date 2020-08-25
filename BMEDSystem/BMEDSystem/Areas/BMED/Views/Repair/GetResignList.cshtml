@@ -1,8 +1,10 @@
-﻿@model IEnumerable<EDIS.Models.RepairListVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.RepairListVModel>
 
 @{
     ViewData["Title"] = "分派案件";
 }
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 <link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
 <script src="~/js/bootstrap-combobox.js"></script>
 
@@ -75,27 +77,27 @@
                     <input type="checkbox" name="checkAll" />
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.DocType)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().DocType)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.DocId)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
                     <br />
-                    @Html.DisplayNameFor(model => model.ApplyDate)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().ApplyDate)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.AccDptName)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.AssetName)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.PlaceLoc)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.TroubleDes)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
                 </th>
                 <th>
-                    @Html.DisplayNameFor(model => model.Days)
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
                 </th>
             </tr>
         </thead>
@@ -152,3 +154,7 @@
     </table>
 </form>
 
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("GetResignList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

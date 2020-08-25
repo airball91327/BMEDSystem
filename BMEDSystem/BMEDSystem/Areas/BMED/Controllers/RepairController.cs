@@ -598,7 +598,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 else
                 {
-                    rv = rv.OrderBy(r => r.FlowRtt).ThenByDescending(r => r.DocId).ToList();
+                    rv = rv.OrderByDescending(r => r.FlowRtt).ThenByDescending(r => r.DocId).ToList();
                 }
             }
 
@@ -612,6 +612,23 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 rv = rv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
+            //
+            /* 處理工程師查詢的下拉選單 */
+            var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
+            List<SelectListItem> listItem1 = new List<SelectListItem>();
+            foreach (string l in engs)
+            {
+                var u = _context.AppUsers.Where(usr => usr.UserName == l && ur.Status == "Y").FirstOrDefault();
+                if (u != null)
+                {
+                    listItem1.Add(new SelectListItem
+                    {
+                        Text = u.FullName + "(" + u.UserName + ")",
+                        Value = u.Id.ToString()
+                    });
+                }
+            }
+            ViewData["AssignEngId"] = new SelectList(listItem1, "Value", "Text");
             //
             if (rv.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("List", rv.ToPagedList(1, pageSize));
@@ -981,6 +998,49 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
              return RedirectToAction("GetResignList", new { role = role });
+        }
+
+        [HttpPost]
+        public JsonResult TransDocToEng(List<RepairListVModel> transData, string AssignEngId)
+        {
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            int assignEngId = Convert.ToInt32(AssignEngId);
+
+            foreach (var item in transData)
+            {
+                if (item.IsSelected)
+                {
+                    RepairModel repair = _context.BMEDRepairs.Find(item.DocId);
+                    //指派工程師
+                    repair.EngId = assignEngId;
+                    _context.Entry(repair).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    RepairFlowModel rf = _context.BMEDRepairFlows.Where(f => f.DocId == item.DocId && f.Status == "?").FirstOrDefault();
+                    //轉送下一關卡
+                    rf.Opinions = "[轉送工程師]";
+                    rf.Status = "1";
+                    rf.Rtt = DateTime.Now;
+                    rf.Rtp = ur.Id;
+                    _context.Entry(rf).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    //
+                    RepairFlowModel flow = new RepairFlowModel();
+                    flow.DocId = item.DocId;
+                    flow.StepId = rf.StepId + 1;
+                    flow.UserId = assignEngId;
+                    flow.UserName = _context.AppUsers.Find(assignEngId).FullName;
+                    flow.Status = "?";
+                    flow.Cls = "設備工程師";
+                    flow.Rtt = DateTime.Now;
+                    _context.BMEDRepairFlows.Add(flow);
+                    _context.SaveChanges();
+                }
+            }
+            return new JsonResult(assignEngId)
+            {
+                Value = new { success = true, error = "" }
+            };
         }
 
         [HttpPost]
@@ -1884,7 +1944,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         //[HttpPost]
-        public IActionResult GetResignList(string role)
+        public IActionResult GetResignList(string role, int page = 1)
         {
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
@@ -1904,7 +1964,10 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["BMEDassignEngId"] = new SelectList(listItem1, "Value", "Text");
 
             /* 所有尚未指派工程師的案件 */
-            var rps = _context.BMEDRepairs.Where(r => r.EngId == 0);
+            var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師")).ToList();
+            var rps = _context.BMEDRepairs.Where(r => r.EngId == 0)
+                                          .Join(rfs, r => r.DocId, rf => rf.DocId,
+                                          (r, rf) => r).ToList();
 
             List<RepairListVModel> rv = new List<RepairListVModel>();
             rps.Join(_context.BMEDRepairDtls, r => r.DocId, d => d.DocId,
@@ -1966,7 +2029,11 @@ namespace EDIS.Areas.BMED.Controllers
             }
             //
             ViewBag.Role = role;
-            return PartialView(rv);
+            //
+            if (rv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView(rv.ToPagedList(1, pageSize));
+            return PartialView(rv.ToPagedList(page, pageSize));
+            //return PartialView(rv);
         }
 
         protected override void Dispose(bool disposing)

@@ -489,7 +489,7 @@ namespace EDIS.Areas.BMED.Controllers
             /* If no search result. */
             if (rps.Count() == 0)
             {
-                return View("RepQryList", rv);
+                return PartialView("RepQryList", rv.ToPagedList(page, pageSize));
             }
 
             rps.Join(repairFlows, r => r.DocId, f => f.DocId,
@@ -747,7 +747,7 @@ namespace EDIS.Areas.BMED.Controllers
             /* If no search result. */
             if (kps.Count() == 0)
             {
-                return View("KeepQryList", kv);
+                return PartialView("KeepQryList", kv.ToPagedList(page, pageSize));
             }
 
             kps.Join(keepFlows, k => k.DocId, f => f.DocId,
