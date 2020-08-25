@@ -426,7 +426,7 @@ namespace EDIS.Areas.BMED.Controllers
             /* If no search result. */
             if (kps.Count() == 0)
             {
-                return View("List", kv);
+                return PartialView("List", kv.ToPagedList(page, pageSize));
             }
 
             switch (ftype)
