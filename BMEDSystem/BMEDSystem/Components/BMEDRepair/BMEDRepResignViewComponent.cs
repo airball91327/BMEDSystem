@@ -106,7 +106,7 @@ namespace EDIS.Components.BMEDRepair
             }
             else if (role == "MedBranchMgr")
             {
-                rv = rv.Where(r => r.repdata.Loc == "分院").ToList();
+                rv = rv.Where(r => r.repdata.Loc != "總院").ToList();
             }
 
             return View(rv);
