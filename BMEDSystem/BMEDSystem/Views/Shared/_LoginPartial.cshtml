@@ -5,24 +5,23 @@
 @inject CustomSignInManager SignInManager
 @inject CustomUserManager UserManager
 
-<style>
-    #logoutForm > ul > li > button:hover {
-        color: aliceblue;
-    }
-</style>
-
 @if (SignInManager.IsSignedIn(User))
 {
-    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm" class="navbar-left">
-        <ul class="nav navbar-nav navbar-right">
-            <li>
-                @*<a asp-area="" asp-controller="Manage" asp-action="Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>*@
-                <a asp-area="" asp-controller="" asp-action="">Hello @UserManager.GetUserFullName(User)!</a>
-            </li>
-            <li>
-                <button type="submit" class="btn btn-link navbar-btn navbar-link">登出</button>
-            </li>
-        </ul>
+    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+        <div id="logoutForm" class="navbar navbar-right">
+            <ul class="nav navbar-top-links ">
+                <li>
+                    <span class="m-r-sm text-muted welcome-message" data-i18n="topnav.welcometext" style="font-family:sans-serif;font-weight:600;font-size:large">
+                        Hello @UserManager.GetCurrentUserLocName(User) @UserManager.GetUserFullName(User) !
+                    </span>
+                </li>
+                <li>
+                    <a href="javascript:document.getElementById('logoutForm').submit()" style="color:#676a6c">
+                        <i class="fa fa-sign-out"></i>登出
+                    </a>
+                </li>
+            </ul>
+        </div>
     </form>
 }
 else

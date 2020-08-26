@@ -72,6 +72,47 @@ namespace EDIS.Models.Identity
             return dptId;
         }
 
+        public string GetCurrentUserLocName(ClaimsPrincipal principal)
+        {
+            string loc = null;
+            string locName = "總院人員";
+            var userName = principal.FindFirstValue(Options.ClaimsIdentity.UserNameClaimType);
+            var user = _context.AppUsers.Where(u => u.UserName == userName).FirstOrDefault();
+            if (user != null)
+            {
+                var dpt = _context.Departments.Find(user.DptId);
+                if (dpt != null)
+                {
+                    loc = dpt.Loc;
+                    if (loc == "L") 
+                    {
+                        locName = "二林院區";
+                    }
+                    else if (loc == "B")
+                    {
+                        locName = "員林院區";
+                    }
+                    else if (loc == "N")
+                    {
+                        locName = "南投院區";
+                    }
+                    else if (loc == "U")
+                    {
+                        locName = "鹿基院區";
+                    }
+                    else if (loc == "T")
+                    {
+                        locName = "雲基院區";
+                    }
+                    else  //總院人員
+                    {
+                         //Do nothing.
+                    }
+                }
+            }
+            return locName;
+        }
+
         public override async Task<bool> HasPasswordAsync(ApplicationUser user)
         {
             if (string.IsNullOrEmpty(user.Id))

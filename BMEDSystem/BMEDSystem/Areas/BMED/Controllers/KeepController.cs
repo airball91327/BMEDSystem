@@ -47,28 +47,38 @@ namespace EDIS.Areas.BMED.Controllers
         // GET: BMED/Keep/Create
         public IActionResult Create()
         {
-            KeepModel r = new KeepModel();
+            KeepModel keep = new KeepModel();
             AppUserModel ur = _context.AppUsers.Where(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            DepartmentModel userDpt = _dptRepo.FindById(ur.DptId);
 
-            r.Email = ur.Email == null ? "" : ur.Email;
+            keep.Email = ur.Email == null ? "" : ur.Email;
             DepartmentModel d = _context.Departments.Find(ur.DptId);
-            r.DocId = GetID();
-            r.UserId = ur.Id;
-            r.UserName = ur.FullName;
-            r.UserAccount = ur.UserName;
-            r.SentDate = DateTime.Now;
-            r.DptId = d == null ? "" : d.DptId;
-            r.Company = d == null ? "" : d.Name_C;
-            r.AccDpt = d == null ? "" : d.DptId;
-            r.AccDptName = d == null ? "" : d.Name_C;
-            r.Ext = ur.Ext == null ? "" : ur.Ext;
-            r.CheckerId = ur.Id;
-            r.Cycle = 0;
-            r.AssetName = "";
-            r.AssetNo = "";
-            r.EngId = 0;
+            keep.DocId = GetID();
+            keep.UserId = ur.Id;
+            keep.UserName = ur.FullName;
+            keep.UserAccount = ur.UserName;
+            keep.SentDate = DateTime.Now;
+            keep.DptId = d == null ? "" : d.DptId;
+            keep.Company = d == null ? "" : d.Name_C;
+            keep.AccDpt = d == null ? "" : d.DptId;
+            keep.AccDptName = d == null ? "" : d.Name_C;
+            keep.Ext = ur.Ext == null ? "" : ur.Ext;
+            keep.CheckerId = ur.Id;
+            keep.Cycle = 0;
+            keep.AssetName = "";
+            keep.AssetNo = "";
+            keep.EngId = 0;
+            keep.Loc = "總院";
             //
-            _context.BMEDKeeps.Add(r);
+            if (userDpt != null)
+            {
+                //分院人員
+                if (userDpt.Loc != "K" && userDpt.Loc != "P" && userDpt.Loc != "C")
+                {
+                    keep.Loc = userDpt.Loc;
+                }
+            }
+            _context.BMEDKeeps.Add(keep);
             _context.SaveChanges();
 
             List<SelectListItem> listItem = new List<SelectListItem>();
@@ -110,7 +120,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
             ViewData["DptMembers"] = new SelectList(dptMemberList, "Value", "Text");
 
-            return View(r);
+            return View(keep);
         }
 
         // POST: BMED/Keep/Create
@@ -369,8 +379,11 @@ namespace EDIS.Areas.BMED.Controllers
             List<KeepListVModel> kv = new List<KeepListVModel>();
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-
-            var kps = _context.BMEDKeeps.ToList();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            // 依照院區搜尋Keep主檔
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();

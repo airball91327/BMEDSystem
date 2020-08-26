@@ -24,5 +24,37 @@ namespace EDIS.Models.Identity
         public DateTime DateCreated { get; set; }
         [Display(Name = "最後異動日期")]
         public DateTime? LastActivityDate { get; set; }
+
+        private readonly ApplicationDbContext db;
+        public DepartmentModel(ApplicationDbContext context)
+        {
+            db = context;
+        }
+        public DepartmentModel()
+        {
+
+        }
+        /// <summary>
+        /// Get User's location by user's department.
+        /// </summary>
+        /// <param name="user"></param>
+        /// <returns></returns>
+        public string GetUserLocation(AppUserModel user)
+        {
+            string loc = null;
+            if (user != null)
+            {
+                var dpt = db.Departments.Find(user.DptId);
+                if (dpt != null)
+                {
+                    loc = dpt.Loc;
+                    if (loc == "K" || loc == "P" || loc == "C") //  總院代號
+                    {
+                        loc = "總院";
+                    }
+                }
+            }
+            return loc;
+        }
     }
 }

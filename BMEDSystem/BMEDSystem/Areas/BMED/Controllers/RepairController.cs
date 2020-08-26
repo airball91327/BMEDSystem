@@ -156,8 +156,11 @@ namespace EDIS.Areas.BMED.Controllers
             List<RepairListVModel> rv = new List<RepairListVModel>();
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-
-            var rps = _context.BMEDRepairs.ToList();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            // 依照院區搜尋Repair主檔
+            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();
@@ -703,7 +706,7 @@ namespace EDIS.Areas.BMED.Controllers
                 //分院人員
                 if (userDpt.Loc != "K" && userDpt.Loc != "P" && userDpt.Loc != "C")
                 {
-                    repair.Loc = "分院";
+                    repair.Loc = userDpt.Loc;
                     return View("Create2", repair);
                 }
             }

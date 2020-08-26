@@ -387,8 +387,13 @@ namespace EDIS.Areas.BMED.Controllers
 
             List<RepairSearchListVModel> rv = new List<RepairSearchListVModel>();
 
-            /* Querying data. */
-            var rps = _context.BMEDRepairs.ToList();
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            // 依照院區搜尋Repair主檔
+            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
             var repairFlows = _context.BMEDRepairFlows.ToList();
             var repairDtls = _context.BMEDRepairDtls.ToList();
             if (!string.IsNullOrEmpty(docid))   //表單編號
@@ -659,9 +664,13 @@ namespace EDIS.Areas.BMED.Controllers
 
 
             List<KeepSearchListViewModel> kv = new List<KeepSearchListViewModel>();
-
-            /* Querying data. */
-            var kps = _context.BMEDKeeps.ToList();
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            // 依照院區搜尋Keep主檔
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
             var keepFlows = _context.BMEDKeepFlows.ToList();
             var keepDtls = _context.BMEDKeepDtls.ToList();
             if (!string.IsNullOrEmpty(docid))   //表單編號

@@ -69,5 +69,7 @@ namespace EDIS.Models
         public string Src { get; set; }
         [Display(Name = "銷貨單號")]
         public string SalesDocId { get; set; }
+        [Display(Name = "申請院區")]
+        public string Loc { get; set; }
     }
 }
