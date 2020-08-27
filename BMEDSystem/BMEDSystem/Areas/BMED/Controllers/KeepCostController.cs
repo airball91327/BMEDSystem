@@ -109,16 +109,41 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                         else
                         {
-                            var vendor = _context.BMEDVendors.Find(keepCost.VendorId);
-                            var checkResult = await new ERPVendors().CheckERPVendorAsync(vendor.UniteNo, vendor.VendorName);
-                            if (checkResult != null)
+                            var kdtl = _context.BMEDRepairDtls.Find(keepCost.DocId);
+                            if (kdtl != null)
                             {
-                                keepCost.ERPVendorId = checkResult;
+                                if (kdtl.NotInExceptDevice == "N")  //非統包
+                                {
+                                    // Do nothing.
+                                }
+                                else
+                                {
+                                    var vendor = _context.BMEDVendors.Find(keepCost.VendorId);
+                                    var checkResult = await new ERPVendors().CheckERPVendorAsync(vendor.UniteNo, vendor.VendorName);
+                                    if (checkResult != null)
+                                    {
+                                        keepCost.ERPVendorId = checkResult;
+                                    }
+                                    else
+                                    {
+                                        string msg = "於ERP系統查無此廠商!!";
+                                        return BadRequest(msg);
+                                    }
+                                }
                             }
                             else
                             {
-                                string msg = "於ERP系統查無此廠商!!";
-                                return BadRequest(msg);
+                                var vendor = _context.BMEDVendors.Find(keepCost.VendorId);
+                                var checkResult = await new ERPVendors().CheckERPVendorAsync(vendor.UniteNo, vendor.VendorName);
+                                if (checkResult != null)
+                                {
+                                    keepCost.ERPVendorId = checkResult;
+                                }
+                                else
+                                {
+                                    string msg = "於ERP系統查無此廠商!!";
+                                    return BadRequest(msg);
+                                }
                             }
                         }
                         int i = _context.BMEDTicketDtls.Where(d => d.TicketDtlNo == keepCost.TicketDtl.TicketDtlNo)

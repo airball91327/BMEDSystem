@@ -68,10 +68,15 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                     var itemToRemove = listItem.Single(r => r.Value == "驗收人");
                     listItem.Remove(itemToRemove);    //只醫工、賀康主管可結案
                 }
+                if (repairDtl.NotInExceptDevice == "N" || repairDtl.DealState == 4)    //非統包 or 報廢
+                {
+                    var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
+                    listItem.Remove(itemToRemove);
+                }
                 if (repairDtl.DealState == 4)   //報廢
                 {
                     var itemToRemove = listItem.Single(r => r.Value == "驗收人");
-                    listItem.Remove(itemToRemove);    //只醫工、賀康主管可結案
+                    listItem.Remove(itemToRemove);    //只醫工主管可結案
                 }
                 if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "Y")   //有費用 & 統包
                 {
@@ -116,6 +121,17 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                     if (itemToRemove != null)
                     {
                         listItem.Remove(itemToRemove);
+                    }
+                }
+                //無費用時單位主管可結案
+                if (repairFlow.Cls == "單位主管")
+                {
+                    if (repairDtl != null)
+                    {
+                        if (repairDtl.IsCharged == "N")
+                        {
+                            listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
+                        }
                     }
                 }
             }

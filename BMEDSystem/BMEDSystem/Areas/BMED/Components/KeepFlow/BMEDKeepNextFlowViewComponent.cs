@@ -32,6 +32,7 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
         {
             /* Get repair and flow details. */
             KeepModel keep = _context.BMEDKeeps.Find(id);
+            KeepDtlModel keepDtl = _context.BMEDKeepDtls.Find(id);
             KeepFlowModel keepFlow = _context.BMEDKeepFlows.Where(f => f.DocId == id && f.Status == "?")
                                                            .FirstOrDefault();
 
@@ -42,7 +43,7 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
             listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
             listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
-            listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
+            listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
             //listItem.Add(new SelectListItem { Text = "醫工主任", Value = "醫工主任" });
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
 
@@ -55,11 +56,29 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             {
                 assign.Cls = keepFlow.Cls;
 
-                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管")    //驗收人 or 醫工主管結案
+                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")    //驗收人 or 醫工主管結案
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
-
+                if (keepDtl != null)
+                {
+                    if (keepDtl.NotInExceptDevice == "N")    //非統包
+                    {
+                        var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
+                        listItem.Remove(itemToRemove);
+                    }
+                }
+                //無費用時單位主管可結案
+                if (keepFlow.Cls == "單位主管")
+                {
+                    if (keepDtl != null)
+                    {
+                        if (keepDtl.IsCharged == "N")
+                        {
+                            listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
+                        }
+                    }
+                }
             }
             ViewData["FlowCls"] = new SelectList(listItem, "Value", "Text", "");
 

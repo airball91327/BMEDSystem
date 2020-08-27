@@ -1,5 +1,14 @@
 ﻿@model EDIS.Models.KeepEmpModel
+
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
 <script src="~/js/BMED/KeepEmp.js" asp-append-version="true"></script>
+
+<script>
+    $(function () {
+        $('.comboboxEMP').combobox();
+    });
+</script>
 
 <form asp-controller="KeepEmp" asp-action="Edit" asp-area="BMED" data-ajax="true"
       data-ajax-method="POST" data-ajax-update="#pnlKEEPEMPLIST"
@@ -21,7 +30,7 @@
             <div class=form-inline>
                 <div class=form-group>
                     <label asp-for="UserName" class="control-title"></label>
-                    <select asp-for="UserId" asp-items="@ViewData["EmpList"] as SelectList" class="form-control"></select>
+                    <select asp-for="UserId" asp-items="@ViewData["EmpList"] as SelectList" class="form-control comboboxEMP"></select>
                     <span asp-validation-for="UserId" class="text-danger"></span>
                 </div>
             </div>

@@ -252,7 +252,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     break;
-                case "設備主管":
+                case "賀康主管":  //設備主管
                     s = roleManager.GetUsersInRole("MedAssetMgr").ToList();
                     list = new List<SelectListItem>();
                     foreach (string l in s)

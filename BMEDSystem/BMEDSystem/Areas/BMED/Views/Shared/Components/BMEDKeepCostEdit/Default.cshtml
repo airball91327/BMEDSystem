@@ -21,10 +21,13 @@
             <div class="form-inline">
                 <label asp-for="StockType" class="control-title"></label>
                 <div class="radio">
-                    <label>
-                        <input type="radio" name="StockType" id="StockType1" value="0">
-                        庫存
-                    </label>
+                    @if (ViewData["HideCost"].ToString() == "Y") //統包才可點庫存
+                    {
+                        <label>
+                            <input type="radio" name="StockType" id="StockType1" value="0">
+                            庫存
+                        </label>
+                    }
                 </div>
                 <div class="radio">
                     <label>
