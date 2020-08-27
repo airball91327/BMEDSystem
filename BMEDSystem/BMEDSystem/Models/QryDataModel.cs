@@ -63,4 +63,15 @@ namespace EDIS.Models
         public string ACC_DPT { get; set; }
         public string DELIV_DPT { get; set; }
     }
+    public class SystemMsg
+    {
+        public string MsgCode { get; set; }
+        public string MsgString { get; set; }
+
+        public SystemMsg()
+        {
+            MsgCode = "0";
+            MsgString = "成功";
+        }
+    }
 }
