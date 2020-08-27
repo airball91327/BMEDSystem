@@ -240,7 +240,15 @@ namespace EDIS.Areas.BMED.Controllers
                     //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
                     mail.message.Body = body;
                     mail.message.IsBodyHtml = true;
-                    mail.SendMail();
+                    // 寄信人員控管
+                    if (flow.Cls.Contains("工程師") || flow.Cls == "賀康主管" || flow.Cls == "醫工主管")
+                    {
+                        // 工程師、主管不寄信
+                    }
+                    else
+                    {
+                        mail.SendMail();
+                    }
                 }
 
                 return new JsonResult(assign)

@@ -179,8 +179,8 @@ else
             {
                 <tr>
                     <td style="text-align:center">
-                        @if ((item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "7084") ||
-                            (item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "8420")) //其他工程師案件
+                        @if ((item.Flg == "?" && UserManager.GetCurrentUserDptId(User) == "7084") ||
+                            (item.Flg == "?" && UserManager.GetCurrentUserDptId(User) == "8420")) //其他案件
                         {
                             @Html.Hidden("transData[" + i + "].DocId", item.DocId)
                             @Html.CheckBox("transData[" + i + "].IsSelected", item.IsSelected, new { @class = "IsSelected2" })

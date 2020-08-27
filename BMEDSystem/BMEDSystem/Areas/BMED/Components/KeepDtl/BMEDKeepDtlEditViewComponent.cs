@@ -31,12 +31,22 @@ namespace EDIS.Areas.BMED.Components.KeepDtl
             var ur = _userRepo.Find(us => us.UserName == this.User.Identity.Name).FirstOrDefault();
 
             // InOut dropdown list's items.
+            string defaultInOut = "";
+            var kp = _context.BMEDKeeps.Find(id);
+            if (kp != null)
+            {
+                var assetKeep = _context.BMEDAssetKeeps.Find(kp.AssetNo);
+                if (assetKeep != null)
+                {
+                    defaultInOut = assetKeep.InOut;
+                }
+            }
             List<SelectListItem> listItem1 = new List<SelectListItem>();
             listItem1.Add(new SelectListItem { Text = "自行", Value = "0" });
             listItem1.Add(new SelectListItem { Text = "委外", Value = "1" });
             listItem1.Add(new SelectListItem { Text = "租賃", Value = "2" });
             listItem1.Add(new SelectListItem { Text = "保固", Value = "3" });
-            ViewData["InOut"] = new SelectList(listItem1, "Value", "Text", "");
+            ViewData["InOut"] = new SelectList(listItem1, "Value", "Text", defaultInOut);
 
             // Result dropdown list's items.
             List<SelectListItem> listItem2 = new List<SelectListItem>();

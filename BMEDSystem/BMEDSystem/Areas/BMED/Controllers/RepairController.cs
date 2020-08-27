@@ -1435,10 +1435,10 @@ namespace EDIS.Areas.BMED.Controllers
                 }
 
             }
-            //if( printType != 0 )
-            //{
-            //    return View("PrintRepairDoc2", vm);
-            //}
+            if (printType == 1)   //一頁式列印(多簽核流程)
+            {
+                return View("PrintRepairDoc2", vm);
+            }
             return View(vm);
         }
 

@@ -145,7 +145,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }).Where(f => f.keepflow.Status == "?").ToList();
                 if (kf.Count() > 0)
                 {
-                    throw new Exception("尚有未結案的保養單需處理!");
+                    return BadRequest("尚有未結案的保養單需處理!");
                 }
             }
                                                  
@@ -1098,10 +1098,10 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                 }
             }
-            //if (printType != 0)
-            //{
-            //    return View("PrintRepairDoc2", vm);
-            //}
+            if (printType == 1)   //一頁式列印(多簽核流程)
+            {
+                return View("PrintKeepDoc2", vm);
+            }
             return View(vm);
         }
 
