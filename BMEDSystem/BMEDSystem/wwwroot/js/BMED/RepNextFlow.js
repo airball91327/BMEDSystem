@@ -109,6 +109,10 @@ $(function () {
                             }
                             i++;
                         });
+                        //
+                        select.combobox();
+                        select.data('combobox').refresh();
+                        //
                         if ($('#FlowCls').val() === "驗收人") {
                             $("#searchUid").show();
                         }
@@ -141,6 +145,9 @@ $(function () {
                     }
                     i++;
                 });
+                //
+                select.combobox();
+                select.data('combobox').refresh();
             }
         });
     });

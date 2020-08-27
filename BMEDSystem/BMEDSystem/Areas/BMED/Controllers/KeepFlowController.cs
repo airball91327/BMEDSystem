@@ -239,7 +239,7 @@ namespace EDIS.Areas.BMED.Controllers
                             if (u != null)
                             {
                                 li = new SelectListItem();
-                                li.Text = u.FullName;
+                                li.Text = u.FullName + "(" + u.UserName + ")";
                                 li.Value = u.Id.ToString();
                                 list.Add(li);
                             }
