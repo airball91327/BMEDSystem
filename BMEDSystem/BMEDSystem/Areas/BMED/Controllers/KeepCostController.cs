@@ -109,7 +109,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                         else
                         {
-                            var kdtl = _context.BMEDRepairDtls.Find(keepCost.DocId);
+                            var kdtl = _context.BMEDKeepDtls.Find(keepCost.DocId);
                             if (kdtl != null)
                             {
                                 if (kdtl.NotInExceptDevice == "N")  //非統包

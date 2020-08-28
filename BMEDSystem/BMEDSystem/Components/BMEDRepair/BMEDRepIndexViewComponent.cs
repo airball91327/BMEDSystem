@@ -1,5 +1,6 @@
 ﻿using EDIS.Models;
 using EDIS.Models.Identity;
+using EDIS.Repositories;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using System;
@@ -13,16 +14,23 @@ namespace EDIS.Components.BMEDRepair
     {
         private readonly ApplicationDbContext _context;
         private readonly CustomRoleManager roleManager;
+        private readonly IRepository<AppUserModel, int> _userRepo;
 
         public BMEDRepIndexViewComponent(ApplicationDbContext context,
-                                         CustomRoleManager customRoleManager)
+                                         CustomRoleManager customRoleManager,
+                                         IRepository<AppUserModel, int> userRepo)
         {
             _context = context;
             roleManager = customRoleManager;
+            _userRepo = userRepo;
         }
 
         public async Task<IViewComponentResult> InvokeAsync()
         {
+            // Get current user.
+            var user = _userRepo.Find(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+            /* 流程的下拉選單 */
             List<SelectListItem> FlowlistItem = new List<SelectListItem>();
             FlowlistItem.Add(new SelectListItem { Text = "待簽核", Value = "待簽核" });
             FlowlistItem.Add(new SelectListItem { Text = "流程中", Value = "流程中" });
@@ -87,6 +95,28 @@ namespace EDIS.Components.BMEDRepair
                 }
             }
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
+
+            /* 擷取該使用者單位底下所有人員 */
+            var dptUsers = _context.AppUsers.Where(a => a.DptId == user.DptId && a.Status == "Y").ToList();
+            List<SelectListItem> dptMemberList = new List<SelectListItem>();
+            foreach (var item in dptUsers)
+            {
+                dptMemberList.Add(new SelectListItem
+                {
+                    Text = item.FullName + "(" + item.UserName + ")",
+                    Value = item.Id.ToString()
+                });
+            }
+
+            // 使用者為工程師，帶工程師列表，其餘帶同部門人員
+            if (user.DptId == "7084" || user.DptId == "8420")
+            {
+                ViewData["BMEDClsUsers"] = new SelectList(listItem5, "Value", "Text");
+            }
+            else
+            {
+                ViewData["BMEDClsUsers"] = new SelectList(dptMemberList, "Value", "Text");
+            }
 
             QryRepListData data = new QryRepListData();
 

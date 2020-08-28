@@ -101,6 +101,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyEngCode = qdata.BMEDqtyEngCode;
             string qtyTicketNo = qdata.BMEDqtyTicketNo;
             string qtyVendor = qdata.BMEDqtyVendor;
+            string qtyClsUser = qdata.BMEDqtyClsUser;
             //至少輸入一個搜尋條件
             if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
                 dptid == null && qtyDate1 == null && qtyDate2 == null && qtyDealStatus == null &&
@@ -614,6 +615,10 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyIsCharged))
             {
                 rv = rv.Where(r => r.IsCharged == qtyIsCharged).ToList();
+            }
+            if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
+            {
+                rv = rv.Where(r => r.FlowUid == Convert.ToInt32(qtyClsUser)).ToList();
             }
             //
             /* 處理工程師查詢的下拉選單 */

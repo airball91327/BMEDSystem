@@ -323,6 +323,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyEngCode = qdata.BMEDKqtyEngCode;
             string qtyTicketNo = qdata.BMEDKqtyTicketNo;
             string qtyVendor = qdata.BMEDKqtyVendor;
+            string qtyClsUser = qdata.BMEDKqtyClsUser;
             //至少輸入一個搜尋條件
             if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
                 dptid == null && qtyDate1 == null && qtyDate2 == null && qtyKeepResult == null &&
@@ -866,6 +867,10 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyIsCharged))
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
+            }
+            if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
+            {
+                kv = kv.Where(r => r.FlowUid == Convert.ToInt32(qtyClsUser)).ToList();
             }
             /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
             foreach (var item in kv)
