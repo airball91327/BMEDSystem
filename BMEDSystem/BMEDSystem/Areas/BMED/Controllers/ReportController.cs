@@ -1082,6 +1082,11 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<UnSignListVModel> UnSignList(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<UnSignListVModel> sv = new List<UnSignListVModel>();
             List<UnSignListVModel> sv2 = new List<UnSignListVModel>();
             TempData["qry"] = JsonConvert.SerializeObject(v); ;
@@ -1100,7 +1105,7 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.DealDes,
                 rd.DealState
             })
-            .Join(_context.BMEDRepairs, rd => rd.DocId, k => k.DocId,
+            .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
             (rd, k) => new
             {
                 rd.DocId,
@@ -1204,10 +1209,12 @@ namespace EDIS.Areas.BMED.Controllers
             str += "LEFT JOIN BMEDASSETS AS F ON B.AssetNo = F.AssetNo ";
             str += "LEFT JOIN BMEDASSETKEEPS AS G ON B.AssetNo = G.AssetNo ";
             str += "WHERE A.STATUS = '?' AND (B.SENTDATE BETWEEN @D1 AND @D2) ";
+            str += "AND B.LOC = @D3 ";
 
             sv2 = _context.UnSignListVModelQuery.FromSql(str,
                 new SqlParameter("D1", v.Sdate),
-                new SqlParameter("D2", v.Edate)).ToList();
+                new SqlParameter("D2", v.Edate),
+                new SqlParameter("D3", urLocation)).ToList();
             foreach (UnSignListVModel s in sv2)
             {
                 switch (s.DealState)
@@ -1334,12 +1341,16 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<DoHrSumMonVModel> DoHrSumMon(ReportQryVModel v)
         {
-
+            /* Get login user. */
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(usr);
+            //
             List<DoHrSumMonVModel> mv = new List<DoHrSumMonVModel>();
             DoHrSumMonVModel dv;
             List<UserHour> query = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate)
                 .Where(d => d.EndDate <= v.Edate)
-                .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
                 (rd, r) => new
                 {
                     rd.DocId,
@@ -1422,7 +1433,7 @@ namespace EDIS.Areas.BMED.Controllers
                 //dv.Fail3MRate
                 IEnumerable<IGrouping<string, UserAsset>> ob = _context.BMEDRepairDtls.Where(d => d.EndDate >= sd)
                 .Where(d => d.EndDate <= v.Edate)
-                .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
                 (rd, r) => new
                 {
                     rd.DocId,
@@ -1674,9 +1685,13 @@ namespace EDIS.Areas.BMED.Controllers
         {
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<MonthRepairVModel> mv = new List<MonthRepairVModel>();
-
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             mv = _context.BMEDRepairDtls
-           .Join(_context.BMEDRepairs.Where(d => d.ApplyDate >= v.Sdate)
+           .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation).Where(d => d.ApplyDate >= v.Sdate)
            .Where(d => d.ApplyDate <= v.Edate), rd => rd.DocId, k => k.DocId,
            (rd, k) => new
            {
@@ -1847,12 +1862,17 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<MonthKeepVModel> MonthKeep(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<MonthKeepVModel> mv = new List<MonthKeepVModel>();
             string s = "";
             _context.BMEDKeepDtls.Where(d => d.EndDate >= v.Sdate)
            .Where(d => d.EndDate <= v.Edate)
-           .Join(_context.BMEDKeeps, rd => rd.DocId, k => k.DocId,
+           .Join(_context.BMEDKeeps.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
            (rd, k) => new
            {
                rd.DocId,
@@ -1970,7 +1990,11 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepairKeepVModel> RepairKeep(ReportQryVModel v)
         {
-
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
             int rcnt = 0;
@@ -1986,7 +2010,8 @@ namespace EDIS.Areas.BMED.Controllers
                 kcnt = 0;
                 tolcost = 0m;
                 var ss = new[] { "?", "2" };
-                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate)
+                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.Loc == urLocation)
+                    .Where(r => r.ApplyDate >= v.Sdate)
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
@@ -2013,7 +2038,8 @@ namespace EDIS.Areas.BMED.Controllers
 
                 m.RepCost = tolcost;
                 //
-                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.SentDate >= v.Sdate)
+                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.Loc == urLocation)
+                    .Where(r => r.SentDate >= v.Sdate)
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
@@ -2049,7 +2075,11 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<RepairKeepVModel> RepairCost(ReportQryVModel v)
         {
-
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
             int rcnt = 0;
@@ -2065,7 +2095,8 @@ namespace EDIS.Areas.BMED.Controllers
                 kcnt = 0;
                 tolcost = 0m;
                 var ss = new[] { "?", "2" };
-                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate)
+                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.Loc == urLocation)
+                    .Where(r => r.ApplyDate >= v.Sdate)
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
@@ -2092,7 +2123,8 @@ namespace EDIS.Areas.BMED.Controllers
 
                 m.RepCost = tolcost;
                 //
-                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.SentDate >= v.Sdate)
+                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.Loc == urLocation)
+                    .Where(r => r.SentDate >= v.Sdate)
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
@@ -2128,7 +2160,11 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<RepairKeepVModel> KeepCost(ReportQryVModel v)
         {
-
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
             int rcnt = 0;
@@ -2144,7 +2180,9 @@ namespace EDIS.Areas.BMED.Controllers
                 kcnt = 0;
                 tolcost = 0m;
                 var ss = new[] { "?", "2" };
-                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate)
+                //維修
+                List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.Loc == urLocation)
+                    .Where(r => r.ApplyDate >= v.Sdate)
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
@@ -2170,8 +2208,9 @@ namespace EDIS.Areas.BMED.Controllers
                          (rd, c) => c).Select(c => c.TotalCost).DefaultIfEmpty(0).Sum();
 
                 m.RepCost = tolcost;
-                //
-                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.SentDate >= v.Sdate)
+                //保養
+                List<KeepModel> ks = _context.BMEDKeeps.Where(r => r.Loc == urLocation)
+                    .Where(r => r.SentDate >= v.Sdate)
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
@@ -2256,6 +2295,11 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<RepeatFailVModel> RepeatFail(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RepeatFailVModel> mv = new List<RepeatFailVModel>();
             List<RepeatFailVModel> mv2 = new List<RepeatFailVModel>();
             RepeatFailVModel m;
@@ -2276,7 +2320,7 @@ namespace EDIS.Areas.BMED.Controllers
                 m.EndDate = rd.EndDate.Value;
                 m.Cost = rd.Cost;
                 m.FailFactor = Convert.ToString(rd.FailFactor);
-                r = _context.BMEDRepairs.Where(i => i.DocId == rd.DocId).ToList().FirstOrDefault();
+                r = _context.BMEDRepairs.Where(i => i.Loc == urLocation).Where(i => i.DocId == rd.DocId).ToList().FirstOrDefault();
                 if (r != null)
                 {
                     m.TroubleDes = r.TroubleDes;
@@ -2300,7 +2344,10 @@ namespace EDIS.Areas.BMED.Controllers
                     AppUserModel u = _context.AppUsers.Find(p.UserId);
                     m.EngNam = u.FullName;
                 }
-                mv2.Add(m);
+                if (r != null)
+                {
+                    mv2.Add(m);
+                }
             }
             IEnumerable<IGrouping<string, RepeatFailVModel>> query = mv2.GroupBy(s => s.AssetNo);
             foreach (var group in query)
@@ -2322,12 +2369,17 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepKeepStokVModel> RepKeepStok(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RepKeepStokVModel> mv = new List<RepKeepStokVModel>();
             List<Cust> cv;
             cv =
            _context.BMEDRepairDtls.Where(d => d.CloseDate >= v.Sdate &&
                d.CloseDate <= v.Edate)
-               .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+               .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
                (rd, r) => new
                {
                    rd.DocId,
@@ -2348,7 +2400,7 @@ namespace EDIS.Areas.BMED.Controllers
                }).Union(
           _context.BMEDKeepDtls.Where(d => d.CloseDate >= v.Sdate &&
               d.CloseDate <= v.Edate)
-              .Join(_context.BMEDKeeps, rd => rd.DocId, r => r.DocId,
+              .Join(_context.BMEDKeeps.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
               (rd, r) => new
               {
                   rd.DocId,
@@ -2455,12 +2507,17 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RpKpStokBdVModel> RpKpStokBd(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             List<RpKpStokBdVModel> sv = new List<RpKpStokBdVModel>();
             List<RpKpStokBdVModel> sv2 = new List<RpKpStokBdVModel>();
             RpKpStokBdVModel rb;
             var rps = _context.BMEDRepairDtls.Where(d => d.CloseDate != null).Where(d => d.CloseDate >= v.Sdate &&
                 d.CloseDate <= v.Edate)
-                .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
                 (rd, r) => new
                 {
                     rd.DocId,
@@ -2493,7 +2550,7 @@ namespace EDIS.Areas.BMED.Controllers
 
             var ksp = _context.BMEDKeepDtls.Where(d => d.CloseDate != null).Where(d => d.CloseDate >= v.Sdate &&
                 d.CloseDate <= v.Edate)
-                .Join(_context.BMEDKeeps, rd => rd.DocId, r => r.DocId,
+                .Join(_context.BMEDKeeps.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
                 (rd, r) => new
                 {
                     rd.DocId,
@@ -2659,13 +2716,18 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<StokCostVModel> StokCost(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<StokCostVModel> sv = new List<StokCostVModel>();
             List<StokCostVModel> sv2 = new List<StokCostVModel>();
 
             sv = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate
                 && d.EndDate <= v.Edate)
-            .Join(_context.BMEDRepairs, rd => rd.DocId, k => k.DocId,
+            .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
             (rd, k) => new
             {
                 rd.DocId,
@@ -2800,7 +2862,7 @@ namespace EDIS.Areas.BMED.Controllers
             //保養
             sv2 = _context.BMEDKeepDtls.Where(d => d.EndDate >= v.Sdate
                && d.EndDate <= v.Edate)
-           .Join(_context.BMEDKeeps, rd => rd.DocId, k => k.DocId,
+           .Join(_context.BMEDKeeps.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
            (rd, k) => new
            {
                rd.DocId,
