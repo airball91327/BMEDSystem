@@ -78,11 +78,11 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                     var itemToRemove = listItem.Single(r => r.Value == "驗收人");
                     listItem.Remove(itemToRemove);    //只醫工主管可結案
                 }
-                if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "Y")   //有費用 & 統包
-                {
-                    var itemToRemove = listItem.Single(r => r.Value == "醫工主管");
-                    listItem.Remove(itemToRemove);    //移除醫工主管的選項
-                }
+                //if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "Y")   //有費用 & 統包
+                //{
+                //    var itemToRemove = listItem.Single(r => r.Value == "醫工主管");
+                //    listItem.Remove(itemToRemove);    //移除醫工主管的選項
+                //}
                 if (repairFlow.Cls == "驗收人" && repairDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
                 {
                     var itemToRemove = listItem.SingleOrDefault(r => r.Value == "醫工主管");
