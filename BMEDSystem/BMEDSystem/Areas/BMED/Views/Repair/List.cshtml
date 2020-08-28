@@ -76,7 +76,7 @@
         }
     }
 
-    function onSuccess() {
+    function onSuccess2() {
         $.Toast.hideToast();
         alert("已轉送");
         BMEDRepReSubmit();
@@ -119,7 +119,7 @@ else
               'duration':0
               })"
           data-ajax-complete="$.Toast.hideToast()"
-          data-ajax-success="onSuccess()"
+          data-ajax-success="onSuccess2()"
           data-ajax-failure="updateFailed">
 
         <div class="form-inline">

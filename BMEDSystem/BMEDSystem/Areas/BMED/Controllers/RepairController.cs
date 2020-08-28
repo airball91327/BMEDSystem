@@ -621,7 +621,7 @@ namespace EDIS.Areas.BMED.Controllers
                 rv = rv.Where(r => r.FlowUid == Convert.ToInt32(qtyClsUser)).ToList();
             }
             //
-            /* 處理工程師查詢的下拉選單 */
+            /* 處理轉單工程師的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
             List<SelectListItem> listItem1 = new List<SelectListItem>();
             foreach (string l in engs)

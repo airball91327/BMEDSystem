@@ -96,7 +96,40 @@
                 </div>
             </div>
         </div>
-
+        <div class="row">
+            <div class="form-inline">
+                <label class="control-title">費用歸屬</label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="LocType" id="LocType1" value="本單位" checked>
+                        本單位
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="LocType" id="LocType2" value="公共區域">
+                        其他單位或公共區域
+                    </label>
+                </div>
+                @*<div class="radio">
+                    <label>
+                        <input type="radio" name="LocType" id="LocType3" value="其他單位">
+                        其他單位
+                    </label>
+                </div>*@
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label asp-for="AccDpt" class="control-title"></label>
+                    <input asp-for="AccDpt" class="form-control" readonly />
+                    <input asp-for="AccDptName" class="form-control" readonly />
+                    <span style="color:red" id="AccDptNameErrorMsg"></span>
+                    <span asp-validation-for="AccDpt" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -183,40 +216,6 @@
                     </label>
                 </div>
                 <span asp-validation-for="RepType" class="text-danger"></span>
-            </div>
-        </div>
-        <div class="row">
-            <div class="form-inline">
-                <label class="control-title">費用歸屬</label>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="LocType" id="LocType1" value="本單位" checked>
-                        本單位
-                    </label>
-                </div>
-                <div class="radio">
-                    <label>
-                        <input type="radio" name="LocType" id="LocType2" value="公共區域">
-                        其他單位或公共區域
-                    </label>
-                </div>
-                @*<div class="radio">
-                    <label>
-                        <input type="radio" name="LocType" id="LocType3" value="其他單位">
-                        其他單位
-                    </label>
-                </div>*@
-            </div>
-        </div>
-        <div class="row">
-            <div class=form-inline>
-                <div class="form-group">
-                    <label asp-for="AccDpt" class="control-title"></label>
-                    <input asp-for="AccDpt" class="form-control" readonly />
-                    <input asp-for="AccDptName" class="form-control" readonly />
-                    <span style="color:red" id="AccDptNameErrorMsg"></span>
-                    <span asp-validation-for="AccDpt" class="text-danger"></span>
-                </div>
             </div>
         </div>
         <div class="row">

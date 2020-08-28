@@ -888,6 +888,23 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             //
+            /* 處理轉單工程師的下拉選單 */
+            var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
+            List<SelectListItem> listItem1 = new List<SelectListItem>();
+            foreach (string l in engs)
+            {
+                var u = _context.AppUsers.Where(usr => usr.UserName == l && ur.Status == "Y").FirstOrDefault();
+                if (u != null)
+                {
+                    listItem1.Add(new SelectListItem
+                    {
+                        Text = u.FullName + "(" + u.UserName + ")",
+                        Value = u.Id.ToString()
+                    });
+                }
+            }
+            ViewData["AssignKEngId"] = new SelectList(listItem1, "Value", "Text");
+            //
             if (kv.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("List", kv.ToPagedList(1, pageSize));
             return PartialView("List", kv.ToPagedList(page, pageSize));
@@ -1141,6 +1158,49 @@ namespace EDIS.Areas.BMED.Controllers
             _context.SaveChanges();
 
             return RedirectToAction("Index", "Home", new { Area = "" });
+        }
+
+        [HttpPost]
+        public JsonResult TransDocToEng(List<RepairListVModel> transKData, string AssignKEngId)
+        {
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            int assignEngId = Convert.ToInt32(AssignKEngId);
+
+            foreach (var item in transKData)
+            {
+                if (item.IsSelected)
+                {
+                    KeepModel keep = _context.BMEDKeeps.Find(item.DocId);
+                    //指派工程師
+                    keep.EngId = assignEngId;
+                    _context.Entry(keep).State = EntityState.Modified;
+                    _context.SaveChanges();
+
+                    KeepFlowModel kf = _context.BMEDKeepFlows.Where(f => f.DocId == item.DocId && f.Status == "?").FirstOrDefault();
+                    //轉送下一關卡
+                    kf.Opinions = "[轉送工程師]";
+                    kf.Status = "1";
+                    kf.Rtt = DateTime.Now;
+                    kf.Rtp = ur.Id;
+                    _context.Entry(kf).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    //
+                    KeepFlowModel flow = new KeepFlowModel();
+                    flow.DocId = item.DocId;
+                    flow.StepId = kf.StepId + 1;
+                    flow.UserId = assignEngId;
+                    flow.UserName = _context.AppUsers.Find(assignEngId).FullName;
+                    flow.Status = "?";
+                    flow.Cls = "設備工程師";
+                    flow.Rtt = DateTime.Now;
+                    _context.BMEDKeepFlows.Add(flow);
+                    _context.SaveChanges();
+                }
+            }
+            return new JsonResult(assignEngId)
+            {
+                Value = new { success = true, error = "" }
+            };
         }
 
         protected override void Dispose(bool disposing)
