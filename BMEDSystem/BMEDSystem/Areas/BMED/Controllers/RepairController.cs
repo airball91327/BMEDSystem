@@ -1973,9 +1973,9 @@ namespace EDIS.Areas.BMED.Controllers
         public IActionResult GetResignList(string role, int page = 1)
         {
             /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = new DepartmentModel(_context).GetUserLocation(usr);
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
             List<SelectListItem> listItem1 = new List<SelectListItem>();
