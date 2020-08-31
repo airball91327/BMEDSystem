@@ -47,6 +47,31 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             //listItem.Add(new SelectListItem { Text = "醫工主任", Value = "醫工主任" });
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
 
+            //額外流程控管
+            if (keepDtl.IsCharged == "Y" && keepDtl.NotInExceptDevice == "N")   //有費用 & 非統包
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "驗收人");
+                listItem.Remove(itemToRemove);    //只醫工主管可結案
+            }
+            if (keepDtl.NotInExceptDevice == "N")    //非統包
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
+                listItem.Remove(itemToRemove);
+            }
+            if (keepFlow.Cls == "驗收人" && keepDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
+            {
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "醫工主管");
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
+                itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
+            }
+
             /* Insert values. */
             AssignModel assign = new AssignModel();
             assign.DocId = id;
@@ -56,15 +81,15 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             {
                 assign.Cls = keepFlow.Cls;
 
-                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")    //驗收人 or 醫工主管結案
+                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")    
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
-                if (keepDtl != null)
+                if (keepFlow.Cls == "驗收人" && keepDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
                 {
-                    if (keepDtl.NotInExceptDevice == "N")    //非統包
+                    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "結案");
+                    if (itemToRemove != null)
                     {
-                        var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
                         listItem.Remove(itemToRemove);
                     }
                 }
@@ -86,7 +111,7 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             listItem3.Add(new SelectListItem { Text = "", Value = "" });
             ViewData["FlowUid"] = new SelectList(listItem3, "Value", "Text", "");
 
-            assign.Hint = "";
+            assign.Hint = "申請者→負責工程師→使用單位→(若有費用)負責工程師→[醫工部主管、賀康主管]→結案";
 
             return View(assign);
         }

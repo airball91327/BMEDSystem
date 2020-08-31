@@ -24,8 +24,7 @@
     <li><a data-toggle="tab" href="#menu3">驗收 <span class="badge" id="BMEDdelivCount">@Model.DeliveryCount</span></a></li>
     <li><a data-toggle="tab" href="#menu4">採購評估 <span class="badge" id="BMEDbuyCount">@Model.BuyEvalateCount</span></a></li>
     @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr") ||
-       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
-       UserManager.GetCurrentUserDptId(User) == "7084" || UserManager.GetCurrentUserDptId(User) == "8420")
+       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
     {
         <li><a data-toggle="tab" href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
     }

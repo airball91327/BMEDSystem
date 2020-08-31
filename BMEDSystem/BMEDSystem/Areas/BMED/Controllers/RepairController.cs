@@ -499,11 +499,10 @@ namespace EDIS.Areas.BMED.Controllers
                         repair = r,
                         flow = f
                     }).ToList();
-                    /* search all RepairDocs which flowCls is in engineer. */
+                    /* search all RepairDocs which doc is not closed. */
                     repairFlows2 = repairFlows2.GroupBy(f => f.flow.DocId)
-                                               .Where(group => group.Last().flow.Status == "?" || group.Last().flow.Status == "2")
-                                               .Where(group => group.Last().flow.Cls.Contains("工程師"))
-                                               .Where(group => group.Last().flow.UserId != 0).Select(group => group.Last()).ToList();
+                                               .Where(group => group.Last().flow.Status == "?")
+                                               .Select(group => group.Last()).ToList();
                     //repairFlows2 = repairFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                     {

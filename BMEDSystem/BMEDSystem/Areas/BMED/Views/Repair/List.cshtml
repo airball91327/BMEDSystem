@@ -219,6 +219,7 @@ else
                             // 案件的前一個流程為"工程師"且人員為該名使用者才可拉單
                             if (item.ExFlowCls.Contains("工程師") && item.ExFlowUid == UserManager.GetCurrentUserId(User))
                             {
+                                @Html.Raw(" |")
                                 <a href="#" onclick="getRepDocBack(@item.DocId, '@item.FlowCls', '@UserManager.GetUserFullName(User)')">拉回案件</a>
                             }
                         }
