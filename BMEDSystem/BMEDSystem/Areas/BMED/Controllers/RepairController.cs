@@ -1100,42 +1100,61 @@ namespace EDIS.Areas.BMED.Controllers
         [HttpPost]
         public JsonResult GetAssetEngId(string AssetNo)
         {
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             AssetModel asset = _context.BMEDAssets.Find(AssetNo);
             AppUserModel engineer = null;
             if (asset != null)
             {
                 engineer = _context.AppUsers.Find(asset.AssetEngId);
             }
-
-            /* 擷取預設負責工程師 */
-            if (engineer == null)  //該設備無預設工程師，改為擷取保管部門所對應工程師
+            //
+            if (AssetNo == "99999") //無財編的工程師處理
             {
-                if (asset != null)
+                var eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
+                if (eid != null)
                 {
-                    var dptid = asset.DelivDpt;
-                    var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
-                    if (eid != null)
-                    {
-                        engineer = _context.AppUsers.Find(eid.EngId);
-                    }
-                    if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
-                    {
-                        var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
-                        return Json(tempEng);
-                    }
-                    var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
-                    return Json(eng);
+                    engineer = _context.AppUsers.Find(eid.EngId);
                 }
-                else  //查無設備
+                if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
                 {
                     var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
                     return Json(tempEng);
                 }
+                var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
+                return Json(eng);
             }
             else
             {
-                var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
-                return Json(eng);
+                /* 擷取預設負責工程師 */
+                if (engineer == null)  //該設備無預設工程師，改為擷取保管部門所對應工程師
+                {
+                    if (asset != null)
+                    {
+                        var dptid = asset.DelivDpt;
+                        var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
+                        if (eid != null)
+                        {
+                            engineer = _context.AppUsers.Find(eid.EngId);
+                        }
+                        if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
+                        {
+                            var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                            return Json(tempEng);
+                        }
+                        var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
+                        return Json(eng);
+                    }
+                    else  //查無設備
+                    {
+                        var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                        return Json(tempEng);
+                    }
+                }
+                else
+                {
+                    var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
+                    return Json(eng);
+                }
             }
         }
 
@@ -1953,6 +1972,10 @@ namespace EDIS.Areas.BMED.Controllers
         //[HttpPost]
         public IActionResult GetResignList(string role, int page = 1)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
             List<SelectListItem> listItem1 = new List<SelectListItem>();
@@ -2026,13 +2049,13 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             //
-            if (role == "MedAssetMgr")
+            if (role == "MedAssetMgr")  //總院設備主管
             {
                 rv = rv.Where(r => r.repdata.Loc == "總院").ToList();
             }
-            else if (role == "MedBranchMgr")
+            else if (role == "MedBranchMgr")    //分院醫工主管
             {
-                rv = rv.Where(r => r.repdata.Loc != "總院").ToList();
+                rv = rv.Where(r => r.repdata.Loc == urLocation).ToList();
             }
             //
             ViewBag.Role = role;
