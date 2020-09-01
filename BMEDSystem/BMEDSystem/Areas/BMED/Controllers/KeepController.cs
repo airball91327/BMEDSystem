@@ -691,6 +691,7 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         Src = j.keep.Src,
                         SentDate = j.keep.SentDate,

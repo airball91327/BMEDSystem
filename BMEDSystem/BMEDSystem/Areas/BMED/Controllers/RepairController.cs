@@ -436,6 +436,7 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
