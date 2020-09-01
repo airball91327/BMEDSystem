@@ -14,6 +14,7 @@ using EDIS.Fliters;
 using Newtonsoft.Json;
 using EDIS.Areas.WebService.Models;
 using WebService;
+using System.Net.Http;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -100,6 +101,11 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.Entry(kd).State = EntityState.Modified;
 
                     _context.SaveChanges();
+                    //sync to oracleBatch
+                    string smsg = SyncToOracleBatch(assign.DocId);
+                    //if (smsg == "1")
+                    //    throw new Exception("同步OracleBatch失敗!");
+
                     // Save stock to ERP system.
                     var ERPreponse = await SaveToERPAsync(assign.DocId);
 
@@ -454,6 +460,11 @@ namespace EDIS.Areas.BMED.Controllers
             return Json(list);
         }
 
+        /// <summary>
+        /// Sync Stock to ERP system.
+        /// </summary>
+        /// <param name="docId"></param>
+        /// <returns></returns>
         private async Task<string> SaveToERPAsync(string docId)
         {
             ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
@@ -562,6 +573,32 @@ namespace EDIS.Areas.BMED.Controllers
 //                }
             }
             return msg;
+        }
+
+        private string SyncToOracleBatch(string docid)
+        {
+            string responseString = "";
+
+            using (var client = new HttpClient())
+            {
+                string urlstr = "http://dms.cch.org.tw/CchWebApi/api/SyncBatch/KeepCloseCase";
+                urlstr += "?docid=" + docid;
+                var url = new Uri(urlstr, UriKind.Absolute);
+                //string json = JsonConvert.SerializeObject(apps);
+                //HttpContent contentPost = new StringContent(json);
+                //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                try
+                {
+                    var response = client.GetAsync(url); //
+                    responseString = response.Result.Content.ReadAsStringAsync().Result;
+                    var msg = JsonConvert.DeserializeObject<SystemMsg>(responseString);
+                    return msg.MsgCode;
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
+            }
         }
 
     }

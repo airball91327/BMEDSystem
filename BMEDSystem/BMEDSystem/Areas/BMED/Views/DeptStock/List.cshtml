@@ -56,9 +56,6 @@
         <th>
             @Html.DisplayNameFor(model => model.FirstOrDefault().Status)
         </th>
-        @*<th>
-                @Html.DisplayNameFor(model => model.CustOrgan_CustId)
-            </th>*@
         <th></th>
     </tr>
 
@@ -92,12 +89,12 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
-            @*<td>
-                    @Html.DisplayFor(modelItem => item.CustOrgan_CustId)
-                </td>*@
-            <td>
-                <button type="button" class="btn btn-primary" value="@item.StockId" id="setStockBtn" onclick="setStockValue(this)">選擇</button>
-            </td>
+            @if (item.Qty > 0)
+            {
+                <td>
+                    <button type="button" class="btn btn-primary" value="@item.StockId" id="setStockBtn" onclick="setStockValue(this)">選擇</button>
+                </td>
+            }
         </tr>
     }
 

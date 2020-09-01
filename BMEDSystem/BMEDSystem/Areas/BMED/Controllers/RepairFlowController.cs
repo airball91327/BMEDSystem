@@ -523,6 +523,11 @@ namespace EDIS.Areas.BMED.Controllers
             return Json(list);
         }
 
+        /// <summary>
+        /// Sync Stock to ERP system.
+        /// </summary>
+        /// <param name="docId"></param>
+        /// <returns></returns>
         private async Task<string> SaveToERPAsync(string docId)
         {
             ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
