@@ -173,6 +173,22 @@ namespace EDIS.Areas.BMED.Controllers
                     flow.Rtt = DateTime.Now;
                     _context.BMEDKeepFlows.Add(flow);
                     _context.SaveChanges();
+                    // 轉送的下一個關卡為驗收人
+                    if (assign.FlowCls == "驗收人")
+                    {
+                        KeepModel kp = _context.BMEDKeeps.Find(assign.DocId);
+                        if (kp.Src != "M")  //非手動出單
+                        {
+                            var usr = _context.AppUsers.Find(assign.FlowUid.Value);
+                            if (usr != null)
+                            {
+                                kp.CheckerId = usr.Id;
+                                kp.CheckerName = usr.FullName;
+                                _context.Entry(kp).State = EntityState.Modified;
+                                _context.SaveChanges();
+                            }
+                        }
+                    }
 
                     //Send Mail
                     //To user and the next flow user.

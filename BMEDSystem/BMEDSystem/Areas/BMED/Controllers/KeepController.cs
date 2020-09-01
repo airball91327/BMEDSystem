@@ -768,11 +768,10 @@ namespace EDIS.Areas.BMED.Controllers
                         keep = k,
                         flow = f
                     }).ToList();
-                    /* search all KeepDocs which flowCls is in engineer. */
+                    /* search all KeepDocs which doc is not closed. */
                     keepFlows2 = keepFlows2.GroupBy(f => f.flow.DocId)
-                                           .Where(group => group.Last().flow.Status == "?" || group.Last().flow.Status == "2")
-                                           .Where(group => group.Last().flow.Cls.Contains("工程師"))
-                                           .Where(group => group.Last().flow.UserId != 0).Select(group => group.Last()).ToList();
+                                           .Where(group => group.Last().flow.Status == "?")
+                                           .Select(group => group.Last()).ToList();
                     //keepFlows2 = keepFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                     {

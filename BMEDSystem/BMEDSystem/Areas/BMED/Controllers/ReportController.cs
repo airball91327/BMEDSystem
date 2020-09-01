@@ -55,7 +55,7 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(d =>
                 {
                     li = new SelectListItem();
-                    li.Text = d.Name_C;
+                    li.Text = d.Name_C + "(" + d.DptId + ")";
                     li.Value = d.DptId;
                     listItem.Add(li);
 
@@ -67,6 +67,11 @@ namespace EDIS.Areas.BMED.Controllers
 
         private List<AssetKpScheVModel> AssetKpSche(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             TempData["qry2"] = JsonConvert.SerializeObject(v);
             List<AssetKpScheVModel> sv = new List<AssetKpScheVModel>();
             var data = _context.BMEDAssets
@@ -82,6 +87,14 @@ namespace EDIS.Areas.BMED.Controllers
                     assetkeep = a.assetkeep,
                     dept = d
                 });
+            if (urLocation == "總院")
+            {
+                data = data.Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K");
+            }
+            else
+            {
+                data = data.Where(r => r.dept.Loc == urLocation);
+            }
             data = data.Where(r => r.asset.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
             if (!string.IsNullOrEmpty(v.AssetName))
             {
@@ -494,6 +507,11 @@ namespace EDIS.Areas.BMED.Controllers
         }
         private List<ProperRate> AssetProperRate(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
             double faildays = 0;
@@ -501,8 +519,12 @@ namespace EDIS.Areas.BMED.Controllers
             int cnt = 0;
             List<ProperRate> sv = new List<ProperRate>();
             ProperRate pr;
-            List<AssetModel> assets = _context.BMEDAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+            //依照院區區分設備
+            var bmedAssets = GetAssetsByLoc(urLocation);
+            //
+            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
                     .Where(a => a.DisposeKind == "正常").ToList();
+            //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
                 assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
@@ -976,13 +998,20 @@ namespace EDIS.Areas.BMED.Controllers
         }
         private List<RpKpHistoryVModel> RpKpHistory(ReportQryVModel v)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<RpKpHistoryVModel> sv = new List<RpKpHistoryVModel>();
             List<RpKpHistoryVModel> sv2 = new List<RpKpHistoryVModel>();
             if (string.IsNullOrEmpty(v.AssetNo))
                 return sv;
             var ss = new[] { "?", "2" };
-            sv = _context.BMEDAssets.Where(a => a.AssetNo == v.AssetNo)
+            //依照院區區分設備
+            List<AssetModel> bmedAssets = GetAssetsByLoc(urLocation);
+            //
+            sv = bmedAssets.Where(a => a.AssetNo == v.AssetNo)
                 .Join(_context.BMEDRepairs, a => a.AssetNo, r => r.AssetNo,
                 (a, r) => new
                 {
@@ -1027,7 +1056,7 @@ namespace EDIS.Areas.BMED.Controllers
                     EngName = e.UserName
                 }).ToList();
             //
-            sv2 = _context.BMEDAssets.Where(a => a.AssetNo == v.AssetNo)
+            sv2 = bmedAssets.Where(a => a.AssetNo == v.AssetNo)
                 .Join(_context.BMEDKeeps, a => a.AssetNo, r => r.AssetNo,
                 (a, r) => new
                 {
@@ -1086,6 +1115,11 @@ namespace EDIS.Areas.BMED.Controllers
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            if (v.Sdate == null || v.Edate == null)
+            {
+                throw new Exception("請選擇一段時間區間!");
+            }
             //
             List<UnSignListVModel> sv = new List<UnSignListVModel>();
             List<UnSignListVModel> sv2 = new List<UnSignListVModel>();
@@ -1492,6 +1526,11 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<MonthFailRateVModel> MonthFailRate(ReportQryVModel v)
         {
+            /* Get login user. */
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(usr);
+            //
             List<MonthFailRateVModel> mv = new List<MonthFailRateVModel>();
 
             // Admin & 設備主管才可查詢全單位，其餘Role只可查詢自己單位
@@ -1526,15 +1565,11 @@ namespace EDIS.Areas.BMED.Controllers
             TimeSpan ts;
             ts = endDate - startDate;
             totalMins = Convert.ToInt32(ts.TotalMinutes);
-            // Get AccDpt assets.
-            List<AssetModel> assets;
-            if (!string.IsNullOrEmpty(v.AccDpt))
+            // Get assets by user's location.
+            List<AssetModel> assets = GetAssetsByLoc(urLocation);
+            if (!string.IsNullOrEmpty(v.AccDpt))    // Get AccDpt assets.
             {
-                assets = _context.BMEDAssets.Where(a => a.AccDpt == v.AccDpt).ToList();
-            }
-            else
-            {
-                assets = _context.BMEDAssets.ToList();
+                assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
             }
             if (!string.IsNullOrEmpty(v.AssetClass1))
             {
@@ -1553,7 +1588,7 @@ namespace EDIS.Areas.BMED.Controllers
                                            (r, rd) => new {
                                                repair = r,
                                                repairDtl = rd
-                                           }).Where(r => r.repairDtl.EndDate != null);
+                                           }).Where(r => r.repairDtl.EndDate != null).ToList();
                 if (repairDocs.Count() > 0)
                 {
                     foreach(var r in repairDocs)
@@ -1994,6 +2029,8 @@ namespace EDIS.Areas.BMED.Controllers
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            // Get departments by location.
+            var departments = GetDepartmentsByLoc(urLocation);
             //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
@@ -2001,7 +2038,7 @@ namespace EDIS.Areas.BMED.Controllers
             int kcnt = 0;
             decimal tolcost = 0m;
 
-            foreach (DepartmentModel p in _context.Departments.ToList())
+            foreach (DepartmentModel p in departments)
             {
                 m = new RepairKeepVModel();
                 m.CustId = p.DptId;
@@ -3099,5 +3136,58 @@ namespace EDIS.Areas.BMED.Controllers
 
             return View(effectRatio);
         }
+
+        /// <summary>
+        /// Get Assets by location, according to asset's delivDpt.
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public List<AssetModel> GetAssetsByLoc(string location)
+        {
+            List<AssetModel> bmedAssets = null;
+            if (location == "總院")
+            {
+                bmedAssets = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
+                                                (a, d) => new
+                                                {
+                                                    asset = a,
+                                                    dept = d
+                                                })
+                                                .Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K")
+                                                .Select(r => r.asset).ToList();
+            }
+            else
+            {
+                bmedAssets = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
+                                (a, d) => new
+                                {
+                                    asset = a,
+                                    dept = d
+                                })
+                                .Where(r => r.dept.Loc == location)
+                                .Select(r => r.asset).ToList();
+            }
+            return bmedAssets;
+        }
+
+        /// <summary>
+        /// Get Departments by location.
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public List<DepartmentModel> GetDepartmentsByLoc(string location)
+        {
+            List<DepartmentModel> departments = null;
+            if (location == "總院")
+            {
+                departments = departments.Where(d => d.Loc == "C" || d.Loc == "P" || d.Loc == "K").ToList();
+            }
+            else
+            {
+                departments = departments.Where(d => d.Loc == location).ToList();
+            }
+            return departments;
+        }
+
     }
 }
