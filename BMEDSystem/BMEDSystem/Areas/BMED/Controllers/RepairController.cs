@@ -267,10 +267,12 @@ namespace EDIS.Areas.BMED.Controllers
                            Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
                            Flg = j.flow.Status,
                            FlowUid = j.flow.UserId,
+                           FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                            FlowCls = j.flow.Cls,
                            FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                            EndDate = j.repdtl.EndDate,
                            IsCharged = j.repdtl.IsCharged,
+                           FlowRtt = j.flow.Rtt,
                            repdata = j.repair,
                            ExFlowUid = _context.BMEDRepairFlows.Where(r => r.DocId == j.flow.DocId).OrderByDescending(r => r.StepId).Skip(1).FirstOrDefault().UserId,
                            ExFlowCls = _context.BMEDRepairFlows.Where(r => r.DocId == j.flow.DocId).OrderByDescending(r => r.StepId).Skip(1).FirstOrDefault().Cls
@@ -307,7 +309,8 @@ namespace EDIS.Areas.BMED.Controllers
                         f.DocId,
                         f.UserId,
                         f.Status,
-                        f.Cls
+                        f.Cls,
+                        f.Rtt
                     }).Distinct().Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
                     (f, r) => new
                     {
@@ -346,11 +349,13 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
                         CloseDate = j.repdtl.CloseDate.Value.Date,
                         IsCharged = j.repdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         repdata = j.repair
                     }));
                     break;
@@ -483,10 +488,12 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
                         IsCharged = j.repdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         repdata = j.repair
                     }));
                     break;
@@ -540,6 +547,7 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         FlowDptId = _context.AppUsers.Find(j.flow.UserId).DptId,
                         EndDate = j.repdtl.EndDate,
@@ -1995,39 +2003,49 @@ namespace EDIS.Areas.BMED.Controllers
 
             /* 所有尚未指派工程師的案件 */
             var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師")).ToList();
-            var rps = _context.BMEDRepairs.Where(r => r.EngId == 0)
-                                          .Join(rfs, r => r.DocId, rf => rf.DocId,
-                                          (r, rf) => r).ToList();
+            //var rps = _context.BMEDRepairs.Where(r => r.EngId == 0)
+            //                              .Join(rfs, r => r.DocId, rf => rf.DocId,
+            //                              (r, rf) => r).ToList();
 
             List<RepairListVModel> rv = new List<RepairListVModel>();
-            rps.Join(_context.BMEDRepairDtls, r => r.DocId, d => d.DocId,
-                    (r, d) => new
-                    {
-                        repair = r,
-                        repdtl = d
-                    })
-                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
-                    (j, d) => new
-                    {
-                        repair = j.repair,
-                        repdtl = j.repdtl,
-                        dpt = d
-                    })
-                    .ToList()
-                    .ForEach(j => rv.Add(new RepairListVModel
-                    {
-                        DocType = "醫工請修",
-                        RepType = j.repair.RepType,
-                        DocId = j.repair.DocId,
-                        ApplyDate = j.repair.ApplyDate,
-                        PlaceLoc = j.repair.PlaceLoc,
-                        ApplyDpt = j.repair.DptId,
-                        AccDpt = j.repair.AccDpt,
-                        AccDptName = j.dpt.Name_C,
-                        TroubleDes = j.repair.TroubleDes,
-                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
-                        repdata = j.repair
-                    }));
+            _context.BMEDRepairs.Where(r => r.EngId == 0)
+                .Join(rfs, r => r.DocId, rf => rf.DocId,
+                (r, rf) => new
+                {
+                    repair = r,
+                    flow = rf
+                })
+                .Join(_context.BMEDRepairDtls, r => r.repair.DocId, d => d.DocId,
+                (r, d) => new
+                {
+                    repair = r.repair,
+                    flow = r.flow,
+                    repdtl = d
+                })
+                .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                (j, d) => new
+                {
+                    repair = j.repair,
+                    flow = j.flow,
+                    repdtl = j.repdtl,
+                    dpt = d
+                })
+                .ToList()
+                .ForEach(j => rv.Add(new RepairListVModel
+                {
+                    DocType = "醫工請修",
+                    RepType = j.repair.RepType,
+                    DocId = j.repair.DocId,
+                    ApplyDate = j.repair.ApplyDate,
+                    PlaceLoc = j.repair.PlaceLoc,
+                    ApplyDpt = j.repair.DptId,
+                    AccDpt = j.repair.AccDpt,
+                    AccDptName = j.dpt.Name_C,
+                    TroubleDes = j.repair.TroubleDes,
+                    Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                    FlowRtt = j.flow.Rtt,
+                    repdata = j.repair
+                }));
 
             /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
             foreach (var item in rv)
@@ -2053,10 +2071,12 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 rv = rv.Where(r => r.repdata.Loc == "總院").ToList();
             }
-            else if (role == "MedBranchMgr")    //分院醫工主管
+            else if (role == "MedBranchMgr")    //分院醫工主管，依院區區分
             {
                 rv = rv.Where(r => r.repdata.Loc == urLocation).ToList();
             }
+            // 排序
+            rv = rv.OrderByDescending(r => r.FlowRtt).ToList();
             //
             ViewBag.Role = role;
             //

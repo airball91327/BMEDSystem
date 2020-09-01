@@ -503,11 +503,13 @@ namespace EDIS.Areas.BMED.Controllers
                             Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                             Flg = j.flow.Status,
                             FlowUid = j.flow.UserId,
+                            FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                             FlowCls = j.flow.Cls,
                             Src = j.keep.Src,
                             SentDate = j.keep.SentDate,
                             EndDate = j.keepdtl.EndDate,
                             IsCharged = j.keepdtl.IsCharged,
+                            FlowRtt = j.flow.Rtt,
                             keepdata = j.keep
                         }));
                         break;
@@ -540,7 +542,8 @@ namespace EDIS.Areas.BMED.Controllers
                           f.DocId,
                           f.UserId,
                           f.Cls,
-                          f.Status
+                          f.Status,
+                          f.Rtt
                       }).Distinct()
                       .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                       (f, k) => new
@@ -594,12 +597,14 @@ namespace EDIS.Areas.BMED.Controllers
                           Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                           Flg = j.flow.Status,
                           FlowUid = j.flow.UserId,
+                          FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                           FlowCls = j.flow.Cls,
                           Src = j.keep.Src,
                           SentDate = j.keep.SentDate,
                           EndDate = j.keepdtl.EndDate,
                           CloseDate = j.keepdtl.CloseDate.Value.Date,
                           IsCharged = j.keepdtl.IsCharged,
+                          FlowRtt = j.flow.Rtt,
                           keepdata = j.keep
                       }));
                       break;
@@ -691,6 +696,7 @@ namespace EDIS.Areas.BMED.Controllers
                         SentDate = j.keep.SentDate,
                         EndDate = j.keepdtl.EndDate,
                         IsCharged = j.keepdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         keepdata = j.keep
                     }));
                     break;
@@ -751,11 +757,13 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         Src = j.keep.Src,
                         SentDate = j.keep.SentDate,
                         EndDate = j.keepdtl.EndDate,
                         IsCharged = j.keepdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         keepdata = j.keep
                     }));
                     break;
@@ -817,11 +825,13 @@ namespace EDIS.Areas.BMED.Controllers
                         Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                         Flg = j.flow.Status,
                         FlowUid = j.flow.UserId,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                         FlowCls = j.flow.Cls,
                         Src = j.keep.Src,
                         SentDate = j.keep.SentDate,
                         EndDate = j.keepdtl.EndDate,
                         IsCharged = j.keepdtl.IsCharged,
+                        FlowRtt = j.flow.Rtt,
                         keepdata = j.keep
                     }));
                     break;
@@ -853,7 +863,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 else
                 {
-                    kv = kv.OrderByDescending(r => r.SentDate).ThenByDescending(r => r.DocId).ToList();
+                    kv = kv.OrderByDescending(r => r.FlowRtt).ThenByDescending(r => r.DocId).ToList();
                 }
             }
 

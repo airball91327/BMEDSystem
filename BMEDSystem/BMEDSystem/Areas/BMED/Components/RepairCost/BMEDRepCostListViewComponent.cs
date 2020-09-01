@@ -65,7 +65,18 @@ namespace EDIS.Areas.BMED.Components.RepairCost
             {
                 ViewData["HideCost"] = "N";
             }
-
+            // Get Vendor uniteNo.
+            foreach(var item in rc)
+            {
+                if (item.VendorId != null)
+                {
+                    var vendor = _context.BMEDVendors.Find(item.VendorId);
+                    if (vendor != null)
+                    {
+                        item.VendorUniteNo = vendor.UniteNo;
+                    }
+                }
+            }
             if (viewType.Contains("Edit"))
             {
                 return View(rc);

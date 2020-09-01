@@ -47,7 +47,18 @@ namespace EDIS.Areas.BMED.Components.KeepCost
             {
                 ViewData["HideCost"] = "N";
             }
-
+            // Get Vendor uniteNo.
+            foreach (var item in kc)
+            {
+                if (item.VendorId != null)
+                {
+                    var vendor = _context.BMEDVendors.Find(item.VendorId);
+                    if (vendor != null)
+                    {
+                        item.VendorUniteNo = vendor.UniteNo;
+                    }
+                }
+            }
             if (viewType.Contains("Edit"))
             {
                 return View(kc);

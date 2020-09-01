@@ -61,6 +61,13 @@ namespace EDIS.Areas.BMED.Components.KeepCost
                 {
                     return View(cost);
                 }
+                if (rf.Cls.Contains("醫工主管") || rf.Cls.Contains("賀康主管")) /* 流程 => 醫工、賀康主管 */
+                {
+                    if (rf.UserId == ur.Id)
+                    {
+                        return View(cost);
+                    }
+                }
                 List<KeepCostModel> t = _context.BMEDKeepCosts.Include(r => r.TicketDtl).Where(c => c.DocId == id).ToList();
                 return View("List", t);
             }

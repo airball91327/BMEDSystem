@@ -76,6 +76,7 @@
                 <th class="col-md-1" style="text-align:center">
                     <input type="checkbox" name="checkAll" />
                 </th>
+                <th></th>
                 <th>
                     @Html.DisplayNameFor(model => model.FirstOrDefault().DocType)
                 </th>
@@ -109,6 +110,9 @@
                     @Html.Hidden("data[" + i + "].DocId", item.DocId)
                     <td style="text-align:center">
                         @Html.CheckBox("data[" + i + "].IsSelected", item.IsSelected, new { @class = "IsSelected" })
+                    </td>
+                    <td>
+                        @Html.ActionLink("預覽", "Views", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.DocType)

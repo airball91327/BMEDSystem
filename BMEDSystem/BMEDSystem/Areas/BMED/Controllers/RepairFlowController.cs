@@ -62,10 +62,13 @@ namespace EDIS.Areas.BMED.Controllers
                 var isCharged = _context.BMEDRepairDtls.Where(d => d.DocId == assign.DocId).FirstOrDefault().IsCharged;
                 if (isCharged == "Y")
                 {
-                    var CheckRepairCost = _context.BMEDRepairCosts.Where(c => c.DocId == assign.DocId).FirstOrDefault();
-                    if (CheckRepairCost == null)
+                    var CheckCost = _context.BMEDRepairCosts.Where(c => c.DocId == assign.DocId).FirstOrDefault();
+                    if (CheckCost == null)
                     {
-                        throw new Exception("尚未輸入費用明細!!");
+                        if (assign.FlowCls == "醫工主管" || assign.FlowCls == "賀康主管")   //送至主管時才Check
+                        {
+                            throw new Exception("尚未輸入費用明細!!");
+                        }
                     }
                 }
             }

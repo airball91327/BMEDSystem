@@ -137,6 +137,9 @@ else
                     @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
                 </th>
                 <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().FlowUidName)
+                </th>
+                <th>
                     @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
                 </th>
             </tr>
@@ -146,8 +149,8 @@ else
             {
                 <tr>
                     <td style="text-align:center">
-                        @if ((item.Flg == "?" && UserManager.GetCurrentUserDptId(User) == "7084") ||
-                            (item.Flg == "?" && UserManager.GetCurrentUserDptId(User) == "8420")) //其他案件
+                        @if ((item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "7084") ||
+                            (item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "8420")) //其他案件
                         {
                             @Html.Hidden("transKData[" + i + "].DocId", item.DocId)
                             @Html.CheckBox("transKData[" + i + "].IsSelected", item.IsSelected, new { @class = "IsSelected3" })
@@ -172,7 +175,7 @@ else
                         }
                         else
                         {
-                            @Html.ActionLink("預覽", "Views", "Keep", new { Area = "BMED", id = item.DocId })
+                            @Html.ActionLink("預覽", "Views", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
                         }
                         @Html.ActionLink("列印", "PrintKeepDoc", "Keep", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
@@ -216,6 +219,9 @@ else
                         {
                             @Html.DisplayFor(modelItem => item.Cost)
                         }
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.FlowUidName)
                     </td>
                     <td>
                         @if (item.Flg != "2")

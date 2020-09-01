@@ -38,6 +38,8 @@ namespace EDIS.Models
         public int? Days { get; set; }
         public string Flg { get; set; }
         public int? FlowUid { get; set; }
+        [Display(Name = "關卡人員")]
+        public string FlowUidName { get; set; }
         public string FlowCls { get; set; }
         public string Src { get; set; }
         [Display(Name = "申請日期")]
@@ -54,5 +56,7 @@ namespace EDIS.Models
         [Display(Name = "CheckBox選取")]
         public Boolean IsSelected { get; set; }
         public KeepModel keepdata { get; set; }
+        [Display(Name = "到件時間")]
+        public DateTime? FlowRtt { get; set; }
     }
 }
