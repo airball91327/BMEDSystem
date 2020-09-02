@@ -29,6 +29,7 @@ namespace EDIS.Models
         public string BMEDKqtyTicketNo { get; set; }
         public string BMEDKqtyVendor { get; set; }
         public string BMEDKqtyClsUser { get; set; }
+        public string BMEDKInOut { get; set; }
     }
 
     public class QryRepListData
@@ -56,6 +57,14 @@ namespace EDIS.Models
         public string BMEDqtyVendor { get; set; }
         public string BMEDqtyClsUser { get; set; }
     }
+
+    public class QryRepResignListData
+    {
+        public string qtyReSignDOCID { get; set; }
+        public string qtyReSignASSETNO { get; set; }
+        public string qtyReSignACCDPT { get; set; }
+    }
+
     public class AssetQryResult
     {
         public string ASSET_NO { get; set; }
@@ -63,6 +72,7 @@ namespace EDIS.Models
         public string ACC_DPT { get; set; }
         public string DELIV_DPT { get; set; }
     }
+
     public class SystemMsg
     {
         public string MsgCode { get; set; }

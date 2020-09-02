@@ -283,7 +283,7 @@ function printRepairDoc(DocId) {
         url: '../Repair/PrintRepairDoc',
         type: "GET",
         async: false,
-        data: { docId: DocId, printType : 1 },
+        data: { docId: DocId, printType : 0 },
         success: function (data) {
             printContent = data;
         }

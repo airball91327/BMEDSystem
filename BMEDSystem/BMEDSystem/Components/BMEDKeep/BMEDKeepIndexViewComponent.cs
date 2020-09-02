@@ -41,7 +41,8 @@ namespace EDIS.Components.BMEDKeep
 
             /* 成本中心 & 申請部門的下拉選單資料 */
             var dptList = new[] { "K", "P", "C" };   //本院部門
-            var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            var departments = _context.Departments.ToList();
             List<SelectListItem> listItem = new List<SelectListItem>();
             foreach (var item in departments)
             {
@@ -96,6 +97,14 @@ namespace EDIS.Components.BMEDKeep
                 }
             }
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
+
+            /* 處理保養方式的下拉選單 */
+            List<SelectListItem> listItem6 = new List<SelectListItem>();
+            listItem6.Add(new SelectListItem { Text = "自行", Value = "自行" });
+            listItem6.Add(new SelectListItem { Text = "委外", Value = "委外" });
+            listItem6.Add(new SelectListItem { Text = "租賃", Value = "租賃" });
+            listItem6.Add(new SelectListItem { Text = "保固", Value = "保固" });
+            ViewData["BMEDKeepInOut"] = new SelectList(listItem6, "Value", "Text", "");
 
             /* 擷取該使用者單位底下所有人員 */
             var dptUsers = _context.AppUsers.Where(a => a.DptId == user.DptId && a.Status == "Y").ToList();

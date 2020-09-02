@@ -4,6 +4,17 @@
 @{
     ViewData["Title"] = "Edit";
 }
+<script>
+    $(function () {
+        var isCharged = '@Model.IsCharged.ToString()';
+        if (isCharged == 'Y') {
+            $('#page2').show();
+        }
+        else {
+            $('#page2').hide();
+        }
+    });
+</script>
 
 <h4>請修紀錄</h4>
 <hr />
@@ -14,7 +25,7 @@
       'icon':'loading',
       'duration':0
       })"
-      data-ajax-loading="imgLOADING2" data-ajax-success="showmsg2">
+      data-ajax-success="showmsg2">
 
     <div class="container">
         @Html.HiddenFor(model => model.DocId)

@@ -1,9 +1,17 @@
-﻿
+﻿@model EDIS.Models.QryRepResignListData
 @using EDIS.Models.Identity
 @using EDIS.Models
 
 @inject CustomUserManager UserManager
 @inject ApplicationDbContext _context
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+<script>
+    $(function () {
+        $('.reSignCombobox').combobox();
+    });
+</script>
+
 @{
     string role = null;
     var user = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
@@ -88,7 +96,39 @@
       data-ajax-complete="$.Toast.hideToast()"
       data-ajax-failure="onFailed">
 
+    <h4>查詢條件</h4>
     <input name="role" type="text" value="@role" hidden />
+
+    <div class="container">
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="qtyReSignDOCID" class="control-title">表單編號</label>
+                    <input asp-for="qtyReSignDOCID" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="qtyReSignASSETNO" class="control-title">財產編號</label>
+                    <input asp-for="qtyReSignASSETNO" class="form-control-s" />
+                </div>
+                <div class="form-group">
+                    <label for="qtyReSignACCDPT" class="control-title">成本中心</label>
+                    <select asp-for="qtyReSignACCDPT" asp-items="@ViewData["ReSignAccDpt"] as SelectList" class="form-control reSignCombobox">
+                        <option value="">請選擇</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group col-md-offset-1 col-md-1">
+                    <div>
+                        <input id="btnReSignQTY" type="submit" value="查詢" class="btn btn-default btn-group-justified" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
 </form>
 
 <h4>未分派案件</h4>

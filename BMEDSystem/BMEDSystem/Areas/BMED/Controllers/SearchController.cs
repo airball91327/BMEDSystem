@@ -53,7 +53,8 @@ namespace EDIS.Areas.BMED.Controllers
 
             /* 成本中心 & 申請部門的下拉選單資料 */
             var dptList = new[] { "K", "P", "C" };  //本院部門
-            var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            var departments = _context.Departments.ToList();
             List<SelectListItem> listItem = new List<SelectListItem>();
             foreach (var item in departments)
             {
@@ -179,7 +180,8 @@ namespace EDIS.Areas.BMED.Controllers
 
             /* 成本中心 & 申請部門的下拉選單資料 */
             var dptList = new[] { "K", "P", "C" };  //本院部門
-            var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            var departments = _context.Departments.ToList();
             List<SelectListItem> listItem = new List<SelectListItem>();
             foreach (var item in departments)
             {
@@ -235,6 +237,15 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
+
+            /* 處理保養方式的下拉選單 */
+            List<SelectListItem> listItem6 = new List<SelectListItem>();
+            listItem6.Add(new SelectListItem { Text = "自行", Value = "自行" });
+            listItem6.Add(new SelectListItem { Text = "委外", Value = "委外" });
+            listItem6.Add(new SelectListItem { Text = "租賃", Value = "租賃" });
+            listItem6.Add(new SelectListItem { Text = "保固", Value = "保固" });
+            ViewData["BMEDKeepInOut"] = new SelectList(listItem6, "Value", "Text", "");
+
             /* 擷取所有人員 */
             List<SelectListItem> userList = new List<SelectListItem>();
             foreach (var item in _context.AppUsers.Where(a => a.Status == "Y").ToList())
@@ -626,6 +637,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyTicketNo = qdata.BMEDKqtyTicketNo;
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
+            string qtyInOut = qdata.BMEDKInOut;
 
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
@@ -856,6 +868,11 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
 
+            /* Search Keep InOut. */
+            if (!string.IsNullOrEmpty(qtyInOut))
+            {
+                kv = kv.Where(k => k.InOut == qtyInOut).ToList();
+            }
             /* Search KeepResults. */
             if (!string.IsNullOrEmpty(qtyKeepResult))
             {

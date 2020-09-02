@@ -1978,9 +1978,13 @@ namespace EDIS.Areas.BMED.Controllers
             }
         }
 
-        //[HttpPost]
-        public IActionResult GetResignList(string role, int page = 1)
+        [HttpPost]
+        public IActionResult GetResignList(QryRepResignListData qdata, string role, int page = 1)
         {
+            string docid = qdata.qtyReSignDOCID;
+            string ano = qdata.qtyReSignASSETNO;
+            string acc = qdata.qtyReSignACCDPT;
+
             /* Get login user. */
             var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
@@ -2066,6 +2070,20 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     item.AssetName = item.repdata.AssetName;
                 }
+            }
+            // Search
+            if (!string.IsNullOrEmpty(docid))   //表單編號
+            {
+                docid = docid.Trim();
+                rv = rv.Where(v => v.DocId == docid).ToList();
+            }
+            if (!string.IsNullOrEmpty(ano))     //財產編號
+            {
+                rv = rv.Where(v => v.AssetNo == ano).ToList();
+            }
+            if (!string.IsNullOrEmpty(acc))     //成本中心
+            {
+                rv = rv.Where(v => v.AccDpt == acc).ToList();
             }
             //
             if (role == "MedAssetMgr")  //總院設備主管

@@ -229,6 +229,16 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="BMEDKqtyClsUser" class="control-title">保養方式</label>
+                    <select asp-for="BMEDKInOut" asp-items="@ViewData["BMEDKeepInOut"] as SelectList" class="form-control">
+                        <option value="">請選擇</option>
+                    </select>
+                </div>
+            </div>
+        </div>
         @if (user.DptId == "8420" || user.DptId == "7084") /* Only MedEngineer can search all engineer docs. */
         {
             <div class="row">

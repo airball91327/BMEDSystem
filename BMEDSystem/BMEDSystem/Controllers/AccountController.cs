@@ -184,8 +184,12 @@ namespace EDIS.Controllers
 
                         _logger.LogInformation("使用者已經登入.");
                         if (!string.IsNullOrEmpty(returnUrl))
-                            return RedirectToLocal(returnUrl);
-
+                        {
+                            if (!returnUrl.Contains("Logout"))
+                            {
+                                return RedirectToLocal(returnUrl);
+                            }
+                        }
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -247,8 +251,12 @@ namespace EDIS.Controllers
 
                         _logger.LogInformation("使用者已經登入.");
                         if (!string.IsNullOrEmpty(returnUrl))
-                            return RedirectToLocal(returnUrl);
-
+                        {
+                            if (!returnUrl.Contains("Logout"))
+                            {
+                                return RedirectToLocal(returnUrl);
+                            }
+                        }
                         return RedirectToAction("Index", "Home");
                     }
                     else
@@ -442,7 +450,7 @@ namespace EDIS.Controllers
         {
             await _signInManager.SignOutAsync();
             _logger.LogInformation("User logged out.");
-            return RedirectToAction(nameof(HomeController.Index), "Home");
+            return RedirectToAction("Login", "Account");
         }
 
         [HttpPost]

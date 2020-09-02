@@ -122,18 +122,19 @@ else
           data-ajax-success="onSuccess2()"
           data-ajax-failure="updateFailed">
 
-        <div class="form-inline">
-            <div class="form-group col-md-7">
-                <label class="control-label col-md-3">轉送工程師:</label>
-                <div class="col-md-5">
-                    @Html.DropDownList("AssignEngId", null, "選擇人員", htmlAttributes: new { @class = "form-control combobox4", required = "required" })
-                </div>
-                <div class="col-md-4">
-                    <input type="submit" class="btn btn-primary" value="確定送出" />
+        <div class="row">
+            <div class="form-inline">
+                <div class="form-group col-md-4">
+                    <label class="control-label col-md-3" style="padding-top:7px;">轉送工程師:</label>
+                    <div class="col-md-6">
+                        @Html.DropDownList("AssignEngId", null, "選擇人員", htmlAttributes: new { @class = "form-control combobox4", required = "required" })
+                    </div>
+                    <div class="col-md-3">
+                        <input type="submit" class="btn btn-primary" value="確定送出" />
+                    </div>
                 </div>
             </div>
         </div>
-        <br /><br />
 
         <table class="table">
             <tr>

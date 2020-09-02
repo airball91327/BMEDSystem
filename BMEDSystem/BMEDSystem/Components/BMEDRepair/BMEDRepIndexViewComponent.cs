@@ -40,7 +40,8 @@ namespace EDIS.Components.BMEDRepair
 
             /* 成本中心 & 申請部門的下拉選單資料 */
             var dptList = new[] { "K", "P", "C" };   //本院部門
-            var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            var departments = _context.Departments.ToList();
             List<SelectListItem> listItem = new List<SelectListItem>();
             foreach (var item in departments)
             {

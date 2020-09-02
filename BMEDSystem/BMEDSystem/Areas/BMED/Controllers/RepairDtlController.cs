@@ -84,6 +84,11 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     if (repairDtl.IsCharged == "N")
                     {
+                        var repCost = _context.BMEDRepairCosts.Where(c => c.DocId == repairDtl.DocId).ToList();
+                        if (repCost.Count() > 0)
+                        {
+                            throw new Exception("點選無費用時，請先刪除所有費用明細!!");
+                        }
                         //_context.BMEDRepairCosts.RemoveRange(_context.BMEDRepairCosts.Where(c => c.DocId == repairDtl.DocId));
                         repairDtl.Cost = 0;
                     }

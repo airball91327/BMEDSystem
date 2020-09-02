@@ -152,6 +152,16 @@
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
+                    <label for="BMEDKqtyClsUser" class="control-title">保養方式</label>
+                    <select asp-for="BMEDKInOut" asp-items="@ViewData["BMEDKeepInOut"] as SelectList" class="form-control">
+                        <option value="">請選擇</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
                     <label for="BMEDKqtyApplyDateFrom" class="control-title">日期查詢</label>
                     <span>
                         <select asp-for="BMEDKqtyDateType" asp-items="@ViewData["DateType"] as SelectList" class="form-control-s"></select>

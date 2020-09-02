@@ -324,6 +324,8 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyTicketNo = qdata.BMEDKqtyTicketNo;
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
+            string qtyInOut = qdata.BMEDKInOut;
+
             //至少輸入一個搜尋條件
             if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
                 dptid == null && qtyDate1 == null && qtyDate2 == null && qtyKeepResult == null &&
@@ -868,6 +870,11 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
 
+            /* Search Keep InOut. */
+            if (!string.IsNullOrEmpty(qtyInOut))
+            {
+                kv = kv.Where(k => k.InOut == qtyInOut).ToList();
+            }
             /* Search KeepResults. */
             if (!string.IsNullOrEmpty(qtyKeepResult))
             {

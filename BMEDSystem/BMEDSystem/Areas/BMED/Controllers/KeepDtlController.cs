@@ -35,6 +35,11 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     if (keepDtlModel.IsCharged == "N")
                     {
+                        var keepCost = _context.BMEDKeepCosts.Where(c => c.DocId == keepDtlModel.DocId).ToList();
+                        if (keepCost.Count() > 0)
+                        {
+                            throw new Exception("點選無費用時，請先刪除所有費用明細!!");
+                        }
                         //_context.BMEDKeepCosts.RemoveRange(_context.BMEDKeepCosts.Where(c => c.DocId == keepDtlModel.DocId));
                         keepDtlModel.Cost = 0;
                     }

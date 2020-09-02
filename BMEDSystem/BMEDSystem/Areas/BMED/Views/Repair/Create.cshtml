@@ -14,6 +14,9 @@
         -webkit-transform: scale(1.5); /* Safari and Chrome */
         -o-transform: scale(1.5); /* Opera */
     }
+    .requiredTag {
+        color: red;
+    }
 </style>
 
 <h2>新增</h2>
@@ -77,6 +80,7 @@
                 <div class="form-group">
                     <label class="control-title">聯絡方式</label>
                     <label asp-for="Ext" class="control-label"></label>
+                    <span class="requiredTag">*</span>
                     <input asp-for="Ext" class="form-control-s" />
                     <span asp-validation-for="Ext" class="text-danger"></span>
                 </div>
@@ -149,6 +153,7 @@
                         <select asp-for="AssetNo" asp-items="@ViewData["DefaultAssets"] as SelectList" class="form-control" id="AssetNo">
                             <option disabled selected>請選擇</option>
                         </select>
+                        <span class="requiredTag">*</span>
                         <span asp-validation-for="AssetNo" class="text-danger"></span>
                         <span style="color:red" id="AssetNoErrorMsg"></span>
                     </div>
@@ -177,6 +182,7 @@
                 <div class="form-group">
                     <label asp-for="AssetName" class="control-title"></label>
                     <input asp-for="AssetName" class="form-control" required />
+                    <span class="requiredTag">*</span>
                     <span asp-validation-for="AssetName" class="text-danger"></span>
                 </div>
             </div>
@@ -215,6 +221,7 @@
                         請修
                     </label>
                 </div>
+                <span class="requiredTag">*</span>
                 <span asp-validation-for="RepType" class="text-danger"></span>
             </div>
         </div>
@@ -223,6 +230,7 @@
                 <div class="form-group">
                     <label asp-for="PlaceLoc" class="control-title"></label>
                     <input asp-for="PlaceLoc" class="form-control" />
+                    <span class="requiredTag">*</span>
                     <span asp-validation-for="PlaceLoc" class="text-danger"></span>
                 </div>
             </div>
@@ -232,6 +240,7 @@
                 <div class="form-group">
                     <label asp-for="TroubleDes" class="control-title"></label>
                     <textarea asp-for="TroubleDes" rows="3" class="form-control"></textarea>
+                    <span class="requiredTag">*</span>
                     <span asp-validation-for="TroubleDes" class="text-danger"></span>
                 </div>
             </div>

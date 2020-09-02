@@ -6,6 +6,12 @@
 }
 <script src="~/js/BMED/KeepCreate.js" asp-append-version="true"></script>
 
+<style>
+    .requiredTag {
+        color: red;
+    }
+</style>
+
 <h2>新增</h2>
 
 <h4>保養單 - 醫療儀器</h4>
@@ -87,6 +93,7 @@
                 <div class="form-group">
                     <label class="control-title">聯絡方式</label>
                     <label asp-for="Ext" class="control-label"></label>
+                    <span class="requiredTag">*</span>
                     <input asp-for="Ext" class="form-control-s" />
                     <span asp-validation-for="Ext" class="text-danger"></span>
                 </div>
@@ -115,6 +122,7 @@
                     <select asp-for="AssetNo" class="form-control" id="AssetNo">
                         <option disabled selected>請選擇</option>
                     </select>
+                    <span class="requiredTag">*</span>
                     <span asp-validation-for="AssetNo" class="text-danger"></span>
                     <span style="color:red" id="AssetNoErrorMsg"></span>
                 </div>
@@ -141,6 +149,7 @@
                 <div class="form-group">
                     <label asp-for="AssetName" class="control-title"></label>
                     <input asp-for="AssetName" class="form-control" />
+                    <span class="requiredTag">*</span>
                     <span asp-validation-for="AssetName" class="text-danger"></span>
                 </div>
             </div>

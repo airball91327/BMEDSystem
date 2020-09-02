@@ -56,18 +56,19 @@
       data-ajax-complete="$.Toast.hideToast()"
       data-ajax-failure="updateFailed">
 
-    <div class="form-inline">
-        <div class="form-group col-md-7">
-            <label class="control-label col-md-3">指派工程師:</label>
-            <div class="col-md-5">
-                @Html.DropDownList("BMEDassignEngId", null, "選擇人員", htmlAttributes: new { @class = "form-control combobox3", required = "required" })
-            </div>
-            <div class="col-md-4">
-                <input type="submit" class="btn btn-primary" value="確定送出" />
+    <div class="row">
+        <div class="form-inline">
+            <div class="form-group col-md-4">
+                <label class="control-label col-md-3" style="padding-top:7px;">指派工程師:</label>
+                <div class="col-md-6">
+                    @Html.DropDownList("BMEDassignEngId", null, "選擇人員", htmlAttributes: new { @class = "form-control combobox3", required = "required" })
+                </div>
+                <div class="col-md-3">
+                    <input type="submit" class="btn btn-primary" value="確定送出" />
+                </div>
             </div>
         </div>
     </div>
-    <br /><br />
 
     <input type="text" name="role" value="@ViewBag.Role" hidden />
     <table class="table">
