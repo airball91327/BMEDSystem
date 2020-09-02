@@ -117,7 +117,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 dptMemberList.Add(new SelectListItem
                 {
-                    Text = item.FullName,
+                    Text = item.FullName + "(" + item.UserName + ")",
                     Value = item.Id.ToString()
                 });
             }
@@ -128,7 +128,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 userList.Add(new SelectListItem
                 {
-                    Text = item.FullName,
+                    Text = item.FullName + "(" + item.UserName + ")",
                     Value = item.Id.ToString()
                 });
             }
@@ -241,7 +241,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 userList.Add(new SelectListItem
                 {
-                    Text = item.FullName,
+                    Text = item.FullName + "(" + item.UserName + ")",
                     Value = item.Id.ToString()
                 });
             }

@@ -124,7 +124,7 @@ namespace EDIS.Controllers
                 ViewData["MailType"] = dealType;
             }
 
-            //ViewData["ReturnUrl"] = returnUrl;
+            ViewData["ReturnUrl"] = returnUrl;
             return View();
         }
 
