@@ -449,8 +449,10 @@ namespace EDIS.Areas.BMED.Controllers
                     return PartialView("RpKpStokBd", RpKpStokBd(v));
                 case "零件帳務清單":
                     return PartialView("StokCost", StokCost(v));
-                //case "滿意度調查統計表":
-                //    return PartialView("QuestionAnalysis", QuestAnaly(v));
+                case "列管報廢清單":
+                    return PartialView("ScrapAsset", ScrapAsset(v));
+                    //case "滿意度調查統計表":
+                    //    return PartialView("QuestionAnalysis", QuestAnaly(v));
                     //case "儀器設備保養清單":
                     //    return PartialView("AssetKeepList", AssetKeepList(v));
 
@@ -505,6 +507,116 @@ namespace EDIS.Areas.BMED.Controllers
                 fileDownloadName: "MonthKeep.xlsx"
             );
         }
+
+        /// <summary>
+        /// Get scrap asset list by query conditions.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        private List<ScrapAsset> ScrapAsset(ReportQryVModel v)
+        {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            /* Get assets by user's location. */
+            var bmedAssets = GetAssetsByLoc(urLocation);
+            // 報廢案件
+            var repairDtl = _context.BMEDRepairDtls.Where(rd => rd.DealState == 4)
+                                                   .Where(rd => rd.CloseDate != null).ToList();
+            //
+            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                                                .ToList();
+            // 列管財產
+            assets = assets.Where(a => a.AssetNo.Length > 6 || a.AssetNo == "99999").ToList();
+            // Query Conditions.
+            if (!string.IsNullOrEmpty(v.AccDpt))
+            {
+                assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
+            }
+            if (!string.IsNullOrEmpty(v.AssetNo))
+            {
+                assets = assets.Where(a => a.AssetNo == v.AssetNo).ToList();
+            }
+            if (v.Sdate != null || v.Edate != null)
+            {
+                repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate && rd.CloseDate <= v.Edate).ToList();
+            }
+            //
+            var result = repairDtl.Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                                    (rd, r) => new
+                                    {
+                                        dtl = rd,
+                                        repair = r
+                                    })
+                                    .Join(_context.BMEDRepairCosts, rd => rd.dtl.DocId, rc => rc.DocId,
+                                    (rd, rc) => new
+                                    {
+                                        dtl = rd.dtl,
+                                        repair = rd.repair,
+                                        cost = rc
+                                    })
+                                    .Join(assets, rd => rd.repair.AssetNo, a => a.AssetNo,
+                                    (rd, a) => new
+                                    {
+                                        dtl = rd.dtl,
+                                        repair = rd.repair,
+                                        cost = rd.cost,
+                                        asset = a
+                                    }).ToList();
+            //
+            List<ScrapAsset> sa = new List<ScrapAsset>();
+            DepartmentModel dpt;
+            AppUserModel usr;
+            RepairFlowModel rf;
+            foreach(var item in result)
+            {
+                ScrapAsset s = new ScrapAsset();
+                s.DocId = item.repair.DocId;
+                s.ApplyDate = item.repair.ApplyDate;
+                s.DptId = item.repair.DptId;
+                dpt = _context.Departments.Find(item.repair.DptId);
+                s.DptName = dpt == null ? "" : dpt.Name_C;
+                s.AccDpt = item.repair.AccDpt;
+                s.AccDptName = dpt == null ? "" : dpt.Name_C;
+                usr = _context.AppUsers.Find(item.repair.UserId);
+                s.UserName = usr == null ? "" : usr.UserName;
+                s.UserFullName = usr == null ? "" : usr.FullName;
+                s.Amt = item.repair.Amt;
+                s.AssetType = "列管";
+                s.AssetNo = item.asset.AssetNo;
+                s.AssetName = item.asset.Cname;
+                s.TroubleDes = item.repair.TroubleDes;
+                s.DealState = "報廢";
+                s.DealDes = item.dtl.DealDes;
+                s.EndDate = item.dtl.EndDate;
+                usr = _context.AppUsers.Find(item.repair.EngId);
+                s.EngName = usr == null ? "" : usr.UserName + usr.FullName;
+                s.Hour = item.dtl.Hour;
+                s.RepType = "維修";
+                s.CloseDate = item.dtl.CloseDate;
+                s.CloseTicketDate = null;
+                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
+                                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人")).LastOrDefault();
+                usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
+                s.FlowDptUser = usr == null ? "" : usr.UserName + usr.FullName;
+                if (rf != null)
+                {
+                    s.FlowDptAcceptTime = rf.Rtt;
+                }
+                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
+                                             .Where(r => r.Cls.Contains("醫工主管")).LastOrDefault();
+                usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
+                s.MedMgr = usr == null ? "" : usr.UserName + usr.FullName;
+                if (rf != null)
+                {
+                    s.MedMgrAcceptTime = rf.Rtt;
+                }
+                sa.Add(s);
+            }
+            return sa;
+        }
+
         private List<ProperRate> AssetProperRate(ReportQryVModel v)
         {
             /* Get login user. */

@@ -1060,6 +1060,39 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         [HttpPost]
+        public IActionResult SendBackToUser(List<RepairListVModel> data, string role, string BMEDassignEngId = null)
+        {
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+
+            foreach (var item in data)
+            {
+                if (item.IsSelected)
+                {
+                    RepairModel repair = _context.BMEDRepairs.Find(item.DocId);
+                    RepairFlowModel rf = _context.BMEDRepairFlows.Where(f => f.DocId == item.DocId && f.Status == "?").FirstOrDefault();
+                    //轉送下一關卡
+                    rf.Opinions = "[退件]請廢除此案件";
+                    rf.Status = "1";
+                    rf.Rtt = DateTime.Now;
+                    rf.Rtp = ur.Id;
+                    _context.Entry(rf).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    //
+                    RepairFlowModel flow = new RepairFlowModel();
+                    flow.DocId = item.DocId;
+                    flow.StepId = rf.StepId + 1;
+                    flow.UserId = repair.UserId;
+                    flow.Status = "?";
+                    flow.Cls = "申請人";
+                    flow.Rtt = DateTime.Now;
+                    _context.BMEDRepairFlows.Add(flow);
+                    _context.SaveChanges();
+                }
+            }
+            return RedirectToAction("GetResignList", new { role = role });
+        }
+
+        [HttpPost]
         public JsonResult GetDptName(string dptId)
         {
             var dpt = _context.Departments.Find(dptId);
@@ -1978,7 +2011,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
         }
 
-        [HttpPost]
+        //[HttpPost]
         public IActionResult GetResignList(QryRepResignListData qdata, string role, int page = 1)
         {
             string docid = qdata.qtyReSignDOCID;
@@ -2007,7 +2040,8 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["BMEDassignEngId"] = new SelectList(listItem1, "Value", "Text");
 
             /* 所有尚未指派工程師的案件 */
-            var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師")).ToList();
+            var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師"))
+                                              .Where(r => r.UserId == 0).ToList();
             //var rps = _context.BMEDRepairs.Where(r => r.EngId == 0)
             //                              .Join(rfs, r => r.DocId, rf => rf.DocId,
             //                              (r, rf) => r).ToList();
