@@ -2643,6 +2643,8 @@ namespace EDIS.Models
     {
         [Display(Name = "表單編號")]
         public string DocId { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         [Display(Name = "送單日期")]
         public DateTime ApplyDate { get; set; }
         [Display(Name = "申請部門")]
@@ -2671,6 +2673,8 @@ namespace EDIS.Models
         public string DealState { get; set; }
         [Display(Name = "處理描述")]
         public string DealDes { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         [Display(Name = "完工日期")]
         public DateTime? EndDate { get; set; }
         [Display(Name = "工程師")]

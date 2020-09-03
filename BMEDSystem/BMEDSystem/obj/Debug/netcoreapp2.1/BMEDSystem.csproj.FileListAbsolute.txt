@@ -2909,3 +2909,4 @@ C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Deb
 C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Views\Shared\_LayoutLogin.g.cshtml.cs
 C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Keep\PrintKeepDoc2.g.cshtml.cs
 J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Keep\PrintKeepDoc2.g.cshtml.cs
+C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Report\ScrapAsset.g.cshtml.cs

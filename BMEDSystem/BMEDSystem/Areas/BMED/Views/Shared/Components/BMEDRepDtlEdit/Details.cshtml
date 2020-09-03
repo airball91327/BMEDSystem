@@ -5,6 +5,19 @@
 }
 @using EDIS.Models.Identity
 @inject CustomUserManager UserManager
+
+<script>
+    $(function () {
+        var isCharged = '@Model.IsCharged.ToString()';
+        if (isCharged == 'Y') {
+            $('#page2').show();
+        }
+        else {
+            $('#page2').hide();
+        }
+    });
+</script>
+
 <div>
     <h3>請修明細</h3>
     <hr />

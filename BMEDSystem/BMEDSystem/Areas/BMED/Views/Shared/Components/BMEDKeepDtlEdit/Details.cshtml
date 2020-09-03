@@ -3,6 +3,18 @@
 @using EDIS.Models.Identity
 @inject CustomUserManager UserManager
 
+<script>
+    $(function () {
+        var isCharged = '@Model.IsCharged.ToString()';
+        if (isCharged == 'Y') {
+            $('#page3').show();
+        }
+        else {
+            $('#page3').hide();
+        }
+    });
+</script>
+
 <div>
     <dl class="dl-horizontal">
         <dt>

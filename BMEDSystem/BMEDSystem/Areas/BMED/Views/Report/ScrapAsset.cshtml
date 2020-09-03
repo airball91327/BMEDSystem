@@ -1,0 +1,174 @@
+﻿@model IEnumerable<EDIS.Models.ScrapAsset>
+@{
+    Layout = null;
+}
+
+<script src="~/js/HtmltoExcel.js"></script>
+
+<input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
+       onclick="javascript:exportExcel('tbToExcel')" />
+
+
+<table class="table" id="tbToExcel">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DocId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.ApplyDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DptId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DptName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccDpt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AccDptName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.UserFullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Amt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssetType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssetNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.AssetName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.TroubleDes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DealState)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DealDes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EngName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hour)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RepType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CloseDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.CloseTicketDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FlowDptUser)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FlowDptAcceptTime)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MedMgr)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.MedMgrAcceptTime)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DocId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ApplyDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DptId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DptName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccDpt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccDptName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.UserFullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Amt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssetType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssetNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssetName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TroubleDes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DealState)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DealDes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EndDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hour)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RepType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CloseDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.CloseTicketDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FlowDptUser)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.FlowDptAcceptTime)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MedMgr)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.MedMgrAcceptTime)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

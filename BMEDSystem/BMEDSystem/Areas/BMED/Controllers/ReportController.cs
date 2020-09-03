@@ -524,46 +524,30 @@ namespace EDIS.Areas.BMED.Controllers
             // 報廢案件
             var repairDtl = _context.BMEDRepairDtls.Where(rd => rd.DealState == 4)
                                                    .Where(rd => rd.CloseDate != null).ToList();
-            //
-            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
-                                                .ToList();
+            var repair = _context.BMEDRepairs.ToList();
             // 列管財產
-            assets = assets.Where(a => a.AssetNo.Length > 6 || a.AssetNo == "99999").ToList();
+            repair = repair.Where(r => r.AssetNo.Length > 6 || r.AssetNo == "99999").ToList();
             // Query Conditions.
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
+                repair = repair.Where(r => r.AccDpt == v.AccDpt).ToList();
             }
             if (!string.IsNullOrEmpty(v.AssetNo))
             {
-                assets = assets.Where(a => a.AssetNo == v.AssetNo).ToList();
+                repair = repair.Where(r => r.AssetNo == v.AssetNo).ToList();
             }
             if (v.Sdate != null || v.Edate != null)
             {
                 repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate && rd.CloseDate <= v.Edate).ToList();
             }
             //
-            var result = repairDtl.Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+            var result = repairDtl.Join(repair, rd => rd.DocId, r => r.DocId,
                                     (rd, r) => new
                                     {
                                         dtl = rd,
                                         repair = r
                                     })
-                                    .Join(_context.BMEDRepairCosts, rd => rd.dtl.DocId, rc => rc.DocId,
-                                    (rd, rc) => new
-                                    {
-                                        dtl = rd.dtl,
-                                        repair = rd.repair,
-                                        cost = rc
-                                    })
-                                    .Join(assets, rd => rd.repair.AssetNo, a => a.AssetNo,
-                                    (rd, a) => new
-                                    {
-                                        dtl = rd.dtl,
-                                        repair = rd.repair,
-                                        cost = rd.cost,
-                                        asset = a
-                                    }).ToList();
+                                    .ToList();
             //
             List<ScrapAsset> sa = new List<ScrapAsset>();
             DepartmentModel dpt;
@@ -584,8 +568,8 @@ namespace EDIS.Areas.BMED.Controllers
                 s.UserFullName = usr == null ? "" : usr.FullName;
                 s.Amt = item.repair.Amt;
                 s.AssetType = "列管";
-                s.AssetNo = item.asset.AssetNo;
-                s.AssetName = item.asset.Cname;
+                s.AssetNo = item.repair.AssetNo;
+                s.AssetName = item.repair.AssetName;
                 s.TroubleDes = item.repair.TroubleDes;
                 s.DealState = "報廢";
                 s.DealDes = item.dtl.DealDes;
