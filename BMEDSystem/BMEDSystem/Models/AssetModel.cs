@@ -119,10 +119,6 @@ namespace EDIS.Models
 
     public class QryAsset
     {
-        [Display(Name = "成本中心")]
-        public string AccDpt { get; set; }
-        [Display(Name = "保管部門")]
-        public string DelivDpt { get; set; }
         [Display(Name = "財產編號")]
         public string AssetNo { get; set; }
         [Display(Name = "設備名稱")]
@@ -131,6 +127,9 @@ namespace EDIS.Models
         public string BmedNo { get; set; }
         [Display(Name = "型號")]
         public string Type { get; set; }
-
+        [Display(Name = "成本中心")]
+        public string AccDpt { get; set; }
+        [Display(Name = "保管部門")]
+        public string DelivDpt { get; set; }
     }
 }

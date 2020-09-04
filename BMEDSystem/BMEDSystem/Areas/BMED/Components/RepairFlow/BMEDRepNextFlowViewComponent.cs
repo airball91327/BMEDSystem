@@ -46,7 +46,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
                 listItem.Add(new SelectListItem { Text = "單位主任", Value = "單位主任" });
                 listItem.Add(new SelectListItem { Text = "單位副院長", Value = "單位副院長" });
-                listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
+                //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
                 listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
                 listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
                 listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
@@ -57,7 +57,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 listItem.Add(new SelectListItem { Text = "申請人", Value = "申請人" });
                 listItem.Add(new SelectListItem { Text = "驗收人", Value = "驗收人" });
                 listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
-                listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
+                //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
                 listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
                 listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
                 listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });

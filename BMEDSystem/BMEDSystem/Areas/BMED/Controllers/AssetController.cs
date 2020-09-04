@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
+using System.IO;
 using System.Linq;
 using System.Text.Encodings.Web;
 using System.Threading.Tasks;
@@ -12,6 +14,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using OfficeOpenXml;
 using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
@@ -141,6 +144,8 @@ namespace EDIS.Areas.BMED.Controllers
             }
             ViewData["KeepEngId"] = new SelectList(listItem, "Value", "Text", "");
             ViewData["AssetEngId"] = new SelectList(listItem, "Value", "Text", "");
+            //
+            TempData["qry"] = qryAsset;
             //
             if (at2.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("List", at2.ToPagedList(1, pageSize));
@@ -734,6 +739,117 @@ namespace EDIS.Areas.BMED.Controllers
             }
         }
 
+        /// <summary>
+        /// Export excel file for Assets by query conditions.
+        /// </summary>
+        /// <param name="v"></param>
+        /// <returns></returns>
+        public IActionResult AssetExcel(QryAsset v)
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("類別");
+            dt.Columns.Add("財產編號");
+            dt.Columns.Add("設備名稱");
+            dt.Columns.Add("成本中心");
+            dt.Columns.Add("保管部門");
+            dt.Columns.Add("保管人員");
+            dt.Columns.Add("工程師名稱");
+            dt.Columns.Add("廠牌");
+            dt.Columns.Add("規格");
+            dt.Columns.Add("型號");
+            dt.Columns.Add("廠商名稱");
+            dt.Columns.Add("廠商統編");
+            dt.Columns.Add("製造號碼");
+            dt.Columns.Add("財產狀況");
+            dt.Columns.Add("成本(取得金額)");
+            dt.Columns.Add("保養週期");
+            dt.Columns.Add("保養起始月");
+            dt.Columns.Add("保養方式");
+            dt.Columns.Add("維修工程師(保養用)");
+            dt.Columns.Add("購入日(取得日期)");
+
+            List<AssetModel> mv = QryAsset(v);
+            mv.Join(_context.AppUsers, a => a.AssetEngId, u => u.Id,
+                (a, u) => new {
+                    asset = a,
+                    user = u
+                })
+                .GroupJoin(_context.BMEDAssetKeeps, a => a.asset.AssetNo, k => k.AssetNo,
+                (a, k) => new {
+                    asset = a.asset,
+                    user = a.user,
+                    assetkeep = k
+                }).SelectMany(a => a.assetkeep.DefaultIfEmpty(),
+                (a, s) => new {
+                    asset = a.asset,
+                    user = a.user,
+                    assetkeep = s
+                })
+                .GroupJoin(_context.BMEDVendors, a => a.asset.VendorId, vd => vd.VendorId,
+                (a, vd) => new {
+                    asset = a.asset,
+                    user = a.user,
+                    assetkeep = a.assetkeep,
+                    vendor = vd
+                }).SelectMany(a => a.vendor.DefaultIfEmpty(),
+                (a, s) => new {
+                    asset = a.asset,
+                    user = a.user,
+                    assetkeep = a.assetkeep,
+                    vendor = s
+                })
+                .ToList()
+            .ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.asset.AssetClass;
+                dw[1] = m.asset.AssetNo;
+                dw[2] = m.asset.Cname;
+                dw[3] = m.asset.AccDptName;
+                dw[4] = m.asset.DelivDptName;
+                dw[5] = m.asset.DelivEmp;
+                dw[6] = m.user.FullName;
+                dw[7] = m.asset.Brand;
+                dw[8] = m.asset.Standard;
+                dw[9] = m.asset.Type;
+                dw[10] = m.vendor == null ? "" : m.vendor.VendorName;
+                dw[11] = m.vendor == null ? "" : m.vendor.UniteNo;
+                dw[12] = m.asset.MakeNo;
+                dw[13] = m.asset.DisposeKind;
+                dw[14] = m.asset.Cost;
+                dw[15] = m.assetkeep == null ? null : m.assetkeep.Cycle;
+                dw[16] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
+                dw[17] = m.assetkeep == null ? "" : 
+                         m.assetkeep.InOut == "0" ? "自行" :
+                         m.assetkeep.InOut == "1" ? "委外" :
+                         m.assetkeep.InOut == "2" ? "租賃" :
+                         m.assetkeep.InOut == "3" ? "保固" : "";
+                dw[18] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
+                dw[19] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("設備列表清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "設備列表清單.xlsx"
+            );
+        }
+
+
         public IActionResult BuyEvaluateListItem(string id = null, string upload = null, int page = 1)
         {
             return ViewComponent("BuyEvaluateAssetListItem", new { id = id, upload = upload, page = page });
@@ -759,6 +875,63 @@ namespace EDIS.Areas.BMED.Controllers
             _context.SaveChanges();
 
             return new JavaScriptResult("alert('刪除成功!');window.opener.location.reload();close();");
+        }
+
+        /// <summary>
+        /// Get Assets by query conditions.
+        /// </summary>
+        /// <param name="qryAsset"></param>
+        /// <returns></returns>
+        public List<AssetModel> QryAsset(QryAsset qryAsset)
+        {
+            List<AssetModel> at = new List<AssetModel>();
+
+            _context.BMEDAssets.GroupJoin(_context.Departments, a => a.DelivDpt, d => d.DptId,
+                (a, d) => new { Asset = a, Department = d })
+                .SelectMany(p => p.Department.DefaultIfEmpty(),
+                (x, y) => new { Asset = x.Asset, Department = y })
+                .ToList()
+                .GroupJoin(_context.AppUsers, e => e.Asset.DelivUid, u => u.Id,
+                (e, u) => new { Asset = e, AppUser = u })
+                .SelectMany(p => p.AppUser.DefaultIfEmpty(),
+                (e, y) => new { Asset = e.Asset.Asset, Department = e.Asset.Department, AppUser = y })
+                .ToList()
+                .ForEach(p =>
+                {
+                    p.Asset.DelivDptName = p.Department == null ? "" : p.Department.Name_C;
+                    p.Asset.DelivEmp = p.AppUser == null ? "" : p.AppUser.FullName;
+                    at.Add(p.Asset);
+                });
+            at.GroupJoin(_context.Departments, a => a.AccDpt, d => d.DptId,
+                (a, d) => new { Asset = a, Department = d })
+                .SelectMany(p => p.Department.DefaultIfEmpty(),
+                (x, y) => new { Asset = x.Asset, Department = y })
+                .ToList()
+                .ForEach(p =>
+                {
+                    p.Asset.AccDptName = p.Department == null ? "" : p.Department.Name_C;
+                    at.Add(p.Asset);
+                });
+            if (!string.IsNullOrEmpty(qryAsset.AssetNo))
+            {
+                at = at.Where(a => a.AssetNo == qryAsset.AssetNo).ToList();
+            }
+            if (!string.IsNullOrEmpty(qryAsset.AssetName))
+            {
+                at = at.Where(a => a.Cname.Contains(qryAsset.AssetName)).ToList();
+            }
+            if (!string.IsNullOrEmpty(qryAsset.AccDpt))
+            {
+                at = at.Where(a => a.AccDpt == qryAsset.AccDpt).ToList();
+            }
+            if (!string.IsNullOrEmpty(qryAsset.Type))
+            {
+                at = at.Where(a => a.Type == qryAsset.Type).ToList();
+            }
+
+            at = at.GroupBy(a => a.AssetNo).Select(g => g.First()).ToList();
+
+            return at;
         }
 
         public class JavaScriptResult : ContentResult

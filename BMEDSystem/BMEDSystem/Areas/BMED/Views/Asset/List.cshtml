@@ -113,7 +113,7 @@
         <div class="form-group">
             <div class="col-md-2">
                 <a class="btn btn-primary" href="@Url.Action("Create")">新增設備</a>
-                @*@Html.ActionLink("新增設備", "Create", null, new { @class = "btn btn-default" })*@
+                <a class="btn btn-default" href="@Url.Action("AssetExcel", TempData["qry"])">匯出Excel</a>
             </div>
             <div class="col-md-5 text-left">
                 <div class="form-inline">
