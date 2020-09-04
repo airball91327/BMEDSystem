@@ -169,7 +169,7 @@ namespace EDIS.Areas.BMED.Controllers
                     AssetModel at = _context.BMEDAssets.Find(keep.AssetNo);
                     //
                     keep.AssetName = _context.BMEDAssets.Find(keep.AssetNo).Cname;
-                    keep.EngId = kp.KeepEngId;
+                    keep.EngId = kp.KeepEngId.Value;
                     //keep.AccDpt = at.AccDpt;
                     keep.SentDate = DateTime.Now;
                     keep.Cycle = kp == null ? 0 : (kp.Cycle == null ? 0 : kp.Cycle.Value);
@@ -227,7 +227,7 @@ namespace EDIS.Areas.BMED.Controllers
                     rf = new KeepFlowModel();
                     rf.DocId = keep.DocId;
                     rf.StepId = 2;
-                    rf.UserId = kp == null ? ur.Id : kp.KeepEngId;
+                    rf.UserId = kp == null ? ur.Id : kp.KeepEngId.Value;
                     rf.Status = "?";
                     AppUserModel u = _context.AppUsers.Find(rf.UserId);
                     if (u == null)

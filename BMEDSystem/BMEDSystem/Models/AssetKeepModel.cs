@@ -23,7 +23,7 @@ namespace EDIS.Models
         [Display(Name = "起始年月(手動)")]
         public int? KeepYm2 { get; set; }
         [Display(Name = "負責工程師")]
-        public int KeepEngId { get; set; }
+        public int? KeepEngId { get; set; }
         [Display(Name = "工程師姓名")]
         public string KeepEngName { get; set; }
         [Display(Name = "預定費用")]
