@@ -42,7 +42,6 @@
     <Folder Include="Areas\BMED\Models\" />
     <Folder Include="Areas\BMED\Repositories\" />
     <Folder Include="Areas\BMED\Views\Repair\Components\Preview\" />
-    <Folder Include="Components\" />
     <Folder Include="Extensions\" />
     <Folder Include="Fliters\" />
     <Folder Include="Services\" />
@@ -66,6 +65,9 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Areas\BMED\Views\Repair\GetResignList.cshtml">
+      <Pack>$(IncludeRazorContentInPack)</Pack>
+    </Content>
+    <Content Update="Views\Shared\Components\QryVendor\Default.cshtml">
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
     <Content Update="Views\Shared\Components\RepResignIndex\Default.cshtml">

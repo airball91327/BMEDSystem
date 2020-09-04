@@ -52,7 +52,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return StatusCode(404);
             }
-            assetKeep.KeepEngName = assetKeep.KeepEngId == 0 ? "" : _context.AppUsers.Find(assetKeep.KeepEngId).FullName;
+            assetKeep.KeepEngName = assetKeep.KeepEngId == null ? "" : _context.AppUsers.Find(assetKeep.KeepEngId).FullName;
             return PartialView(assetKeep);
         }
 
@@ -112,7 +112,7 @@ namespace EDIS.Areas.BMED.Controllers
         {
             if (ModelState.IsValid)
             {
-                assetKeep.KeepEngName = _context.AppUsers.Find(assetKeep.KeepEngId).FullName;
+                assetKeep.KeepEngName = _context.AppUsers.Find(assetKeep.KeepEngId.Value).FullName;
                 _context.Entry(assetKeep).State = EntityState.Modified;
                 _context.SaveChanges();
                 return new JsonResult(assetKeep)

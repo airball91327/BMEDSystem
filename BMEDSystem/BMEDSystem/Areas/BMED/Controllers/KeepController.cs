@@ -169,13 +169,16 @@ namespace EDIS.Areas.BMED.Controllers
                     AssetModel at = _context.BMEDAssets.Find(keep.AssetNo);
                     //
                     keep.AssetName = _context.BMEDAssets.Find(keep.AssetNo).Cname;
+                    if (!kp.KeepEngId.HasValue)
+                    {
+                        throw new Exception("此設備尚未設定保養工程師!!");
+                    }
                     keep.EngId = kp.KeepEngId.Value;
                     //keep.AccDpt = at.AccDpt;
                     keep.SentDate = DateTime.Now;
                     keep.Cycle = kp == null ? 0 : (kp.Cycle == null ? 0 : kp.Cycle.Value);
                     keep.Src = "M";
                     _context.Entry(keep).State = EntityState.Modified;
-
                     //
                     KeepDtlModel dl = new KeepDtlModel();
                     var notInExceptDevice = _context.ExceptDevice.Find(keep.AssetNo);
