@@ -61,7 +61,7 @@ namespace EDIS.Areas.BMED.Components.AssetKeep
                     u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
                     if (u != null)
                     {
-                        listItem.Add(new SelectListItem { Text = u.FullName, Value = u.Id.ToString() });
+                        listItem.Add(new SelectListItem { Text = u.FullName + "(" + u.UserName + ")", Value = u.Id.ToString() });
                     }
                 }
                 ViewData["KeepEngId"] = new SelectList(listItem, "Value", "Text", "");

@@ -244,7 +244,7 @@ namespace EDIS.Areas.BMED.Controllers
                 AppUserModel u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
                 if (u != null)
                 {
-                    listItem5.Add(new SelectListItem { Text = u.FullName, Value = u.Id.ToString() });
+                    listItem5.Add(new SelectListItem { Text = u.FullName + "(" + u.UserName + ")", Value = u.Id.ToString() });
                 }
             }
             ViewData["AssetEngId"] = new SelectList(listItem5, "Value", "Text", "");
@@ -335,7 +335,7 @@ namespace EDIS.Areas.BMED.Controllers
             List<SelectListItem> listItem2 = new List<SelectListItem>();
             _context.AppUsers.Where(u => u.DptId == asset.DelivDpt).ToList().ForEach(u =>
             {
-                listItem2.Add(new SelectListItem { Text = u.FullName, Value = u.Id.ToString() });
+                listItem2.Add(new SelectListItem { Text = u.FullName + "(" + u.UserName + ")", Value = u.Id.ToString() });
             });
             if (listItem2.Where(item => item.Value == asset.DelivUid.ToString()).Count() == 0)
                 listItem2.Add(new SelectListItem { Text = asset.DelivEmp, Value = asset.DelivUid.ToString() });
@@ -364,7 +364,7 @@ namespace EDIS.Areas.BMED.Controllers
                 AppUserModel u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
                 if (u != null)
                 {
-                    listItem5.Add(new SelectListItem { Text = u.FullName, Value = u.Id.ToString() });
+                    listItem5.Add(new SelectListItem { Text = u.FullName + "(" + u.UserName + ")", Value = u.Id.ToString() });
                 }
             }
             ViewData["AssetEngId"] = new SelectList(listItem5, "Value", "Text", "");
