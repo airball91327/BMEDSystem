@@ -580,8 +580,8 @@ namespace EDIS.Areas.BMED.Controllers
                 s.RepType = "維修";
                 s.CloseDate = item.dtl.CloseDate;
                 s.CloseTicketDate = null;
-                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
-                                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人")).LastOrDefault();
+                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId).OrderBy(r => r.StepId)
+                                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人") || r.Cls.Contains("單位主管")).LastOrDefault();
                 usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
                 s.FlowDptUser = usr == null ? "" : usr.UserName + usr.FullName;
                 if (rf != null)

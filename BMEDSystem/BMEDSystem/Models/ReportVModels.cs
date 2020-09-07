@@ -2657,7 +2657,7 @@ namespace EDIS.Models
         public string AccDptName { get; set; }
         [Display(Name = "申請人")]
         public string UserName { get; set; }
-        [Display(Name = "成本中心名稱")]
+        [Display(Name = "申請人姓名")]
         public string UserFullName { get; set; }
         [Display(Name = "數量")]
         public int? Amt { get; set; }
