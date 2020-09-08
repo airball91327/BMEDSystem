@@ -1145,19 +1145,20 @@ namespace EDIS.Areas.BMED.Controllers
             var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             AssetModel asset = _context.BMEDAssets.Find(AssetNo);
             AppUserModel engineer = null;
-            if (asset != null)
+            if (asset != null)  //設備負責工程師
             {
                 engineer = _context.AppUsers.Find(asset.AssetEngId);
             }
             //
             if (AssetNo == "99999") //無財編的工程師處理
             {
+                // 依照使用者的部門設定工程師
                 var eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
                 if (eid != null)
                 {
                     engineer = _context.AppUsers.Find(eid.EngId);
                 }
-                if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
+                if (engineer == null)//該部門無預設工程師，設定選取ID為0的User，為尚未分配之案件
                 {
                     var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
                     return Json(tempEng);
@@ -1173,12 +1174,24 @@ namespace EDIS.Areas.BMED.Controllers
                     if (asset != null)
                     {
                         var dptid = asset.DelivDpt;
-                        var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
-                        if (eid != null)
+                        if (!string.IsNullOrEmpty(asset.DelivDpt))   
                         {
-                            engineer = _context.AppUsers.Find(eid.EngId);
+                            var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
+                            if (eid != null)
+                            {
+                                engineer = _context.AppUsers.Find(eid.EngId);
+                            }
                         }
-                        if (engineer == null)//該部門無預設工程師，設定選取ID為99999的User，為尚未分配之案件
+                        else   //設備無保管部門
+                        {
+                            // 依照使用者的部門設定工程師
+                            var eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
+                            if (eid != null)
+                            {
+                                engineer = _context.AppUsers.Find(eid.EngId);
+                            }
+                        }
+                        if (engineer == null)//上述條件皆對應不到工程師，設定選取ID為0的User，為尚未分配之案件
                         {
                             var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
                             return Json(tempEng);
@@ -1188,8 +1201,19 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     else  //查無設備
                     {
-                        var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
-                        return Json(tempEng);
+                        // 依照使用者的部門設定工程師
+                        var eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
+                        if (eid != null)
+                        {
+                            engineer = _context.AppUsers.Find(eid.EngId);
+                        }
+                        if (engineer == null)//該部門無預設工程師，設定選取ID為0的User，為尚未分配之案件
+                        {
+                            var tempEng = new { EngId = "0", UserName = "00000", FullName = "主管再行分派" };
+                            return Json(tempEng);
+                        }
+                        var eng = new { EngId = engineer.Id, UserName = engineer.UserName, FullName = engineer.FullName };
+                        return Json(eng);
                     }
                 }
                 else

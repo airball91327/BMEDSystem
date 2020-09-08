@@ -73,6 +73,11 @@ $(function () {
         }
         else if ($(this).val() === "單位主管" || $(this).val() === "單位主任" || $(this).val() === "其他")
         {
+            var select = $('#FlowUid');
+            select.empty();
+            select.append($('<option selected="selected"></option>').text('請選擇').val('請選擇'));
+            select.combobox();
+            select.data('combobox').refresh();
             $("#searchUid").show();
         }
         else {

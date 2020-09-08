@@ -81,6 +81,7 @@ $(function () {
             $("#pnlVENDOR").hide();
         }
     });
+    $('input:radio[name="StockType"]').trigger('click');
 
     /* Auto calculate total price when input price or qty. */
     $('#Price').change(function () {

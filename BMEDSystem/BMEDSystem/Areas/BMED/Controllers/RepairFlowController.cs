@@ -124,11 +124,18 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 if (assign.FlowCls == "結案")
                 {
-                    if ( assign.Cls == "驗收人" && repairDtl != null)
+                    if (assign.Cls == "驗收人" && repairDtl != null)
                     {
                         if (repairDtl.IsCharged == "Y")
                         {
                             throw new Exception("有費用之案件不可由驗收人直接結案!");
+                        }
+                    }
+                    if (assign.Cls == "驗收人" && repairDtl != null)
+                    {
+                        if (repairDtl.DealState == 4)
+                        {
+                            throw new Exception("報廢之案件不可由驗收人直接結案!");
                         }
                     }
                     RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);

@@ -115,12 +115,16 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
-                if (repairFlow.Cls == "驗收人" && repairDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
+                //有費用 & 關卡於驗收人 or 有費用 & 為報廢設備，移除結案選項
+                if (repairFlow.Cls == "驗收人")  
                 {
-                    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "結案");
-                    if (itemToRemove != null)
+                    if (repairDtl.IsCharged == "Y" || repairDtl.DealState == 4)
                     {
-                        listItem.Remove(itemToRemove);
+                        var itemToRemove = listItem.SingleOrDefault(r => r.Value == "結案");
+                        if (itemToRemove != null)
+                        {
+                            listItem.Remove(itemToRemove);
+                        }
                     }
                 }
                 //無費用時單位主管可結案
