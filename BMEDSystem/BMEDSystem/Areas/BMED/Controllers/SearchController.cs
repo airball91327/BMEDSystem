@@ -498,7 +498,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
-                repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().UserId == Convert.ToInt32(qtyClsUser))
+                repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
                                          .Select(group => group.Last()).ToList();
             }
 
@@ -761,7 +761,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
-                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().UserId == Convert.ToInt32(qtyClsUser))
+                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
                                      .Select(group => group.Last()).ToList();
             }
 

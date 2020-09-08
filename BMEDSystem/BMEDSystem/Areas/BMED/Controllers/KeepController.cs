@@ -709,7 +709,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "請選擇":
                     /* Get all dealing repair docs. */
                     _context.BMEDKeepFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
-                                          .Select(group => group.Last()).ToList()
+                                          .Select(group => group.OrderBy(g => g.StepId).Last()).ToList()
                                           .Where(f => f.Status != "3")
                     .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                     (f, k) => new
@@ -784,7 +784,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }).ToList();
                     /* search all KeepDocs which doc is not closed. */
                     keepFlows2 = keepFlows2.GroupBy(f => f.flow.DocId)
-                                           .Where(group => group.Last().flow.Status == "?")
+                                           .Where(group => group.OrderBy(g => g.flow.StepId).Last().flow.Status == "?")
                                            .Select(group => group.Last()).ToList();
                     //keepFlows2 = keepFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
