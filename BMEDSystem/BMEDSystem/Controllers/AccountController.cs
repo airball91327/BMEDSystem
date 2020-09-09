@@ -170,9 +170,9 @@ namespace EDIS.Controllers
                         else
                         {
                             // user's password encrypt by DES.
-                            string DESKey = "84203025";
-                            var encryptPW = CryptoExtensions.DESEncrypt(model.Password, DESKey);   // Encrypt and check password.
-                            if (encryptPW != loginUser.Password)
+                            //string DESKey = "84203025";
+                            //var encryptPW = CryptoExtensions.DESEncrypt(model.Password, DESKey);   // Encrypt and check password.
+                            if (model.Password != loginUser.Password)
                             {
                                 ModelState.AddModelError(string.Empty, "密碼錯誤.");
                                 return View(model);

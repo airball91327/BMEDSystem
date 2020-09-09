@@ -2144,7 +2144,7 @@ namespace EDIS.Areas.BMED.Controllers
                 rv = rv.Where(v => v.AccDpt == acc).ToList();
             }
             //
-            if (role == "MedAssetMgr")  //總院設備主管
+            if (role == "MedAssetMgr" || role == "MedMgr")  //總院設備主管、醫工主管
             {
                 rv = rv.Where(r => r.repdata.Loc == "總院").ToList();
             }

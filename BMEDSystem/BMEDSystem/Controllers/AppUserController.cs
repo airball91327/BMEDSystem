@@ -158,9 +158,10 @@ namespace EDIS.Controllers
                     return View(appUser);
                 }
                 // user's password encrypt by DES.
-                string DESKey = "84203025";
-                var encryptPW = CryptoExtensions.DESEncrypt(appUser.Password, DESKey);   // Encrypt and check password.
-                appUser.Password = encryptPW;
+                //string DESKey = "84203025";
+                //var encryptPW = CryptoExtensions.DESEncrypt(appUser.Password, DESKey);   // Encrypt and check password.
+                //appUser.Password = encryptPW;
+                appUser.Password = appUser.Password;
                 appUser.DateCreated = DateTime.Now;
                 appUser.LastActivityDate = DateTime.Now;
                 _context.AppUsers.Add(appUser);

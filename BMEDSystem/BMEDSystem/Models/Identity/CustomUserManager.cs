@@ -144,12 +144,12 @@ namespace EDIS.Models.Identity
             if (ur != null)
             {
                 // user's password encrypt by DES.
-                string DESKey = "84203025";
-                var checkPW = CryptoExtensions.DESEncrypt(currentPassword, DESKey);
-                if (ur.Password == checkPW)
+                //string DESKey = "84203025";
+                //var checkPW = CryptoExtensions.DESEncrypt(currentPassword, DESKey);
+                if (ur.Password == currentPassword)
                 {
-                    var encryptPW = CryptoExtensions.DESEncrypt(newPassword, DESKey);   // Encrypt and check password.
-                    ur.Password = encryptPW;
+                    //var encryptPW = CryptoExtensions.DESEncrypt(newPassword, DESKey);   // Encrypt and check password.
+                    ur.Password = newPassword;
                     _context.Entry(ur).State = EntityState.Modified;
                     _context.SaveChanges();
                     s = "成功";
@@ -173,9 +173,9 @@ namespace EDIS.Models.Identity
             if (ur != null)
             {
                 // user's password encrypt by DES.
-                string DESKey = "84203025";
-                var encryptPW = CryptoExtensions.DESEncrypt(newPassword, DESKey);   // Encrypt and check password.
-                ur.Password = encryptPW;
+                //string DESKey = "84203025";
+                //var encryptPW = CryptoExtensions.DESEncrypt(newPassword, DESKey);   // Encrypt and check password.
+                ur.Password = newPassword;
                 _context.Entry(ur).State = EntityState.Modified;
                 _context.SaveChanges();
                 s = "成功";
