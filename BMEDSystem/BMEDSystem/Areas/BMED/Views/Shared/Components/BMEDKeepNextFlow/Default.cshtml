@@ -1,6 +1,8 @@
 ﻿@model EDIS.Models.AssignModel
 
 <script src="~/js/BMED/KeepNextFlow.js" asp-append-version="true"></script>
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
 
 <form asp-controller="KeepFlow" asp-action="NextFlow" asp-area="BMED" data-ajax="true" data-ajax-method="POST" id="nextFlowForm"
       data-ajax-begin="$.Toast.showToast({
@@ -72,8 +74,8 @@
 </form>
 
 @*<div id="pnlKEEPFLOWLIST">
-    @if (Model != null)
-    {
-        @await Component.InvokeAsync("BMEDKeepFlowList", new { id = Model.DocId })
-    }
-</div>*@
+        @if (Model != null)
+        {
+            @await Component.InvokeAsync("BMEDKeepFlowList", new { id = Model.DocId })
+        }
+    </div>*@

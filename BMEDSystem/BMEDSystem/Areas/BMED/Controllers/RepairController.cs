@@ -1360,6 +1360,23 @@ namespace EDIS.Areas.BMED.Controllers
                                 Value = x.ASSET_NO
                             });
                         });
+                        // no result.
+                        if (objs.Count() <= 0)
+                        {
+                            assets = _context.BMEDAssets.Where(a => a.AssetNo.Contains(QueryStr) ||
+                                                                    a.Cname.Contains(QueryStr)).ToList();
+                            if (assets.Count() != 0)
+                            {
+                                assets.ForEach(asset =>
+                                {
+                                    list.Add(new SelectListItem
+                                    {
+                                        Text = asset.Cname + "(" + asset.AssetNo + ")",
+                                        Value = asset.AssetNo.ToString()
+                                    });
+                                });
+                            }
+                        }
                     }
                     catch (Exception e)
                     {

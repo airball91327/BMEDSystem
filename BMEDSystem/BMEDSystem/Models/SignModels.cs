@@ -24,13 +24,13 @@ namespace EDIS.Models
         public string AssignCls { get; set; }
         [Display(Name = "意見描述")]
         public string AssignOpn { get; set; }
-        [Required(ErrorMessage = "必填寫欄位")]
+        [Required(ErrorMessage = "流程關卡為必填寫欄位")]
         [Display(Name = "流程關卡")]
         public string FlowCls { get; set; }
         [Display(Name = "廠商")]
         public string FlowVendor { get; set; }
         public string VendorName { get; set; }
-        [Required(ErrorMessage = "必填寫欄位")]
+        [Required(ErrorMessage = "關卡人員為必填寫欄位")]
         [Display(Name = "關卡人員")]
         public int? FlowUid { get; set; }
         [Display(Name = "目前關卡")]

@@ -391,35 +391,58 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     if (k != null)
                     {
-                        /* 與驗收人同單位的成員(包括驗收人) */
-                        var checkerDptId = _context.AppUsers.Find(k.CheckerId).DptId;
-                        List<AppUserModel> ul = _context.AppUsers.Where(f => f.DptId == checkerDptId)
-                                                                 .Where(f => f.Status == "Y").ToList();
-                        if (asset != null)
+                        if (k.Src != "M")// 非手動出單
                         {
-                            if (asset.DelivDpt != k.DptId)
-                            {
-                                ul.AddRange(_context.AppUsers.Where(f => f.DptId == asset.DelivDpt)
-                                                             .Where(f => f.Status == "Y").ToList());
-                            }
-                        }
-                        /* 驗收人 */
-                        var checker = _context.AppUsers.Find(k.CheckerId);
-                        list = new List<SelectListItem>();
-                        li = new SelectListItem();
-                        li.Text = checker.FullName + "(" + checker.UserName + ")";
-                        li.Value = checker.Id.ToString();
-                        list.Add(li);
+                            /* 成本中心的成員 */
+                            List<AppUserModel> ul = _context.AppUsers.Where(f => f.DptId == k.AccDpt)
+                                                                     .Where(f => f.Status == "Y").ToList();
+                            /* 驗收人列表 */
+                            list = new List<SelectListItem>();
+                            li = new SelectListItem();
+                            li.Text = "請選擇";
+                            li.Value = null;
+                            list.Add(li);
 
-                        foreach (AppUserModel l in ul)
-                        {
-                            /* 申請人以外的成員 */
-                            if (l.Id != k.UserId)
+                            foreach (AppUserModel l in ul)
                             {
                                 li = new SelectListItem();
                                 li.Text = l.FullName + "(" + l.UserName + ")";
                                 li.Value = l.Id.ToString();
                                 list.Add(li);
+                            }
+                        }
+                        else
+                        {
+                            /* 與驗收人同單位的成員(包括驗收人) */
+                            var checkerDptId = _context.AppUsers.Find(k.CheckerId).DptId;
+                            List<AppUserModel> ul = _context.AppUsers.Where(f => f.DptId == checkerDptId)
+                                                                     .Where(f => f.Status == "Y").ToList();
+                            if (asset != null)
+                            {
+                                if (asset.DelivDpt != k.DptId)
+                                {
+                                    ul.AddRange(_context.AppUsers.Where(f => f.DptId == asset.DelivDpt)
+                                                                 .Where(f => f.Status == "Y").ToList());
+                                }
+                            }
+                            /* 驗收人 */
+                            var checker = _context.AppUsers.Find(k.CheckerId);
+                            list = new List<SelectListItem>();
+                            li = new SelectListItem();
+                            li.Text = checker.FullName + "(" + checker.UserName + ")";
+                            li.Value = checker.Id.ToString();
+                            list.Add(li);
+
+                            foreach (AppUserModel l in ul)
+                            {
+                                /* 申請人以外的成員 */
+                                if (l.Id != k.UserId)
+                                {
+                                    li = new SelectListItem();
+                                    li.Text = l.FullName + "(" + l.UserName + ")";
+                                    li.Value = l.Id.ToString();
+                                    list.Add(li);
+                                }
                             }
                         }
                     }
