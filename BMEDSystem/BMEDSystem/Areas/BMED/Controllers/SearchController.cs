@@ -532,7 +532,7 @@ namespace EDIS.Areas.BMED.Controllers
                 .ToList()
                 .ForEach(j => rv.Add(new RepairSearchListVModel
                 {
-                    DocType = "醫工請修",
+                    DocType = "請修",
                     RepType = j.repair.RepType,
                     DocId = j.repair.DocId,
                     ApplyDate = j.repair.ApplyDate,
@@ -794,7 +794,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }).ToList()
                 .ForEach(j => kv.Add(new KeepSearchListViewModel
                 {
-                    DocType = "醫工保養",
+                    DocType = "保養",
                     DocId = j.keep.DocId,
                     AssetNo = j.keep.AssetNo,
                     AssetName = j.keep.AssetName,

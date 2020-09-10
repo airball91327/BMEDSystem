@@ -129,7 +129,7 @@ namespace EDIS.Areas.BMED.Controllers
                             });
                     mail.sto = sto.TrimEnd(new char[] { ',' });
 
-                    mail.message.Subject = "醫工智能保修系統[醫工保養案-結案通知]：設備名稱： " + keep.AssetName;
+                    mail.message.Subject = "醫工智能保修系統[保養案-結案通知]：設備名稱： " + keep.AssetName;
                     body += "<p>表單編號：" + keep.DocId + "</p>";
                     body += "<p>送單日期：" + keep.SentDate.Value.ToString("yyyy/MM/dd") + "</p>";
                     body += "<p>申請人：" + keep.UserName + "</p>";

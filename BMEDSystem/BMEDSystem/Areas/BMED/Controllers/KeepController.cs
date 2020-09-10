@@ -488,7 +488,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }).ToList()
                         .ForEach(j => kv.Add(new KeepListVModel
                         {
-                            DocType = "醫工保養",
+                            DocType = "保養",
                             DocId = j.keep.DocId,
                             AssetNo = j.keep.AssetNo,
                             AssetName = j.keep.AssetName,
@@ -582,7 +582,7 @@ namespace EDIS.Areas.BMED.Controllers
                       }).ToList()
                       .ForEach(j => kv.Add(new KeepListVModel
                       {
-                          DocType = "醫工保養",
+                          DocType = "保養",
                           DocId = j.keep.DocId,
                           AssetNo = j.keep.AssetNo,
                           AssetName = j.keep.AssetName,
@@ -676,7 +676,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }).ToList()
                     .ForEach(j => kv.Add(new KeepListVModel
                     {
-                        DocType = "醫工保養",
+                        DocType = "保養",
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,
@@ -743,7 +743,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }).ToList()
                     .ForEach(j => kv.Add(new KeepListVModel
                     {
-                        DocType = "醫工保養",
+                        DocType = "保養",
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,
@@ -811,7 +811,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }).ToList()
                     .ForEach(j => kv.Add(new KeepListVModel
                     {
-                        DocType = "醫工保養",
+                        DocType = "保養",
                         DocId = j.keep.DocId,
                         AssetNo = j.keep.AssetNo,
                         AssetName = j.keep.AssetName,

@@ -207,7 +207,7 @@ namespace EDIS.Areas.BMED.Controllers
                 .ToList()
                 .ForEach(j => rv.Add(new RepairSearchListVModel
                 {
-                    DocType = "醫工請修",
+                    DocType = "請修",
                     RepType = j.repair.RepType,
                     DocId = j.repair.DocId,
                     ApplyDate = j.repair.ApplyDate,

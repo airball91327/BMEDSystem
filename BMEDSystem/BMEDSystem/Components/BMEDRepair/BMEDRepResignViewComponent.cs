@@ -67,7 +67,7 @@ namespace EDIS.Components.BMEDRepair
                     .ToList()
                     .ForEach(j => rv.Add(new RepairListVModel
                     {
-                        DocType = "醫工請修",
+                        DocType = "請修",
                         RepType = j.repair.RepType,
                         DocId = j.repair.DocId,
                         ApplyDate = j.repair.ApplyDate,
