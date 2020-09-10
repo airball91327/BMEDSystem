@@ -151,9 +151,13 @@ namespace EDIS.Areas.BMED.Controllers
 
                     _context.SaveChanges();
                     //sync to oracleBatch
-                    string smsg = SyncToOracleBatch(assign.DocId);
-                    if(smsg == "1")
-                        throw new Exception("同步OracleBatch失敗!");
+                    var rep = _context.BMEDRepairs.Find(assign.DocId);
+                    if (rep.Loc == "總院")
+                    {
+                        string smsg = SyncToOracleBatch(assign.DocId);
+                        if (smsg == "1")
+                            throw new Exception("同步OracleBatch失敗!");
+                    }
 
                     // Save stock to ERP system.
                     var ERPreponse = await SaveToERPAsync(assign.DocId);
