@@ -11,6 +11,7 @@
             return false;
         });
         $("#BMEDrepSearchForm").submit();
+        $('#homeNav > li > a').attr('data-toggle', 'tab');  //Set data-toggle to other tabs.
     });
     var onFailed = function (data) {
         alert(data.responseText);
@@ -18,15 +19,15 @@
     };
 </script>
 <h4>簽核列表</h4>
-<ul class="nav nav-tabs">
+<ul class="nav nav-tabs" id="homeNav">
     <li class="active"><a data-toggle="tab" href="#menu1">請修 <span class="badge" id="BMEDrepCount">@Model.RepairCount</span></a></li>
-    <li><a data-toggle="tab" href="#menu2">保養 <span class="badge" id="BMEDkeepCount">@Model.KeepCount</span></a></li>
-    <li><a data-toggle="tab" href="#menu3">驗收 <span class="badge" id="BMEDdelivCount">@Model.DeliveryCount</span></a></li>
-    <li><a data-toggle="tab" href="#menu4">採購評估 <span class="badge" id="BMEDbuyCount">@Model.BuyEvalateCount</span></a></li>
+    <li><a href="#menu2">保養 <span class="badge" id="BMEDkeepCount">@Model.KeepCount</span></a></li>
+    <li><a href="#menu3">驗收 <span class="badge" id="BMEDdelivCount">@Model.DeliveryCount</span></a></li>
+    <li><a href="#menu4">採購評估 <span class="badge" id="BMEDbuyCount">@Model.BuyEvalateCount</span></a></li>
     @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr") ||
        UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
     {
-        <li><a data-toggle="tab" href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
+        <li><a href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
     }
 </ul>
 
