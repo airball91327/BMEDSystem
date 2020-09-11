@@ -22,6 +22,11 @@
     function closeKeepDoc(docId) {
         var r = confirm("是否直接結案?");
         if (r == true) {
+            $.Toast.showToast({
+                'title': '結案中，請稍待...',
+                'icon': 'loading',
+                'duration': 0
+            });
             $.ajax({
                 url: url,
                 type: "POST",
@@ -33,14 +38,7 @@
                     Cls: '驗收人',
                     FlowUid: @UserManager.GetCurrentUserId(User) 
                 },
-                async: false,
-                beforeSend: function () {
-                    $.Toast.showToast({
-                        'title': '結案中，請稍待...',
-                        'icon': 'loading',
-                        'duration': 0
-                    });
-                },
+                async: true,
                 success: function (data) {
                     if (data.success == false) {
                         alert(data.error);
@@ -48,7 +46,7 @@
                         alert("此案件已結案!");
                     }
                     $.Toast.hideToast();
-                    BMEDKeepReSubmit();
+                    setTimeout('BMEDKeepReSubmit()', 500);
                 },
                 onFailed: function (data) {
                     alert(data.responseText);
