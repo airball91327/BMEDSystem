@@ -34,16 +34,25 @@
                     FlowUid: @UserManager.GetCurrentUserId(User)
                 },
                 async: false,
+                beforeSend: function () {
+                    $.Toast.showToast({
+                        'title': '結案中，請稍待...',
+                        'icon': 'loading',
+                        'duration': 0
+                    });
+                },
                 success: function (data) {
                     if (data.success == false) {
                         alert(data.error);
                     } else {
                         alert("此案件已結案!");
                     }
+                    $.Toast.hideToast();
                     BMEDRepReSubmit();
                 },
                 onFailed: function (data) {
                     alert(data.responseText);
+                    $.Toast.hideToast();
                 }
             });
         }

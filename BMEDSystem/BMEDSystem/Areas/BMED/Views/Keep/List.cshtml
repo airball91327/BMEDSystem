@@ -18,11 +18,12 @@
 </style>
 
 <script>
+    var url = '@Url.Action("NextFlow", "KeepFlow", new { Area = "BMED" })';
     function closeKeepDoc(docId) {
         var r = confirm("是否直接結案?");
         if (r == true) {
             $.ajax({
-                url: '../BMED/KeepFlow/NextFlow',
+                url: url,
                 type: "POST",
                 dataType: "json",
                 data: {
@@ -30,15 +31,28 @@
                     AssignCls: '同意',
                     FlowCls: '結案',
                     Cls: '驗收人',
-                    FlowUid: @UserManager.GetCurrentUserId(User)
+                    FlowUid: @UserManager.GetCurrentUserId(User) 
                 },
                 async: false,
+                beforeSend: function () {
+                    $.Toast.showToast({
+                        'title': '結案中，請稍待...',
+                        'icon': 'loading',
+                        'duration': 0
+                    });
+                },
                 success: function (data) {
-                    alert("此案件已結案!");
+                    if (data.success == false) {
+                        alert(data.error);
+                    } else {
+                        alert("此案件已結案!");
+                    }
+                    $.Toast.hideToast();
                     BMEDKeepReSubmit();
                 },
                 onFailed: function (data) {
                     alert(data.responseText);
+                    $.Toast.hideToast();
                 }
             });
         }
