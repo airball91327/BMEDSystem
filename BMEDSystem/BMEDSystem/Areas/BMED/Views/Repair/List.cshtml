@@ -223,6 +223,9 @@ else
                 <th>
                     @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
                 </th>
+                <th>
+                    文件狀態
+                </th>
             </tr>
 
             @{int i = 0; }
@@ -230,10 +233,11 @@ else
             {
                 <tr>
                     <td style="text-align:center">
+                        @Html.Hidden("transData[" + i + "].DocId", item.DocId)
                         @if ((item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "7084") ||
                             (item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "8420")) //其他案件
                         {
-                            @Html.Hidden("transData[" + i + "].DocId", item.DocId)
+
                             @Html.CheckBox("transData[" + i + "].IsSelected", item.IsSelected, new { @class = "IsSelected2" })
                         }
                     </td>
@@ -327,6 +331,16 @@ else
                         @if (item.Flg != "2")
                         {
                             @Html.DisplayFor(modelItem => item.Days)
+                        }
+                    </td>
+                    <td>
+                        @if (item.Flg == "2")
+                        {
+                            <span>已結案</span>
+                        }
+                        else
+                        {
+                            <span>未結案</span>
                         }
                     </td>
                 </tr>

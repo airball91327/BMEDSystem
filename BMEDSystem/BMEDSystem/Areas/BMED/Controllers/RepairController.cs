@@ -449,8 +449,10 @@ namespace EDIS.Areas.BMED.Controllers
                 case "請選擇":
                     /* Get all dealing repair docs. */
                     _context.BMEDRepairFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
+                                            .Select(group => group.First())
+                    .Join(_context.BMEDRepairFlows, f1 => f1.DocId, f2 => f2.DocId, (f1, f2) => f2).GroupBy(f2 => f2.DocId)
                                             .Select(group => group.OrderBy(g => g.StepId).Last()).ToList()
-                                            .Where(f => f.Status != "3")
+                                            .Where(f2 => f2.Status != "3")
                     .Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
                     (f, r) => new
                     {

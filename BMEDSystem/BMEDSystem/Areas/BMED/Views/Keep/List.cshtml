@@ -195,6 +195,9 @@ else
                 <th>
                     @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
                 </th>
+                <th>
+                    文件狀態
+                </th>
             </tr>
 
             @{int i = 0; }
@@ -280,6 +283,16 @@ else
                         @if (item.Flg != "2")
                         {
                             @Html.DisplayFor(modelItem => item.Days)
+                        }
+                    </td>
+                    <td>
+                        @if (item.Flg == "2")
+                        {
+                            <span>已結案</span>
+                        }
+                        else
+                        {
+                            <span>未結案</span>
                         }
                     </td>
                 </tr>
