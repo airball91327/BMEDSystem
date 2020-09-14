@@ -71,7 +71,7 @@ $(function () {
             appenddata += "<option value = '0' selected=true></option>";
             select.html(appenddata);
         }
-        else if ($(this).val() === "單位主管" || $(this).val() === "單位主任" || $(this).val() === "其他") {
+        else if ($(this).val() === "單位主任" || $(this).val() === "其他") {
             var select = $('#FlowUid');
             select.empty();
             select.append($('<option selected="selected"></option>').text('請選擇').val('請選擇'));
@@ -220,7 +220,7 @@ $(function () {
                     $(this).prop('disabled', true);
                     $(this).hide();
                 }
-                else if ($("#Cls").val() === "驗收人") {
+                else if ($("#Cls").val() === "驗收人" || $("#Cls").val() === "單位主管") {
                     $(this).prop('disabled', false);
                     $(this).show();
                 }

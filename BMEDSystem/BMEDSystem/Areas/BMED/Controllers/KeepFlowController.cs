@@ -327,19 +327,25 @@ namespace EDIS.Areas.BMED.Controllers
                     //}
                     break;
                 case "單位主管":
+                    /* Get login user. */
+                    u = _userRepo.Find(ur => ur.UserName == this.User.Identity.Name).FirstOrDefault();
+                    /* Get login user's location. */
+                    var urLocation = new DepartmentModel(_context).GetUserLocation(u);
+                    if (urLocation != "總院")
+                    {
+                        s = roleManager.GetUsersInRole("Manager").ToList();
+                        list = new List<SelectListItem>();
+                        foreach (string l in s)
+                        {
+                            u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                            li = new SelectListItem();
+                            li.Text = u.FullName + "(" + u.UserName + ")";
+                            li.Value = u.Id.ToString();
+                            list.Add(li);
+                        }
+                    }
+                    break;
                 case "單位主任":
-                    //s = roleManager.GetUsersInRole("Manager").ToList();
-                    /* 擷取申請人單位底下所有人員 */
-                    //string c = _context.AppUsers.Find(r.UserId).DptId;
-                    //var dptUsers = _context.AppUsers.Where(a => a.DptId == c).ToList();
-                    //list = new List<SelectListItem>();
-                    //foreach (var item in dptUsers)
-                    //{
-                    //        li = new SelectListItem();
-                    //        li.Text = item.FullName;
-                    //        li.Value = item.Id.ToString();
-                    //        list.Add(li);
-                    //}
                     break;
                 case "單位副院長":
                     s = roleManager.GetUsersInRole("ViceSI").ToList();

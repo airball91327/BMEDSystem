@@ -908,22 +908,12 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             //
-            /* 處理轉單工程師的下拉選單 */
-            var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
+            /* 處理轉單關卡的下拉選單 */
             List<SelectListItem> listItem1 = new List<SelectListItem>();
-            foreach (string l in engs)
-            {
-                var u = _context.AppUsers.Where(usr => usr.UserName == l && ur.Status == "Y").FirstOrDefault();
-                if (u != null)
-                {
-                    listItem1.Add(new SelectListItem
-                    {
-                        Text = u.FullName + "(" + u.UserName + ")",
-                        Value = u.Id.ToString()
-                    });
-                }
-            }
-            ViewData["AssignKEngId"] = new SelectList(listItem1, "Value", "Text");
+            listItem1.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
+            listItem1.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
+            listItem1.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
+            ViewData["AssignKCls"] = new SelectList(listItem1, "Value", "Text");
             //
             if (kv.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("List", kv.ToPagedList(1, pageSize));
@@ -1221,6 +1211,92 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 Value = new { success = true, error = "" }
             };
+        }
+
+        [HttpPost]
+        public JsonResult AssignDocs(List<KeepListVModel> transKData, string AssignKCls, string AssignKUid)
+        {
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            int assignUid = Convert.ToInt32(AssignKUid);
+
+            foreach (var item in transKData)
+            {
+                if (item.IsSelected)
+                {
+                    if (AssignKCls == "設備工程師")
+                    {
+                        KeepModel keep = _context.BMEDKeeps.Find(item.DocId);
+                        //指派工程師
+                        keep.EngId = assignUid;
+                        _context.Entry(keep).State = EntityState.Modified;
+                        _context.SaveChanges();
+                    }
+
+                    KeepFlowModel kf = _context.BMEDKeepFlows.Where(f => f.DocId == item.DocId && f.Status == "?").FirstOrDefault();
+                    //轉送下一關卡
+                    kf.Opinions = "[轉送案件]";
+                    kf.Status = "1";
+                    kf.Rtt = DateTime.Now;
+                    kf.Rtp = ur.Id;
+                    _context.Entry(kf).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    //
+                    KeepFlowModel flow = new KeepFlowModel();
+                    flow.DocId = item.DocId;
+                    flow.StepId = kf.StepId + 1;
+                    flow.UserId = assignUid;
+                    flow.UserName = _context.AppUsers.Find(assignUid).FullName;
+                    flow.Status = "?";
+                    flow.Cls = AssignKCls;
+                    flow.Rtt = DateTime.Now;
+                    _context.BMEDKeepFlows.Add(flow);
+                    _context.SaveChanges();
+                }
+            }
+            return new JsonResult(assignUid)
+            {
+                Value = new { success = true, error = "" }
+            };
+        }
+
+        [HttpPost]
+        public IActionResult GetEmpByCls(string cls)
+        {
+            List<SelectListItem> list = new List<SelectListItem>();
+            List<string> s = new List<string>();
+            SelectListItem li;
+            AppUserModel u;
+
+            switch (cls)
+            {
+                case "醫工主管":
+                    s = roleManager.GetUsersInRole("MedMgr").ToList();
+                    break;
+                case "賀康主管": //設備主管
+                    s = roleManager.GetUsersInRole("MedAssetMgr").ToList();
+                    break;
+                case "設備工程師":
+                    s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                    break;
+                default:
+                    break;
+            }
+            list = new List<SelectListItem>();
+            if (s.Count() > 0)
+            {
+                foreach (string l in s)
+                {
+                    u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                    if (u != null)
+                    {
+                        li = new SelectListItem();
+                        li.Text = u.FullName + "(" + u.UserName + ")";
+                        li.Value = u.Id.ToString();
+                        list.Add(li);
+                    }
+                }
+            }
+            return Json(list);
         }
 
         protected override void Dispose(bool disposing)
