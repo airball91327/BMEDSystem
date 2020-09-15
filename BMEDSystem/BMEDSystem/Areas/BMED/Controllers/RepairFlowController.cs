@@ -362,6 +362,14 @@ namespace EDIS.Areas.BMED.Controllers
                             list.Add(li);
                         }
                     }
+                    if (r.Loc == "總院")
+                    {
+                        list.Remove(list.Single(x => x.Value == "1129"));
+                    }
+                    else
+                    {
+                        list.Remove(list.Single(x => x.Value == "12549"));
+                    }
                     break;
                 case "醫工主任":
                     s = roleManager.GetUsersInRole("MedDirector").ToList();

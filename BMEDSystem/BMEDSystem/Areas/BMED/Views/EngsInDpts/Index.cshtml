@@ -1,0 +1,73 @@
+﻿@model IEnumerable<EDIS.Models.EngsInDptsViewModel>
+
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewData["Title"] = "部門對應工程師";
+}
+<script src="~/js/HtmltoExcel.js"></script>
+
+<h2>
+    <b>部門對應工程師</b>
+</h2>
+
+<div>
+    <p>
+        <a asp-action="Create" class="btn btn-primary">新增</a>
+    </p>
+    <input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
+           onclick="javascript:exportExcel('tbToExcel')" />
+</div>
+
+<table class="table" id="tbToExcel">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.DptId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DptName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EngName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EngUserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.RtpName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rtt)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DptId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DptName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngUserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RtpName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rtt)
+                </td>
+                <td>
+                    <a class="btn btn-primary" href="@Url.Action("Edit", "EngsInDpts", new { Area = "BMED", AccDptId = item.DptId, EngId = item.EngId })">編輯</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

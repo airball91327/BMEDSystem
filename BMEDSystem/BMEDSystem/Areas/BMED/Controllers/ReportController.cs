@@ -451,11 +451,10 @@ namespace EDIS.Areas.BMED.Controllers
                     return PartialView("StokCost", StokCost(v));
                 case "列管報廢清單":
                     return PartialView("ScrapAsset", ScrapAsset(v));
-                    //case "滿意度調查統計表":
-                    //    return PartialView("QuestionAnalysis", QuestAnaly(v));
-                    //case "儀器設備保養清單":
-                    //    return PartialView("AssetKeepList", AssetKeepList(v));
-
+                //case "滿意度調查統計表":
+                //    return PartialView("QuestionAnalysis", QuestAnaly(v));
+                //case "儀器設備保養清單":
+                //    return PartialView("AssetKeepList", AssetKeepList(v));
             }
 
             return View();
@@ -734,11 +733,67 @@ namespace EDIS.Areas.BMED.Controllers
                 fileDownloadName: "AssetKeepList.xlsx"
             );
         }
-        public IActionResult AssetKeepList()
+        public List<AssetKeepListVModel> AssetKeepList(ReportQryVModel v)
         {
-            List<AssetKeepListVModel> lst = GetAssetKeepList();
-
-            return View(lst.Take(100).ToList());
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            TempData["qry2"] = JsonConvert.SerializeObject(v);
+            List<AssetKeepListVModel> lst = new List<AssetKeepListVModel>();
+            var data = _context.BMEDAssets.Join(_context.BMEDAssetKeeps, at => at.AssetNo, k => k.AssetNo,
+                (at, k) => new
+                {
+                    asset = at,
+                    assetkeep = k
+                }).Join(_context.Departments, at => at.asset.AccDpt, d => d.DptId,
+                (at, d) => new {
+                    asset = at.asset,
+                    assetkeep = at.assetkeep,
+                    dept = d
+                });
+            if (urLocation == "總院")
+            {
+                data = data.Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K");
+            }
+            else
+            {
+                data = data.Where(r => r.dept.Loc == urLocation);
+            }
+            data = data.Where(r => r.asset.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
+            string acc = v.AccDpt;
+            string deliv = v.DelivDpt;
+            string ano = v.AssetNo;
+            string aname = v.AssetName;
+            if (!string.IsNullOrEmpty(acc)) //成本中心
+                data = data.Where(x => x.asset.AccDpt == acc);
+            if (!string.IsNullOrEmpty(deliv))   //保管部門
+                data = data.Where(x => x.asset.DelivDpt == deliv);
+            if (!string.IsNullOrEmpty(ano)) //財產編號
+                data = data.Where(x => x.asset.AssetNo == ano);
+            if (!string.IsNullOrEmpty(aname)) //財產名稱關鍵字
+                data = data.Where(x => x.asset.Cname.Contains(aname));
+            AssetKeepListVModel ak;
+            foreach (var item in data.ToList())
+            {
+                ak = new AssetKeepListVModel();
+                ak.AssetNo = item.asset.AssetNo;
+                ak.AssetName = item.asset.Cname;
+                ak.Brand = item.asset.Brand;
+                ak.Standard = item.asset.Standard;
+                ak.Type = item.asset.Type;
+                ak.InOut = item.assetkeep.InOut;
+                ak.AccDptName = item.dept.Name_C;
+                ak.LeaveSite = item.asset.LeaveSite;
+                //ak.WartySt = item.asset.WartySt;
+                //ak.WartyEd = item.asset.WartyEd;
+                //ak.Sdate = item.contract == null ? "" : item.contract.Sdate.ToString("yyyy/MM/dd");
+                //ak.Edate = item.contract == null ? "" : item.contract.Edate.ToString("yyyy/MM/dd");
+                ak.Note = item.asset.Note;
+                lst.Add(ak);
+            }
+            return lst;
         }
 
         public List<AssetKeepListVModel> GetAssetKeepList()
@@ -849,7 +904,15 @@ namespace EDIS.Areas.BMED.Controllers
         public IActionResult Index3(ReportQryVModel v)
         {
             TempData["qry2"] = v;
-            return PartialView("AssetKpSche", AssetKpSche(v));
+            switch (v.ReportClass)
+            {
+                case "儀器設備保養清單":
+                    return PartialView("AssetKeepList", AssetKeepList(v));
+                case "設備保養排程年報":
+                    return PartialView("AssetKpSche", AssetKpSche(v));
+
+            }
+            return View();
         }
         public IActionResult ExcelRpKpHistory(ReportQryVModel v)
         {

@@ -1,0 +1,42 @@
+﻿@model EDIS.Models.EngsInDptsModel
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>EngsInDptsModel</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Rtp)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Rtp)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.Rtt)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.Rtt)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.AppUsers)
+        </dt>
+        <dd>
+            @Html.DisplayFor(model => model.AppUsers.Email)
+        </dd>
+    </dl>
+</div>
+<div>
+    @Html.ActionLink("Edit", "Edit", new { /* id = Model.PrimaryKey */ }) |
+    <a asp-action="Index">Back to List</a>
+</div>

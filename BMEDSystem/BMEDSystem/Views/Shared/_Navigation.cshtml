@@ -157,7 +157,7 @@
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件(廠牌)統計表" })">維修保養零件(廠牌)統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
-                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "儀器設備保養清單" })">儀器設備保養清單</a>
+                                    <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "儀器設備保養清單" })">儀器設備保養清單</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "EffectRatio", area: "BMED")">
                                     <a href="@Url.Action("EffectRatio", "Report", new { Area = "BMED" })">成效指標</a>
@@ -218,6 +218,14 @@
                                         <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "AppUser", area: "", cssClass: "in")">
                                             <li>
                                                 <a href="@Url.Action("Index", "AppUser", new { Area = "" })">使用者一覽</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="@Html.IsSelected(controller: "EngsInDpts", area: "BMED")">
+                                        <a href="#">部門對應工程師管理<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "EngsInDpts", area: "BMED", cssClass: "in")">
+                                            <li>
+                                                <a href="@Url.Action("Index", "EngsInDpts", new { Area = "BMED" })">對應表一覽</a>
                                             </li>
                                         </ul>
                                     </li>

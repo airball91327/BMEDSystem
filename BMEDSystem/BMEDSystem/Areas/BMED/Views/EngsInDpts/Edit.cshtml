@@ -1,0 +1,49 @@
+﻿@model EDIS.Models.EngsInDptsModel
+
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewData["Title"] = "編輯";
+}
+
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $('.combobox').combobox();
+    });
+</script>
+
+<h2>編輯</h2>
+
+<h4>部門對應工程師</h4>
+<hr />
+<div class="row">
+    <div class="col-md-2">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="AccDptId" />
+            <input type="hidden" asp-for="EngIdOrigin" />
+            <div class="form-group">
+                <label asp-for="DptName" class="control-label"></label>
+                <input asp-for="DptName" class="form-control" readonly />
+            </div>
+            <div class="form-group">
+                <label asp-for="UserName" class="control-label"></label>
+                <select asp-for="EngId" asp-items="@ViewData["EngId"] as SelectList" class="form-control combobox"></select>
+                <span asp-validation-for="EngId" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="儲存" class="btn btn-default" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">回到列表</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

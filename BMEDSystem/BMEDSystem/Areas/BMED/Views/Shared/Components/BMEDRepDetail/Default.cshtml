@@ -4,6 +4,21 @@
     ViewBag.Title = "Details";
 }
 
+<script>
+    $(function () {
+        var isCharged = null;
+        @if (Model.IsCharged != null)
+        {
+            @:isCharged = '@Model.IsCharged.ToString()';
+        }
+        if (isCharged == 'Y') {
+            $('#page2').show();
+        }
+        else {
+            $('#page2').hide();
+        }
+    });
+</script>
 
 <div>
     <h3>請修明細</h3>

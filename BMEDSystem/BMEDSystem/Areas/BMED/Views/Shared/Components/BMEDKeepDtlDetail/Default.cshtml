@@ -1,5 +1,21 @@
 ﻿@model EDIS.Models.KeepDtlModel
 
+<script>
+    $(function () {
+        var isCharged = null;
+        @if (Model.IsCharged != null)
+        {
+            @:isCharged = '@Model.IsCharged.ToString()';
+        }
+        if (isCharged == 'Y') {
+            $('#page3').show();
+        }
+        else {
+            $('#page3').hide();
+        }
+    });
+</script>
+
 <div>
     <dl class="dl-horizontal">
         <dt>
