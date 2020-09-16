@@ -253,10 +253,11 @@ namespace EDIS.Areas.BMED.Controllers
             AppUserModel u;
             KeepModel k = _context.BMEDKeeps.Find(docid);
             AssetModel asset = _context.BMEDAssets.Where(a => a.AssetNo == k.AssetNo).FirstOrDefault();
+            string[] locList;
 
             switch (cls)
             {
-                case "維修工程師":
+                case "維修工程師":  //Not Used
                     roleManager.GetUsersInRole("Engineer").ToList()
                         .ForEach(x =>
                         {
@@ -308,7 +309,7 @@ namespace EDIS.Areas.BMED.Controllers
                         list.Remove(list.Single(x => x.Value == "12549"));
                     }
                     break;
-                case "醫工主任":
+                case "醫工主任":  //Not Used
                     s = roleManager.GetUsersInRole("MedDirector").ToList();
                     list = new List<SelectListItem>();
                     foreach (string l in s)
@@ -323,7 +324,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     break;
-                case "醫工經辦":
+                case "醫工經辦":  //Not Used
                     //list = new List<SelectListItem>();
                     //u = _context.AppUsers.Where(ur => ur.UserName == "1814").FirstOrDefault();
                     //if (!string.IsNullOrEmpty(u.DptId))
@@ -353,9 +354,9 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     break;
-                case "單位主任":
+                case "單位主任":  //Not Used
                     break;
-                case "單位副院長":
+                case "單位副院長":  //Not Used
                     s = roleManager.GetUsersInRole("ViceSI").ToList();
                     list = new List<SelectListItem>();
                     foreach (string l in s)
@@ -475,9 +476,23 @@ namespace EDIS.Areas.BMED.Controllers
                     li.Value = keepEng.Id.ToString();
                     list.Add(li);
                     /* 其他工程師 */
+                    locList = new[] { "K", "P", "C" };
+                    if (k.Loc != "總院")
+                    {
+                        Array.Clear(locList, 0, locList.Length);
+                        locList = new[] { k.Loc };
+                    }
                     foreach (string l in s)
                     {
-                        u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
+                        u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
+                            {
+                                appuser = ur,
+                                dpt = d
+                            })
+                            .Where(d => locList.Contains(d.dpt.Loc))
+                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+
                         if (u != null && l != keepEng.UserName)
                         {
                             li = new SelectListItem();
@@ -487,7 +502,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     break;
-                case "列管財產負責人":
+                case "列管財產負責人":  //Not Used
                     //list = new List<SelectListItem>();
                     //u = _context.AppUsers.Where(ur => ur.UserName == "181151").FirstOrDefault();
                     //if (!string.IsNullOrEmpty(u.DptId))
@@ -498,7 +513,7 @@ namespace EDIS.Areas.BMED.Controllers
                     //    list.Add(li);
                     //}
                     break;
-                case "固資財產負責人":
+                case "固資財產負責人":  //Not Used
                     //list = new List<SelectListItem>();
                     //u = _context.AppUsers.Where(ur => ur.UserName == "1814").FirstOrDefault();
                     //if (!string.IsNullOrEmpty(u.DptId))
@@ -508,6 +523,57 @@ namespace EDIS.Areas.BMED.Controllers
                     //    li.Value = u.Id.ToString();
                     //    list.Add(li);
                     //}
+                    break;
+                case "醫工分院主管":
+                    s = roleManager.GetUsersInRole("MedBranchMgr").ToList();
+                    list = new List<SelectListItem>();
+                    locList = new[] { k.Loc };
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
+                            {
+                                appuser = ur,
+                                dpt = d
+                            })
+                            .Where(d => locList.Contains(d.dpt.Loc))
+                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                        if (u != null)
+                        {
+                            li = new SelectListItem();
+                            li.Text = u.FullName + "(" + u.UserName + ")";
+                            li.Value = u.Id.ToString();
+                            list.Add(li);
+                        }
+                    }
+                    break;
+                case "設備主管":
+                    s = roleManager.GetUsersInRole("DeviceMgr").ToList();
+                    list = new List<SelectListItem>();
+                    locList = new[] { "K", "P", "C" };
+                    if (k.Loc != "總院")
+                    {
+                        Array.Clear(locList, 0, locList.Length);
+                        locList = new[] { k.Loc };
+                    }
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
+                            {
+                                appuser = ur,
+                                dpt = d
+                            })
+                            .Where(d => locList.Contains(d.dpt.Loc))
+                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                        if (u != null)
+                        {
+                            li = new SelectListItem();
+                            li.Text = u.FullName + "(" + u.UserName + ")";
+                            li.Value = u.Id.ToString();
+                            list.Add(li);
+                        }
+                    }
                     break;
                 default:
                     list = new List<SelectListItem>();

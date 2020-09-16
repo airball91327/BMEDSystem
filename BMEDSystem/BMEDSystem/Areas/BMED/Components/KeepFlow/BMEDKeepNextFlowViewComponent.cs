@@ -42,20 +42,28 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
             //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
             listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
-            listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
             listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
-            //listItem.Add(new SelectListItem { Text = "醫工主任", Value = "醫工主任" });
+            //總、分院不同關卡
+            if (keep.Loc == "總院")
+            {
+                listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
+            }
+            else
+            {
+                listItem.Add(new SelectListItem { Text = "醫工分院主管", Value = "醫工分院主管" });
+                listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
+            }
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
 
             //額外流程控管
             if (keepDtl.IsCharged == "Y" && keepDtl.NotInExceptDevice == "N")   //有費用 & 非統包
             {
-                var itemToRemove = listItem.Single(r => r.Value == "驗收人");
-                listItem.Remove(itemToRemove);    //只醫工主管可結案
+                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                listItem.Remove(itemToRemove);
             }
             if (keepDtl.NotInExceptDevice == "N")    //非統包
             {
-                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
+                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");  //移除賀康主管關卡
                 listItem.Remove(itemToRemove);
             }
             if (keepFlow.Cls == "驗收人" && keepDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
@@ -81,7 +89,7 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             {
                 assign.Cls = keepFlow.Cls;
 
-                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")    
+                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")  //可結案人員
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }

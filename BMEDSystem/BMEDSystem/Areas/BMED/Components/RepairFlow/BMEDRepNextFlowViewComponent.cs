@@ -37,69 +37,60 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
             RepairDtlModel repairDtl = _context.BMEDRepairDtls.Find(id);
             RepairFlowModel repairFlow = _context.BMEDRepairFlows.Where(f => f.DocId == id && f.Status == "?")
                                                                  .FirstOrDefault();
-            /* 增設流程 */
-            List<SelectListItem> listItem = new List<SelectListItem>();
-            if (repair.RepType == "增設")
-            {
-                listItem.Add(new SelectListItem { Text = "申請人", Value = "申請人" });
-                listItem.Add(new SelectListItem { Text = "驗收人", Value = "驗收人" });
-                listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
-                listItem.Add(new SelectListItem { Text = "單位主任", Value = "單位主任" });
-                listItem.Add(new SelectListItem { Text = "單位副院長", Value = "單位副院長" });
-                //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
-                listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
-                listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
-                listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
-                //listItem.Add(new SelectListItem { Text = "醫工主任", Value = "醫工主任" });
-            }
-            else  //維修流程
-            {
-                listItem.Add(new SelectListItem { Text = "申請人", Value = "申請人" });
-                listItem.Add(new SelectListItem { Text = "驗收人", Value = "驗收人" });
-                listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
-                //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
-                listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
-                listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
-                listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
 
-                //額外流程控管
-                if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "N")   //有費用 & 非統包
+            List<SelectListItem> listItem = new List<SelectListItem>();
+            listItem.Add(new SelectListItem { Text = "申請人", Value = "申請人" });
+            listItem.Add(new SelectListItem { Text = "驗收人", Value = "驗收人" });
+            listItem.Add(new SelectListItem { Text = "單位主管", Value = "單位主管" });
+            //listItem.Add(new SelectListItem { Text = "維修工程師", Value = "維修工程師" });
+            listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
+            listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
+            //總、分院不同關卡
+            if (repair.Loc == "總院")
+            {
+                listItem.Add(new SelectListItem { Text = "醫工主管", Value = "醫工主管" });
+            }
+            else
+            {
+                listItem.Add(new SelectListItem { Text = "醫工分院主管", Value = "醫工分院主管" });
+                listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
+            }
+
+            //額外流程控管
+            if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "N")   //有費用 & 非統包
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                listItem.Remove(itemToRemove);
+            }
+            if (repairDtl.NotInExceptDevice == "N" || repairDtl.DealState == 4)    //非統包 or 報廢
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");  //移除賀康主管關卡
+                listItem.Remove(itemToRemove);
+            }
+            if (repairDtl.DealState == 4)   //報廢
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                listItem.Remove(itemToRemove);    
+            }
+            if (repairDtl.NotInExceptDevice == "Y" && repairDtl.DealState != 4)   // 統包 & 非報廢
+            {
+                var itemToRemove = listItem.Single(r => r.Value == "醫工主管"); //移除醫工主管關卡
+                listItem.Remove(itemToRemove);    
+            }
+            if (repairFlow.Cls == "驗收人" && repairDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
+            {
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "醫工主管");
+                if (itemToRemove != null)
                 {
-                    var itemToRemove = listItem.Single(r => r.Value == "驗收人");
-                    listItem.Remove(itemToRemove);    //只醫工主管可結案
-                }
-                if (repairDtl.NotInExceptDevice == "N" || repairDtl.DealState == 4)    //非統包 or 報廢
-                {
-                    var itemToRemove = listItem.Single(r => r.Value == "賀康主管");
                     listItem.Remove(itemToRemove);
                 }
-                if (repairDtl.DealState == 4)   //報廢
+                itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");
+                if (itemToRemove != null)
                 {
-                    var itemToRemove = listItem.Single(r => r.Value == "驗收人");
-                    listItem.Remove(itemToRemove);    //只醫工主管可結案
+                    listItem.Remove(itemToRemove);
                 }
-                if (repairDtl.NotInExceptDevice == "Y" && repairDtl.DealState != 4)   // 統包 & 非報廢
-                {
-                    var itemToRemove = listItem.Single(r => r.Value == "醫工主管");
-                    listItem.Remove(itemToRemove);    //移除醫工主管的選項
-                }
-                if (repairFlow.Cls == "驗收人" && repairDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
-                {
-                    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "醫工主管");
-                    if (itemToRemove != null)
-                    {
-                        listItem.Remove(itemToRemove);
-                    }
-                    itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");
-                    if (itemToRemove != null)
-                    {
-                        listItem.Remove(itemToRemove);
-                    }
-                }
-                //
             }
-            //listItem.Add(new SelectListItem { Text = "列管財產負責人", Value = "列管財產負責人" });
-            //listItem.Add(new SelectListItem { Text = "固資財產負責人", Value = "固資財產負責人" });
+            //
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
             /* Insert values. */
             AssignModel assign = new AssignModel();
@@ -115,7 +106,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
-                //有費用 & 關卡於驗收人 or 有費用 & 為報廢設備，移除結案選項
+                //有費用 & 關卡於驗收人 or 有費用 & 為報廢設備，驗收人不可結案
                 if (repairFlow.Cls == "驗收人")  
                 {
                     if (repairDtl.IsCharged == "Y" || repairDtl.DealState == 4)
@@ -152,8 +143,9 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
             ViewData["DefaultChecker"] = new SelectList(listItem4, "Value", "Text", defaultChecker.Id.ToString());
 
             /* 驗收人員所屬部門搜尋的下拉選單資料 */
-            var dptList = new[] { "K", "P", "C" };   //本院部門
-            var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            //var dptList = new[] { "K", "P", "C" };   //本院部門
+            //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+            var departments = _context.Departments.ToList();
             List<SelectListItem> listItem5 = new List<SelectListItem>();
             foreach (var item in departments)
             {
