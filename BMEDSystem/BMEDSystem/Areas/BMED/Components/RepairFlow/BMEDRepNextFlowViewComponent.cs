@@ -59,23 +59,35 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
             //額外流程控管
             if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "N")   //有費用 & 非統包
             {
-                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
-                listItem.Remove(itemToRemove);
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (repairDtl.NotInExceptDevice == "N" || repairDtl.DealState == 4)    //非統包 or 報廢
             {
-                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");  //移除賀康主管關卡
-                listItem.Remove(itemToRemove);
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (repairDtl.DealState == 4)   //報廢
             {
-                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
-                listItem.Remove(itemToRemove);    
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (repairDtl.NotInExceptDevice == "Y" && repairDtl.DealState != 4)   // 統包 & 非報廢
             {
-                var itemToRemove = listItem.Single(r => r.Value == "醫工主管"); //移除醫工主管關卡
-                listItem.Remove(itemToRemove);    
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "醫工主管"); //移除醫工主管關卡
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (repairFlow.Cls == "驗收人" && repairDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
             {
@@ -102,7 +114,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 assign.Cls = repairFlow.Cls;
 
                 if (repairFlow.Cls == "驗收人" || repairFlow.Cls == "醫工主管" || 
-                    repairFlow.Cls == "賀康主管")    //可結案人員
+                    repairFlow.Cls == "賀康主管" || repairFlow.Cls == "設備主管")    //可結案人員
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }

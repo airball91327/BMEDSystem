@@ -117,7 +117,7 @@ $(function () {
                         select.combobox();
                         select.data('combobox').refresh();
                         //
-                        if ($('#FlowCls').val() === "驗收人") {
+                        if ($('#FlowCls').val() === "驗收人" || $('#FlowCls').val() === "單位主管") {
                             $("#searchUid").show();
                         }
                     }

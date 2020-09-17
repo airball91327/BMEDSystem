@@ -407,14 +407,37 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         s = roleManager.GetUsersInRole("Manager").ToList();
                         list = new List<SelectListItem>();
+                        locList = new[] { "K", "P", "C" };
+                        if (r.Loc != "總院")
+                        {
+                            Array.Clear(locList, 0, locList.Length);
+                            locList = new[] { r.Loc };
+                        }
                         foreach (string l in s)
                         {
-                            u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
-                            li = new SelectListItem();
-                            li.Text = u.FullName + "(" + u.UserName + ")";
-                            li.Value = u.Id.ToString();
-                            list.Add(li);
+                            u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
+                            {
+                                appuser = ur,
+                                dpt = d
+                            })
+                            .Where(d => locList.Contains(d.dpt.Loc))
+                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                            if (u != null)
+                            {
+                                li = new SelectListItem();
+                                li.Text = u.FullName + "(" + u.UserName + ")";
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
                         }
+                    }
+                    else
+                    {
+                        li = new SelectListItem();
+                        li.Text = "請選擇";
+                        li.Value = "請選擇";
+                        list.Add(li);
                     }
                     break;
                 case "單位主任":  //Not Used

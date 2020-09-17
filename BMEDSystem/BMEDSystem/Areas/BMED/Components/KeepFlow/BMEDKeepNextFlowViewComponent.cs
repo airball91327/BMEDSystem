@@ -58,13 +58,19 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             //額外流程控管
             if (keepDtl.IsCharged == "Y" && keepDtl.NotInExceptDevice == "N")   //有費用 & 非統包
             {
-                var itemToRemove = listItem.Single(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
-                listItem.Remove(itemToRemove);
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (keepDtl.NotInExceptDevice == "N")    //非統包
             {
-                var itemToRemove = listItem.Single(r => r.Value == "賀康主管");  //移除賀康主管關卡
-                listItem.Remove(itemToRemove);
+                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
+                if (itemToRemove != null)
+                {
+                    listItem.Remove(itemToRemove);
+                }
             }
             if (keepFlow.Cls == "驗收人" && keepDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
             {
@@ -89,7 +95,8 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             {
                 assign.Cls = keepFlow.Cls;
 
-                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || keepFlow.Cls == "賀康主管")  //可結案人員
+                if (keepFlow.Cls == "驗收人" || keepFlow.Cls == "醫工主管" || 
+                    keepFlow.Cls == "賀康主管" || keepFlow.Cls == "設備主管")  //可結案人員
                 {
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
