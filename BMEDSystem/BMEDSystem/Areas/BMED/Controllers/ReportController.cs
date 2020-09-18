@@ -617,7 +617,7 @@ namespace EDIS.Areas.BMED.Controllers
             //依照院區區分設備
             var bmedAssets = GetAssetsByLoc(urLocation);
             //
-            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                     .Where(a => a.DisposeKind == "正常").ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
@@ -1465,7 +1465,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = lk.Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).ToList();
+            sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -1583,7 +1583,7 @@ namespace EDIS.Areas.BMED.Controllers
                     ApplyDate = rd.ApplyDate,
                     EndDate = rd.EndDate.Value,
                     AccDpt = rd.AccDpt
-                }).Where(m => m.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).ToList();
+                }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -1738,6 +1738,10 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 assets = assets.Where(a => a.AssetClass == v.AssetClass2).ToList();
             }
+            if (!string.IsNullOrEmpty(v.AssetClass3))
+            {
+                assets = assets.Where(a => a.AssetClass == v.AssetClass3).ToList();
+            }
             foreach (var item in assets)
             {
                 int repairMins = 0;
@@ -1792,7 +1796,7 @@ namespace EDIS.Areas.BMED.Controllers
         //                r.AccDpt,
         //                r.AssetNo
         //            }).Join(_context.BMEDAssets.Where(r => r.AccDpt == p.DptId)
-        //            .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+        //            .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
         //            .Where(a => a.DisposeKind == "正常"), rd => rd.AssetNo, r => r.AssetNo,
         //            (rd, r) => new
         //            {
@@ -1801,7 +1805,7 @@ namespace EDIS.Areas.BMED.Controllers
         //                r.AssetClass
         //            }).Count();
         //        //
-        //        m.PlantAmt = _context.BMEDAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+        //        m.PlantAmt = _context.BMEDAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
         //            .Where(r => r.AccDpt == p.DptId)
         //            .Where(a => a.DisposeKind == "正常")
         //            .Count();
@@ -1995,7 +1999,7 @@ namespace EDIS.Areas.BMED.Controllers
                AssetClass = k.k.AssetClass,
                Hour = k.k.Hour,
                PlantClass = k.k.PlantClass
-           }).Where(m => m.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).ToList();
+           }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
 
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -2147,7 +2151,7 @@ namespace EDIS.Areas.BMED.Controllers
                 InOut = k.k.InOut,
                 AssetClass = k.k.AssetClass,
                 EngNam = u.FullName
-            }).Where(m => m.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).ToList()
+            }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList()
             .ForEach(m =>
             {
                 switch (m.InOut)
@@ -2211,7 +2215,7 @@ namespace EDIS.Areas.BMED.Controllers
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
                 //
@@ -2239,7 +2243,7 @@ namespace EDIS.Areas.BMED.Controllers
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
 
@@ -2296,7 +2300,7 @@ namespace EDIS.Areas.BMED.Controllers
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
                 //
@@ -2324,7 +2328,7 @@ namespace EDIS.Areas.BMED.Controllers
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
 
@@ -2382,7 +2386,7 @@ namespace EDIS.Areas.BMED.Controllers
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
                 //
@@ -2410,7 +2414,7 @@ namespace EDIS.Areas.BMED.Controllers
                    .Where(r => r.SentDate <= v.Edate)
                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                    (r, f) => r).Join(_context.BMEDAssets
-                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
 
@@ -2527,7 +2531,7 @@ namespace EDIS.Areas.BMED.Controllers
                     m.ApplyDate = r.ApplyDate;
                     m.AssetNo = r.AssetNo;
                     a = _context.BMEDAssets.Where(s => s.AssetNo == r.AssetNo)
-                            .Where(s => s.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).FirstOrDefault();
+                            .Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).FirstOrDefault();
                     if (a != null)
                     {
                         m.AssetNam = a.Cname;
@@ -2587,7 +2591,7 @@ namespace EDIS.Areas.BMED.Controllers
                    rd.DocId,
                    r.AccDpt,
                    r.AssetClass
-               }).Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+               }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                (rd, c) => new Cust
                {
@@ -2608,7 +2612,7 @@ namespace EDIS.Areas.BMED.Controllers
                    rd.DocId,
                    r.AccDpt,
                    r.AssetClass
-               }).Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+               }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
               .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
               (rd, c) => new Cust
               {
@@ -2725,7 +2729,7 @@ namespace EDIS.Areas.BMED.Controllers
                     rd.DocId,
                     rd.AccDpt,
                     r.AssetClass
-                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                 .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                 (rd, c) => new
                 {
@@ -2758,7 +2762,7 @@ namespace EDIS.Areas.BMED.Controllers
                     rd.DocId,
                     rd.AccDpt,
                     r.AssetClass
-                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1))
+                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                 .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                 (rd, c) => new
                 {
@@ -3209,7 +3213,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? v.AssetClass2 : v.AssetClass1)).ToList();
+            sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             sv = sv.GroupJoin(_context.BMEDDeptStocks, s => s.StokNo, d => d.StockNo,
                 (s, d) => new { s, d })
                 .SelectMany(k => k.d.DefaultIfEmpty(),

@@ -14,6 +14,7 @@
         $("#AssetClass1").click(function () {
             if ($("#AssetClass1").prop("checked")) {
                 $("#AssetClass2").prop("checked", false);
+                $("#AssetClass3").prop("checked", false);
             } else {
                 $("#AssetClass2").prop("checked", true);
             }
@@ -21,6 +22,15 @@
         $("#AssetClass2").click(function () {
             if ($("#AssetClass2").prop("checked")) {
                 $("#AssetClass1").prop("checked", false);
+                $("#AssetClass3").prop("checked", false);
+            } else {
+                $("#AssetClass1").prop("checked", true);
+            }
+        })
+        $("#AssetClass3").click(function () {
+            if ($("#AssetClass3").prop("checked")) {
+                $("#AssetClass1").prop("checked", false);
+                $("#AssetClass2").prop("checked", false);
             } else {
                 $("#AssetClass1").prop("checked", true);
             }
@@ -59,6 +69,7 @@
             <div class="col-md-10">
                 <input name="AssetClass1" id="AssetClass1" type="checkbox" value="醫療設備" checked="checked" />醫療設備
                 <input name="AssetClass2" id="AssetClass2" type="checkbox" value="工程設施" />工程設施
+                <input name="AssetClass3" id="AssetClass3" type="checkbox" value="資訊設備" />資訊設備
             </div>
         </div>
 

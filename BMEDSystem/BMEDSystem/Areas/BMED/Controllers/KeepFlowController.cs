@@ -342,7 +342,7 @@ namespace EDIS.Areas.BMED.Controllers
                     var urLocation = new DepartmentModel(_context).GetUserLocation(u);
                     if (urLocation != "總院")
                     {
-                        s = roleManager.GetUsersInRole("Manager").ToList();
+                        s = roleManager.GetUsersInRole("Manager").OrderBy(x => x).ToList();
                         list = new List<SelectListItem>();
                         locList = new[] { "K", "P", "C" };
                         if (k.Loc != "總院")
@@ -488,7 +488,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "設備工程師":
 
                     /* Get all engineers. */
-                    s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                    s = roleManager.GetUsersInRole("MedEngineer").OrderBy(x => x).ToList();
                     var keepEngId = _context.BMEDAssetKeeps.Find(k.AssetNo).KeepEngId;
                     var keepEng = _context.AppUsers.Find(keepEngId);
 
@@ -548,7 +548,7 @@ namespace EDIS.Areas.BMED.Controllers
                     //}
                     break;
                 case "醫工分院主管":
-                    s = roleManager.GetUsersInRole("MedBranchMgr").ToList();
+                    s = roleManager.GetUsersInRole("MedBranchMgr").OrderBy(x => x).ToList();
                     list = new List<SelectListItem>();
                     locList = new[] { k.Loc };
                     foreach (string l in s)
@@ -571,7 +571,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     break;
                 case "設備主管":
-                    s = roleManager.GetUsersInRole("DeviceMgr").ToList();
+                    s = roleManager.GetUsersInRole("DeviceMgr").OrderBy(x => x).ToList();
                     list = new List<SelectListItem>();
                     locList = new[] { "K", "P", "C" };
                     if (k.Loc != "總院")

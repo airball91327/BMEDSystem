@@ -23,6 +23,8 @@ namespace EDIS.Models
         public string AssetClass1 { get; set; }
         [Display(Name = "工程設施")]
         public string AssetClass2 { get; set; }
+        [Display(Name = "資訊設備")]
+        public string AssetClass3 { get; set; }
         [Display(Name = "起始日期")]
         public DateTime? Sdate { get; set; }
         [Display(Name = "迄止日期")]
