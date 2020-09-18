@@ -47,6 +47,7 @@ namespace EDIS.Areas.BMED.Controllers
         public async Task<IActionResult> NextFlow(AssignModel assign)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            var keepDtl = _context.BMEDKeepDtls.Find(assign.DocId);
 
             /* 工程師的流程控管 */
             if (assign.Cls == "設備工程師")
@@ -92,6 +93,13 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 if (assign.FlowCls == "結案")
                 {
+                    if (assign.Cls == "驗收人" && keepDtl != null)
+                    {
+                        if (keepDtl.IsCharged == "Y")
+                        {
+                            throw new Exception("有費用之案件不可由驗收人直接結案!");
+                        }
+                    }
                     KeepDtlModel kd = _context.BMEDKeepDtls.Find(assign.DocId);
                     kd.CloseDate = DateTime.Now;
                     kf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
