@@ -96,7 +96,8 @@
     function BMEDRepReSubmit() {
         /* Refresh repair form. */
         var strArray = window.location.href.split("/");
-        var page = strArray[strArray.length - 1].replace('#', '');
+        var strArray2 = strArray[strArray.length - 1].split("#");
+        var page = strArray2[strArray2.length - 1];
         fetchPageREP(page);
         /* Refresh repair count. */
         $.ajax({
