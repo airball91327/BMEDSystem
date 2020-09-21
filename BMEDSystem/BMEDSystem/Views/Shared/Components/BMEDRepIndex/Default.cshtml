@@ -94,7 +94,10 @@
         });
     });
     function BMEDRepReSubmit() {
-        $("#BMEDrepSearchForm").submit();
+        /* Refresh repair form. */
+        var strArray = window.location.href.split("/");
+        var page = strArray[strArray.length - 1].replace('#', '');
+        fetchPageREP(page);
         /* Refresh repair count. */
         $.ajax({
             url: '@Url.Action("GetRepairCounts", "Repair", new { Area = "BMED" })',

@@ -2453,24 +2453,28 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("請修日期");
             dt.Columns.Add("單位名稱");
             dt.Columns.Add("設備財編");
+            dt.Columns.Add("設備名稱");
             dt.Columns.Add("設備型號");
             dt.Columns.Add("故障描述");
             dt.Columns.Add("故障原因");
             dt.Columns.Add("處理描述");
             dt.Columns.Add("完工日期");
+            dt.Columns.Add("工程師");
             List<RepeatFailVModel> mv = RepeatFail(v);
             mv.ForEach(m =>
             {
                 dw = dt.NewRow();
                 dw[0] = m.DocId;
-                dw[1] = m.ApplyDate;
+                dw[1] = m.ApplyDate.ToString("yyyy/MM/dd");
                 dw[2] = m.CustNam;
-                dw[3] = m.AssetNo + m.AssetNam;
-                dw[4] = m.Type;
-                dw[5] = m.TroubleDes;
-                dw[6] = m.FailFactor;
-                dw[7] = m.DealDes;
-                dw[8] = m.EndDate;
+                dw[3] = m.AssetNo;
+                dw[4] = m.AssetNam;
+                dw[5] = m.Type;
+                dw[6] = m.TroubleDes;
+                dw[7] = m.FailFactor;
+                dw[8] = m.DealDes;
+                dw[9] = m.EndDate.ToString("yyyy/MM/dd");
+                dw[10] = m.EngNam;
                 dt.Rows.Add(dw);
             });
             //

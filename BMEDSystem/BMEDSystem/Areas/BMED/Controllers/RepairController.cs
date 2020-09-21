@@ -638,8 +638,9 @@ namespace EDIS.Areas.BMED.Controllers
             listItem1.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
             ViewData["AssignCls"] = new SelectList(listItem1, "Value", "Text");
             //
-            if (rv.ToPagedList(page, pageSize).Count <= 0)
-                return PartialView("List", rv.ToPagedList(1, pageSize));
+            var pageCount = rv.ToPagedList(page, pageSize).PageCount;
+            if (rv.ToPagedList(page, pageSize).Count <= 0)  //If the page has no items.
+                return PartialView("List", rv.ToPagedList(pageCount, pageSize));
             return PartialView("List", rv.ToPagedList(page, pageSize));
             //return View("List", rv);
         }

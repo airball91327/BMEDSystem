@@ -91,7 +91,10 @@
         });
     });
     function BMEDKeepReSubmit() {
-        $("#BMEDkeepSearchForm").submit();
+        /* Refresh keep form. */
+        var strArray = window.location.href.split("/");
+        var page = strArray[strArray.length - 1].replace('#', '');
+        fetchPageREP(page);
         /* Refresh keep count. */
         $.ajax({
             url: '@Url.Action("GetKeepCounts", "Keep", new { Area = "BMED" })',
