@@ -95,7 +95,7 @@
         var strArray = window.location.href.split("/");
         var strArray2 = strArray[strArray.length - 1].split("#");
         var page = strArray2[strArray2.length - 1];
-        fetchPageREP(page);
+        fetchPageKEEP(page);
         /* Refresh keep count. */
         $.ajax({
             url: '@Url.Action("GetKeepCounts", "Keep", new { Area = "BMED" })',
