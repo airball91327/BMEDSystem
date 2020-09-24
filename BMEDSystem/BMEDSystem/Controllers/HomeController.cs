@@ -39,12 +39,26 @@ namespace EDIS.Controllers
         {
             /* Get user details. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_BMEDcontext).GetUserLocation(ur);
             //請修案件數
-            var BMEDrepairCount = _BMEDcontext.BMEDRepairFlows.Where(f => f.Status == "?")
-                                                              .Where(f => f.UserId == ur.Id).Count();
+            var BMEDrepairCount = _BMEDcontext.BMEDRepairs.Where(r => r.Loc == urLocation)
+                                              .Join(_BMEDcontext.BMEDRepairFlows, r => r.DocId, rf => rf.DocId,
+                                              (r, rf) => new 
+                                              { 
+                                                  repair = r,
+                                                  repairflow = rf
+                                              }).Where(f => f.repairflow.Status == "?")
+                                                .Where(f => f.repairflow.UserId == ur.Id).Count();
             //保養案件數
-            var BMEDkeepCount = _BMEDcontext.BMEDKeepFlows.Where(f => f.Status == "?")
-                                                          .Where(f => f.UserId == ur.Id).Count();
+            var BMEDkeepCount = _BMEDcontext.BMEDKeeps.Where(k => k.Loc == urLocation)
+                                              .Join(_BMEDcontext.BMEDKeepFlows, k => k.DocId, kf => kf.DocId,
+                                              (k, kf) => new
+                                              {
+                                                  keep = k,
+                                                  keepflow = kf
+                                              }).Where(f => f.keepflow.Status == "?")
+                                                .Where(f => f.keepflow.UserId == ur.Id).Count();
             //驗收案件數
             var BMEDdeliveryCount = _BMEDcontext.DelivFlows.Where(f => f.Status == "?")
                                                            .Where(f => f.UserId == ur.Id).Count();

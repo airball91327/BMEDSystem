@@ -1326,8 +1326,16 @@ namespace EDIS.Areas.BMED.Controllers
         {
             /* Get user details. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            var repairCount = _context.BMEDRepairFlows.Where(f => f.Status == "?")
-                                                      .Where(f => f.UserId == ur.Id).Count();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var repairCount = _context.BMEDRepairs.Where(r => r.Loc == urLocation)
+                                        .Join(_context.BMEDRepairFlows, r => r.DocId, rf => rf.DocId,
+                                        (r, rf) => new
+                                        {
+                                            repair = r,
+                                            repairflow = rf
+                                        }).Where(f => f.repairflow.Status == "?")
+                                          .Where(f => f.repairflow.UserId == ur.Id).Count();
             return Json(repairCount);
         }
 

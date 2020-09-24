@@ -1039,8 +1039,16 @@ namespace EDIS.Areas.BMED.Controllers
         {
             /* Get user details. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            var keepCount = _context.BMEDKeepFlows.Where(f => f.Status == "?")
-                                                  .Where(f => f.UserId == ur.Id).Count();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var keepCount = _context.BMEDKeeps.Where(k => k.Loc == urLocation)
+                                              .Join(_context.BMEDKeepFlows, k => k.DocId, kf => kf.DocId,
+                                              (k, kf) => new
+                                              {
+                                                  keep = k,
+                                                  keepflow = kf
+                                              }).Where(f => f.keepflow.Status == "?")
+                                                .Where(f => f.keepflow.UserId == ur.Id).Count();
             return Json(keepCount);
         }
 
