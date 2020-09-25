@@ -126,8 +126,8 @@
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
                                UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                               UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                               UserManager.IsInRole(User, "MedToDo"))
+                               UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
+                               UserManager.IsInRole(User, "DeviceMgr"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })">月故障率統計表</a>
