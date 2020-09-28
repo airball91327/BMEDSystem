@@ -341,7 +341,7 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         // POST: BMED/Search/GetRepQryList
         [HttpPost]
-        public IActionResult GetRepQryList(QryRepListData qdata, int page = 1)
+        public async Task<IActionResult> GetRepQryList(QryRepListData qdata, int page = 1)
         {
             string docid = qdata.BMEDqtyDOCID;
             string ano = qdata.BMEDqtyASSETNO;
@@ -573,6 +573,27 @@ namespace EDIS.Areas.BMED.Controllers
                 else
                 {
                     item.AssetName = repairDoc.AssetName;
+                }
+                // 檢查報廢案件是否已經請購
+                if (item.DealState == "報廢")
+                {
+                    HttpClient client = new HttpClient();
+                    client.BaseAddress = new Uri("http://dms.cch.org.tw/");
+                    string url = "Cchwebapi/api/purchase?docid=" + item.DocId;
+                    client.DefaultRequestHeaders.Accept.Clear();
+                    client.DefaultRequestHeaders.Accept.Add(
+                        new MediaTypeWithQualityHeaderValue("application/json"));
+                    HttpResponseMessage response = await client.GetAsync(url);
+                    string rstr = "";
+                    if (response.IsSuccessStatusCode)
+                    {
+                        rstr = await response.Content.ReadAsStringAsync();
+                        if (rstr == "true")
+                        {
+                            item.IsPurchase = "Y";
+                        }
+                    }
+                    client.Dispose();
                 }
             }
 

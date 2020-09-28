@@ -55,6 +55,8 @@ namespace EDIS.Models
         public DateTime? CloseDate { get; set; }
         [Display(Name = "[有][無]費用")]
         public string IsCharged { get; set; }
+        [Display(Name = "是否已請購")]
+        public string IsPurchase { get; set; }
         public RepairModel repdata { get; set; }
     }
 }

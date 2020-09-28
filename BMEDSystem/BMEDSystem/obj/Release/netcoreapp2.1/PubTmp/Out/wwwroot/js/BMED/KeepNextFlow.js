@@ -71,7 +71,12 @@ $(function () {
             appenddata += "<option value = '0' selected=true></option>";
             select.html(appenddata);
         }
-        else if ($(this).val() === "單位主管" || $(this).val() === "單位主任" || $(this).val() === "其他") {
+        else if ($(this).val() === "單位主任" || $(this).val() === "其他") {
+            var select = $('#FlowUid');
+            select.empty();
+            select.append($('<option selected="selected"></option>').text('請選擇').val('請選擇'));
+            select.combobox();
+            select.data('combobox').refresh();
             $("#searchUid").show();
         }
         else {
@@ -112,7 +117,7 @@ $(function () {
                         select.combobox();
                         select.data('combobox').refresh();
                         //
-                        if ($('#FlowCls').val() === "驗收人") {
+                        if ($('#FlowCls').val() === "驗收人" || $('#FlowCls').val() === "單位主管") {
                             $("#searchUid").show();
                         }
                     }
@@ -198,10 +203,11 @@ $(function () {
                         $('#FlowCls option[value=""]').prop('selected', true);
                         $('#FlowUid').val("");
                     }
-                    if ($(this).val() !== "結案") {
-                        $(this).prop('disabled', true);
-                        $(this).hide();
-                    }
+                    /*2020/7/22 護理部反應*/
+                    //if ($(this).val() !== "結案") {
+                    //    $(this).prop('disabled', true);
+                    //    $(this).hide();
+                    //}
                 });
             }
         }
@@ -214,7 +220,7 @@ $(function () {
                     $(this).prop('disabled', true);
                     $(this).hide();
                 }
-                else if ($("#Cls").val() === "驗收人") {
+                else if ($("#Cls").val() === "驗收人" || $("#Cls").val() === "單位主管") {
                     $(this).prop('disabled', false);
                     $(this).show();
                 }

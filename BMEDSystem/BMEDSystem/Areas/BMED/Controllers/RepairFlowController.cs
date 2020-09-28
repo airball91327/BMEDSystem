@@ -588,17 +588,10 @@ namespace EDIS.Areas.BMED.Controllers
                 case "醫工分院主管":
                     s = roleManager.GetUsersInRole("MedBranchMgr").OrderBy(x => x).ToList();
                     list = new List<SelectListItem>();
-                    locList = new[] { r.Loc };
+                    //locList = new[] { r.Loc };
                     foreach (string l in s)
                     {
-                        u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
-                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
-                            {
-                                appuser = ur,
-                                dpt = d
-                            })
-                            .Where(d => locList.Contains(d.dpt.Loc))
-                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                        u = _context.AppUsers.Where(ur => ur.UserName == l && ur.Status == "Y").FirstOrDefault();
                         if (u != null)
                         {
                             li = new SelectListItem();

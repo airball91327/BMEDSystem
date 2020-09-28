@@ -5,6 +5,7 @@
     }
     else {
         alert("儲存成功!");
-        $.Toast.hideToast();
+        //$.Toast.hideToast();
+        window.location.reload();
     }
 }

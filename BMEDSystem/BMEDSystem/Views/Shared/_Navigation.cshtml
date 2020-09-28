@@ -190,7 +190,8 @@
                     </li>
 
                     @{
-                        if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin"))
+                        if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                            UserManager.IsInRole(User, "MedAssetMgr"))
                         {
                             <li class="@Html.IsSelected(controller: "KeepFormat", area: "BMED")
                                        @Html.IsSelected(controller: "Asset", area: "BMED")
@@ -213,14 +214,6 @@
                                             </li>
                                         </ul>
                                     </li>
-                                    <li class="@Html.IsSelected(controller: "AppUser", area: "")">
-                                        <a href="#">人員管理<span class="fa arrow"></span></a>
-                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "AppUser", area: "", cssClass: "in")">
-                                            <li>
-                                                <a href="@Url.Action("Index", "AppUser", new { Area = "" })">使用者一覽</a>
-                                            </li>
-                                        </ul>
-                                    </li>
                                     <li class="@Html.IsSelected(controller: "EngsInDpts", area: "BMED")">
                                         <a href="#">部門對應工程師管理<span class="fa arrow"></span></a>
                                         <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "EngsInDpts", area: "BMED", cssClass: "in")">
@@ -229,7 +222,17 @@
                                             </li>
                                         </ul>
                                     </li>
-
+                                    @if (UserManager.IsInRole(User, "Admin"))
+                                    {
+                                        <li class="@Html.IsSelected(controller: "AppUser", area: "")">
+                                            <a href="#">人員管理<span class="fa arrow"></span></a>
+                                            <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "AppUser", area: "", cssClass: "in")">
+                                                <li>
+                                                    <a href="@Url.Action("Index", "AppUser", new { Area = "" })">使用者一覽</a>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                    }
                                 </ul>
                             </li>
                         }
