@@ -3212,3 +3212,5 @@ C:\Users\mac\OneDrive\CchHosp\8420\BMEDSystem\BMEDSystem\BMEDSystem\BMEDSystem\o
 C:\Users\mac\OneDrive\CchHosp\8420\BMEDSystem\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.pdb
 C:\Users\mac\OneDrive\CchHosp\8420\BMEDSystem\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.genruntimeconfig.cache
 C:\Users\mac\OneDrive\CchHosp\8420\BMEDSystem\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csproj.CopyComplete
+J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Shared\Components\ERPProductIndex\Default.cshtml.g.cs
+J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Repair\ERPProductList.cshtml.g.cs

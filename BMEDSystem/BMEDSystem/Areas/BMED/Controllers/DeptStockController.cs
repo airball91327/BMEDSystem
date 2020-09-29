@@ -217,7 +217,7 @@ namespace EDIS.Areas.BMED.Controllers
             List<WsStock> stocks = JsonConvert.DeserializeObject<List<WsStock>>(s);
             foreach (var obj in stocks)
             {
-                var objs2 = await ERPWebServices.GetProductAsync(obj.PRD_NO, "");
+                var objs2 = await ERPWebServices.GetProductAsync(obj.PRD_NO, "", "");
                 s = objs2.Body.GetProductResult;
                 pd = JsonConvert.DeserializeObject<List<Prdts>>(s).FirstOrDefault();
                 deptStock = new DeptStockModel();

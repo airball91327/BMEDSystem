@@ -18,6 +18,9 @@ using X.PagedList;
 using System.Net.Http;
 using System.Net.Http.Headers;
 using Newtonsoft.Json;
+using EDIS.Areas.WebService.Models;
+using WebService;
+using Microsoft.AspNetCore.Http;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -2265,6 +2268,68 @@ namespace EDIS.Areas.BMED.Controllers
                 return PartialView(rv.ToPagedList(1, pageSize));
             return PartialView(rv.ToPagedList(page, pageSize));
             //return PartialView(rv);
+        }
+
+        public async Task<IActionResult> ERPProductList(IFormCollection fm, int page = 1)
+        {
+            string pno = fm["qtyPRODUCTNO"];
+            string pname = fm["qtyPRODUCTNAME"];
+
+            List<PrudoctVModel> pv = await GetERPProductsAsync(pno, pname);
+            if (string.IsNullOrEmpty(pno) && string.IsNullOrEmpty(pname))
+            {
+                pv = pv.ToList();
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(pno))
+                {
+                    pv = pv.Where(d => d.PRD_NO.Contains(pno)).ToList();
+                }
+                if (!string.IsNullOrEmpty(pname))
+                {
+                    pv = pv.Where(d => d.NAME.Contains(pname)).ToList();
+                }
+            }
+
+            if (pv.ToPagedList(page, pageSize).Count <= 0)
+                return PartialView("ERPProductList", pv.ToPagedList(1, pageSize));
+
+            return PartialView("ERPProductList", pv.ToPagedList(page, pageSize));
+        }
+
+        private async Task<List<PrudoctVModel>> GetERPProductsAsync(string pno, string pname)
+        {
+            PrudoctVModel product;
+            List<PrudoctVModel> productList = new List<PrudoctVModel>();
+
+            ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
+            var objs = await ERPWebServices.GetProductAsync(pno, pname, "");
+            string s = objs.Body.GetProductResult;
+            List<Prdts> PrdtsList = JsonConvert.DeserializeObject<List<Prdts>>(s);
+            foreach (var item in PrdtsList)
+            {
+                product = new PrudoctVModel();
+                product.PRD_NO = item.PRD_NO;
+                product.NAME = item.NAME;
+                product.SNM = item.SNM;
+                product.INV_NAME = item.INV_NAME;
+                product.IDX1 = item.IDX1;
+                product.UT = item.UT;
+                product.KND = item.KND;
+                product.SPC_TAX = item.SPC_TAX;
+                product.SUP1 = item.SUP1;
+                if (!string.IsNullOrEmpty(item.SUP1))
+                {
+                    var objs2 = await ERPWebServices.GetVendorAsync(item.SUP1, "", "");
+                    string s2 = objs2.Body.GetVendorResult;
+                    List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s2);
+                    var vendor = vendors.First();
+                    product.SUP1 = vendor.NAME;
+                }
+                productList.Add(product);
+            }
+            return productList;
         }
 
         protected override void Dispose(bool disposing)

@@ -1,0 +1,76 @@
+﻿
+@{
+    ViewBag.Title = "品項列表";
+}
+
+<h2>品項列表</h2>
+<br />
+
+<form asp-action="GetERPProducts" asp-controller="Repair" asp-area="BMED" id="frmERPProductLIST">
+    <div class="form-horizontal">
+
+        <div class="form-group">
+            @Html.Label("qtyPRODUCTNO", "品項編號", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBox("qtyPRODUCTNO", "", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.Label("qtyPRODUCTNAME", "品項名稱(關鍵字)", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBox("qtyPRODUCTNAME", "", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="btnERPQTY" type="button" value="查詢" class="btn btn-default" />
+                <img id="imgLOADING_PRODUCT" src="~/Images/opc-ajax-loader.gif" style="display: none" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div id="pnlERPProductLIST" style="margin-top: 40px">
+</div>
+
+<script>
+    $(function () {
+        fetchPageERP(1);
+        $('#btnERPQTY').click(function () {
+            fetchPageERP(1);
+        });
+    });
+
+    var fetchPageERP = function (page) {
+        var pagedPartialUrl = '@Url.Action("ERPProductList", "Repair", new { Area = "BMED" })';
+        var s = $('#frmERPProductLIST').serialize();
+        $('#imgLOADING_PRODUCT').show();
+        $.ajax({
+            url: pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlERPProductLIST').html(data);
+
+                $('#pnlERPProductLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPageERP(pageNumber);
+                        });
+                    }
+                });
+                $('#imgLOADING_PRODUCT').hide();
+            }
+        });
+    };
+</script>

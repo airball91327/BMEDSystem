@@ -20,23 +20,16 @@
         <div class="row">
             <div class="form-inline">
                 <label asp-for="StockType" class="control-title"></label>
-                <div class="radio">
-                    @if (ViewData["HideCost"].ToString() == "Y") //統包只可點庫存
-                    {
+                @if (ViewData["HideCost"].ToString() == "Y") //統包才顯示庫存
+                {
+                    <div class="radio">
                         <label>
                             <input type="radio" name="StockType" id="StockType1" value="0" checked>
                             庫存
                         </label>
-                    }
-                </div>
+                    </div>
+                }
                 <div class="radio">
-                    @*@if (ViewData["HideCost"].ToString() == "N") //非統包只可點發票
-                         {
-                             <label>
-                                 <input type="radio" name="StockType" id="StockType2" value="2" checked>
-                                 發票
-                             </label>
-                        }*@
                     <label>
                         <input type="radio" name="StockType" id="StockType2" value="2" checked>
                         發票
@@ -116,6 +109,7 @@
                 <div class="form-group">
                     <label asp-for="PartName" class="control-title"></label>
                     <input asp-for="PartName" class="form-control" />
+                    <input type="button" value="品項查詢" class="btn btn-default" data-toggle="modal" data-target="#modalPRODUCT" id="btnQtyProduct" />
                     <input type="button" value="選擇庫存品項" class="btn btn-default" data-toggle="modal" data-target="#modalSTOCK" id="btnQtyStock" />
                     <span style="color: #ff9c00;">*</span>
                     <span asp-validation-for="PartName" class="text-danger"></span>
@@ -191,6 +185,24 @@
             </div>
             <div class="modal-body">
                 @await Component.InvokeAsync("BMEDDeptStockIndex")
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ERP品項查詢 Modal -->
+<div id="modalPRODUCT" class="modal fade" role="dialog">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">選擇品項</h4>
+            </div>
+            <div class="modal-body">
+                @await Component.InvokeAsync("ERPProductIndex")
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>

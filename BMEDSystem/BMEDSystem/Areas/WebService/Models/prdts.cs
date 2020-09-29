@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -24,6 +25,7 @@ namespace EDIS.Areas.WebService.Models
         public string STOP { get; set; }
         public string KND { get; set; }
         public string SPC_TAX { get; set; }
+        public string SUP1 { get; set; }
     }
 
     public class WsStock
@@ -38,4 +40,25 @@ namespace EDIS.Areas.WebService.Models
         public string CUS_NM { get; set; }
     }
 
+    public class PrudoctVModel
+    {
+        [DisplayName("貨品代號")]
+        public string PRD_NO { get; set; }
+        [DisplayName("名稱")]
+        public string NAME { get; set; }
+        [DisplayName("簡稱")]
+        public string SNM { get; set; }
+        [DisplayName("發票名稱")]
+        public string INV_NAME { get; set; }
+        [DisplayName("中類代號")]
+        public string IDX1 { get; set; }
+        [DisplayName("主單位")]
+        public string UT { get; set; }
+        [DisplayName("大類")]
+        public string KND { get; set; }
+        [DisplayName("商品稅率")]
+        public string SPC_TAX { get; set; }
+        [DisplayName("主供應商")]
+        public string SUP1 { get; set; }
+    }
 }

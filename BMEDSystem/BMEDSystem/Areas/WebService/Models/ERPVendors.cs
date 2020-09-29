@@ -25,7 +25,7 @@ namespace EDIS.Areas.WebService.Models
             ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
             try
             {
-                var objs = await ERPWebServices.GetVendorAsync(uno, "");
+                var objs = await ERPWebServices.GetVendorAsync("", uno, "");
                 string s = objs.Body.GetVendorResult;
                 List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s);
                 var vendor = vendors.First();
