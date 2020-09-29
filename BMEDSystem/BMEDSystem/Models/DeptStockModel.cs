@@ -45,5 +45,8 @@ namespace EDIS.Models
         public DateTime? Rtt { get; set; }
         [Display(Name = "機構")]
         public string CustOrganCustId { get; set; }
+        [NotMapped]
+        [Display(Name = "廠商")]
+        public string CUS_NM { get; set; }
     }
 }

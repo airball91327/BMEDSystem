@@ -1,24 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
+    "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
+    "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "projectUniqueName": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
         "projectName": "EDIS",
-        "projectPath": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-        "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+        "projectPath": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\mac\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
