@@ -237,7 +237,8 @@
                 </div>
             </div>
         </div>
-        @if (user.DptId == "8420" || user.DptId == "7084") /* Only MedEngineer can search all engineer docs. */
+        @if (user.DptId == "8420" || user.DptId == "7084" ||
+            UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
         {
             <div class="row">
                 <div class=form-inline>
