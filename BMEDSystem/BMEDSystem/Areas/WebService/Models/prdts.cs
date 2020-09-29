@@ -35,6 +35,7 @@ namespace EDIS.Areas.WebService.Models
         public string IDX_NO { get; set; }
         public string IDX_NM { get; set; }
         public string QTY { get; set; }
+        public string CUS_NM { get; set; }
     }
 
 }

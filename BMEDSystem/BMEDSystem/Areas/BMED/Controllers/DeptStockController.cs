@@ -226,7 +226,7 @@ namespace EDIS.Areas.BMED.Controllers
                 deptStock.StockNo = obj.PRD_NO;
                 deptStock.Unite = pd.UT;
                 deptStock.Qty = obj.QTY == null ? 0 : Convert.ToInt32(obj.QTY);
-
+                deptStock.CUS_NM = obj.CUS_NM;
                 deptStockList.Add(deptStock);
                 serNo++;
             }
