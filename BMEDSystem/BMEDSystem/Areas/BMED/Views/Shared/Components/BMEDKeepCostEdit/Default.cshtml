@@ -109,10 +109,14 @@
             <div class=form-inline>
                 <div class="form-group">
                     <label asp-for="PartName" class="control-title"></label>
-                    <input asp-for="PartName" class="form-control" />
                     @if (ViewData["HideCost"].ToString() == "Y") //統包才顯示
                     {
+                        <input asp-for="PartName" class="form-control" readonly />
                         <input type="button" value="品項查詢" class="btn btn-default" data-toggle="modal" data-target="#modalPRODUCT" id="btnQtyProduct" />
+                    }
+                    else
+                    {
+                        <input asp-for="PartName" class="form-control" />
                     }
                     <input type="button" value="選擇庫存品項" class="btn btn-default" data-toggle="modal" data-target="#modalSTOCK" id="btnQtyStock" />
                     <span asp-validation-for="PartName" class="text-danger"></span>

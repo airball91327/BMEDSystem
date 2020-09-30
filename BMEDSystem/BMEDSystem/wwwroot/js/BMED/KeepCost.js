@@ -42,7 +42,7 @@ $(function () {
 
     /* According stock type to change labels and input textboxs. */
     $('input:radio[name="StockType"]').click(function () {
-        $('#PartName').attr("readonly", false);
+        //$('#PartName').attr("readonly", false);
         $('#Price').attr("readonly", false);
         var item = $(this).val();
         if (item === "2") {             // 點選"發票"
