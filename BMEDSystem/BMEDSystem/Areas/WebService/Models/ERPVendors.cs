@@ -36,6 +36,29 @@ namespace EDIS.Areas.WebService.Models
                 return null;
             }
         }
+
+        /// <summary>
+        /// Get the ERP vendor by uno.
+        /// </summary>
+        /// <param name="uno"></param>
+        /// <param name="vname"></param>
+        /// <returns></returns>
+        public async Task<ERPVendors> GetERPVendorAsync(string uno)
+        {
+            ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
+            try
+            {
+                var objs = await ERPWebServices.GetVendorAsync("", uno, "");
+                string s = objs.Body.GetVendorResult;
+                List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s);
+                var vendor = vendors.First();
+                return vendor;
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+        }
     }
 
 }

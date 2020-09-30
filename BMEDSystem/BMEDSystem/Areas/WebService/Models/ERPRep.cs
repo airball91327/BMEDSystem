@@ -17,8 +17,10 @@ namespace EDIS.Areas.WebService.Models
         public DateTime PS_DD { get; set; }
         public string CUS_NO { get; set; }
         public string ZHANG_ID { get; set; } //立帳方式(1.單張立帳，2.不立帳，3.收到發票才立帳)
-        public string INV_CUS_NO { get; set; } //進貨廠商代號(有進貨廠商代號，則產生進貨單。)
-        public string ISPAY { get; set; } //是否立即付款
+        public int ADD { get; set; } //0=新增，1=修改
+        public string WEBMAC { get; set; }  //機器型號
+        public string WEBITM { get; set; }  //機器序號
+
 
         public ERPRepHead()
         {
@@ -38,5 +40,7 @@ namespace EDIS.Areas.WebService.Models
         public decimal AMTN { get; set; } //未稅額
         public decimal TAX { get; set; } //稅額
         public decimal AMT { get; set; } //金額
+        public string INV_CUS_NO { get; set; } //進貨廠商代號(有進貨廠商代號，則產生進貨單。)
+        public string ISPAY { get; set; } //是否立即付款
     }
 }

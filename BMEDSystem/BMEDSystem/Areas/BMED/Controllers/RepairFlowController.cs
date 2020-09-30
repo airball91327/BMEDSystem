@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using EDIS.Areas.WebService.Models;
 using WebService;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -648,37 +649,58 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var repair = _context.BMEDRepairs.Find(docId);
             ERPRepHead hd = new ERPRepHead();
-            if (repair != null)
-            {
-                hd.CUS_NO = repair.AccDpt;
-            }
+            hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
 #if DEBUG
             hd.SAL_NO = "344033";
 #endif
+            if (repair != null)
+            {
+                hd.CUS_NO = repair.AccDpt;
+                var asset = _context.BMEDAssets.Find(repair.AssetNo);
+                if (asset != null)
+                {
+                    hd.WEBMAC = asset.Type;
+                    hd.WEBITM = asset.MakeNo;
+                }
+                if (!string.IsNullOrEmpty(repair.SalesDocId))
+                {
+                    hd.ADD = 1;
+                }
+            }
             //Get repair doc's costs.
             var repairCosts = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId).ToList();
             if (repairCosts.Count() > 0)
             {
-                // 讀取庫存明細
-                var stocks = repairCosts.Where(rc => rc.StockType == "0").OrderBy(rc => rc.SeqNo).ToList();
+                // 讀取庫存明細 (2020/9/30增加發票明細)
+                var stocks = repairCosts.Where(rc => rc.StockType == "0" || rc.StockType == "2").OrderBy(rc => rc.SeqNo).ToList();
                 if (stocks.Count() > 0)
                 {
-
                     int i = 1;
                     List<ERPRepBody> body = new List<ERPRepBody>();
                     foreach (var stock in stocks)
                     {
+                        // get ERP vendor id.
+                        var vendor = _context.BMEDVendors.Find(stock.VendorId);
+                        var ERPvendor = await new ERPVendors().GetERPVendorAsync(vendor.UniteNo);
+                        // 
+                        var isPay = "F";
+                        if (stock.IsPetty == "Y")
+                        {
+                            isPay = "T";
+                        }
                         body.Add(new ERPRepBody
                         {
                             ITM = i,
-                            PRD_NO = stock.PartNo.ToString(),
-                            PRD_NAME = stock.PartName.ToString(),
+                            PRD_NO = stock.PartNo,
+                            PRD_NAME = stock.PartName,
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
-                            AMT = Convert.ToDecimal(stock.TotalCost)
+                            AMT = Convert.ToDecimal(stock.TotalCost),
+                            INV_CUS_NO = ERPvendor.CUS_NO,
+                            ISPAY = isPay
                         });
                         i++;
                     }
@@ -686,67 +708,24 @@ namespace EDIS.Areas.BMED.Controllers
                     string mf = JsonConvert.SerializeObject(hd);
                     string bf = JsonConvert.SerializeObject(body);
                     var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
-                    msg = response.Body.PostRepStuffResult;
-                    //回傳銷貨單號，回寫至請修單主檔
-                    if (repair != null)
+                    JObject objs = JObject.Parse(response.Body.PostRepStuffResult);
+                    string rtnCode = objs["RtnCode"].ToString();
+                    if (rtnCode == "1")
                     {
-                        repair.SalesDocId = msg;
-                        _context.Entry(repair).State = EntityState.Modified;
-                        _context.SaveChanges();
+                        msg = objs["RtnMsg"].ToString();
+                        //回傳銷貨單號，回寫至請修單主檔
+                        if (repair != null)
+                        {
+                            repair.SalesDocId = msg;
+                            _context.Entry(repair).State = EntityState.Modified;
+                            _context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        msg = "寫入ERP失敗!";
                     }
                 }
-                // 讀取發票
-//                var tickets = repairCosts.Where(rc => rc.StockType == "2").OrderBy(rc => rc.SeqNo).ToList();
-//                if (tickets.Count() > 0)
-//                {
-//                    foreach (var item in tickets)
-//                    {
-//                        // Header
-//                        ERPRepHead hdt = new ERPRepHead();
-//                        if (repair != null)
-//                        {
-//                            hdt.CUS_NO = repair.AccDpt;
-//                        }
-//                        hdt.BIL_NO = docId;
-//                        hdt.PS_DD = DateTime.Now.Date;
-//                        hdt.INV_CUS_NO = item.ERPVendorId;
-//                        hdt.SAL_NO = User.Identity.Name;
-//#if DEBUG
-//                        hdt.SAL_NO = "344033";
-//                        hdt.CUS_NO = "5300";
-//#endif
-//                        // Body
-//                        List<ERPRepBody> bodyt = new List<ERPRepBody>();
-//                        bodyt.Add(new ERPRepBody
-//                        {
-//                            ITM = 1,
-//                            PRD_NO = item.PartNo.ToString(),
-//                            PRD_NAME = item.PartName.ToString(),
-//                            QTY = Convert.ToDecimal(item.Qty),
-//                            UP = Convert.ToDecimal(item.Price),
-//                            AMT = Convert.ToDecimal(item.TotalCost)
-//                        });
-//                        //
-//                        string mf = JsonConvert.SerializeObject(hdt);
-//                        string bf = JsonConvert.SerializeObject(bodyt);
-//                        var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
-//                        msg = response.Body.PostRepStuffResult;
-//                        //回傳銷貨單號，回寫至請修單主檔
-//                        if (repair != null)
-//                        {
-//                            if (string.IsNullOrEmpty(repair.SalesDocId))
-//                            {
-//                                repair.SalesDocId = msg;
-//                            }
-//                            else
-//                            {
-//                                repair.SalesDocId = repair.SalesDocId + ";" + msg;
-//                            }
-//                            _context.Entry(repair).State = EntityState.Modified;
-//                            _context.SaveChanges();
-//                        }
-//                    }
-//                }
             }
             return msg;
         }

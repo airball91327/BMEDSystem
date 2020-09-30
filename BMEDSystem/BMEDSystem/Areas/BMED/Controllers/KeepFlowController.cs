@@ -15,6 +15,7 @@ using Newtonsoft.Json;
 using EDIS.Areas.WebService.Models;
 using WebService;
 using System.Net.Http;
+using Newtonsoft.Json.Linq;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -625,22 +626,33 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var keep = _context.BMEDKeeps.Find(docId);
             ERPRepHead hd = new ERPRepHead();
-            if (keep != null)
-            {
-                hd.CUS_NO = keep.AccDpt;
-            }
+            hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
 #if DEBUG
             hd.SAL_NO = "344033";
 #endif
+            if (keep != null)
+            {
+                hd.CUS_NO = keep.AccDpt;
+                var asset = _context.BMEDAssets.Find(keep.AssetNo);
+                if (asset != null)
+                {
+                    hd.WEBMAC = asset.Type;
+                    hd.WEBITM = asset.MakeNo;
+                }
+                if (!string.IsNullOrEmpty(keep.SalesDocId))
+                {
+                    hd.ADD = 1;
+                }
+            }
             //Get keep doc's costs.
             var keepCosts = _context.BMEDKeepCosts.Where(rc => rc.DocId == docId).ToList();
             if (keepCosts.Count() > 0)
             {
-                // 讀取庫存明細
-                var stocks = keepCosts.Where(rc => rc.StockType == "0").OrderBy(rc => rc.SeqNo).ToList();
+                // 讀取庫存明細 (2020/9/30增加發票明細)
+                var stocks = keepCosts.Where(rc => rc.StockType == "0" || rc.StockType == "2").OrderBy(rc => rc.SeqNo).ToList();
                 if (stocks.Count() > 0)
                 {
 
@@ -648,14 +660,25 @@ namespace EDIS.Areas.BMED.Controllers
                     List<ERPRepBody> body = new List<ERPRepBody>();
                     foreach (var stock in stocks)
                     {
+                        // get ERP vendor id.
+                        var vendor = _context.BMEDVendors.Find(stock.VendorId);
+                        var ERPvendor = await new ERPVendors().GetERPVendorAsync(vendor.UniteNo);
+                        // 
+                        var isPay = "F";
+                        if (stock.IsPetty == "Y")
+                        {
+                            isPay = "T";
+                        }
                         body.Add(new ERPRepBody
                         {
                             ITM = i,
-                            PRD_NO = stock.PartNo.ToString(),
-                            PRD_NAME = stock.PartName.ToString(),
+                            PRD_NO = stock.PartNo,
+                            PRD_NAME = stock.PartName,
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
-                            AMT = Convert.ToDecimal(stock.TotalCost)
+                            AMT = Convert.ToDecimal(stock.TotalCost),
+                            INV_CUS_NO = ERPvendor.CUS_NO,
+                            ISPAY = isPay
                         });
                         i++;
                     }
@@ -663,67 +686,24 @@ namespace EDIS.Areas.BMED.Controllers
                     string mf = JsonConvert.SerializeObject(hd);
                     string bf = JsonConvert.SerializeObject(body);
                     var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
-                    msg = response.Body.PostRepStuffResult;
-                    //回傳銷貨單號，回寫至請修單主檔
-                    if (keep != null)
+                    JObject objs = JObject.Parse(response.Body.PostRepStuffResult);
+                    string rtnCode = objs["RtnCode"].ToString();
+                    if (rtnCode == "1")
                     {
-                        keep.SalesDocId = msg;
-                        _context.Entry(keep).State = EntityState.Modified;
-                        _context.SaveChanges();
+                        msg = objs["RtnMsg"].ToString();
+                        //回傳銷貨單號，回寫至請修單主檔
+                        if (keep != null)
+                        {
+                            keep.SalesDocId = msg;
+                            _context.Entry(keep).State = EntityState.Modified;
+                            _context.SaveChanges();
+                        }
+                    }
+                    else
+                    {
+                        msg = "寫入ERP失敗!";
                     }
                 }
-                // 讀取發票
-//                var tickets = keepCosts.Where(rc => rc.StockType == "2").OrderBy(rc => rc.SeqNo).ToList();
-//                if (tickets.Count() > 0)
-//                {
-//                    foreach (var item in tickets)
-//                    {
-//                        // Header
-//                        ERPRepHead hdt = new ERPRepHead();
-//                        if (keep != null)
-//                        {
-//                            hdt.CUS_NO = keep.AccDpt;
-//                        }
-//                        hdt.BIL_NO = docId;
-//                        hdt.PS_DD = DateTime.Now.Date;
-//                        hdt.INV_CUS_NO = item.ERPVendorId;
-//                        hdt.SAL_NO = User.Identity.Name;
-//#if DEBUG
-//                        hdt.SAL_NO = "344033";
-//                        hdt.CUS_NO = "5300";
-//#endif
-//                        // Body
-//                        List<ERPRepBody> bodyt = new List<ERPRepBody>();
-//                        bodyt.Add(new ERPRepBody
-//                        {
-//                            ITM = 1,
-//                            PRD_NO = item.PartNo.ToString(),
-//                            PRD_NAME = item.PartName.ToString(),
-//                            QTY = Convert.ToDecimal(item.Qty),
-//                            UP = Convert.ToDecimal(item.Price),
-//                            AMT = Convert.ToDecimal(item.TotalCost)
-//                        });
-//                        //
-//                        string mf = JsonConvert.SerializeObject(hdt);
-//                        string bf = JsonConvert.SerializeObject(bodyt);
-//                        var response = await ERPWebServices.PostRepStuffAsync(mf, bf);
-//                        msg = response.Body.PostRepStuffResult;
-//                        //回傳銷貨單號，回寫至請修單主檔
-//                        if (keep != null)
-//                        {
-//                            if (string.IsNullOrEmpty(keep.SalesDocId))
-//                            {
-//                                keep.SalesDocId = msg;
-//                            }
-//                            else
-//                            {
-//                                keep.SalesDocId = keep.SalesDocId + ";" + msg;
-//                            }
-//                            _context.Entry(keep).State = EntityState.Modified;
-//                            _context.SaveChanges();
-//                        }
-//                    }
-//                }
             }
             return msg;
         }
