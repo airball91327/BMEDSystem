@@ -46,6 +46,7 @@ $(function () {
         $('#Price').attr("readonly", false);
         var item = $(this).val();
         if (item === "2") {             // 點選"發票"
+            $('#btnQtyProduct').show();
             $('#btnQtyStock').hide();
             $("#SignNo").val('');
             $("#pnlSIGN").hide();
@@ -57,6 +58,7 @@ $(function () {
             $("#pnlVENDOR").show();
         }
         else if (item === "3") {        // 點選"簽單"
+            $('#btnQtyProduct').show();
             $('#btnQtyStock').hide();
             $("#TicketDtl_TicketDtlNo").val('');
             $("#pnlTICKET").hide();
@@ -70,6 +72,7 @@ $(function () {
         }
         else {
             $('#btnQtyStock').show();    // 點選"庫存"
+            $('#btnQtyProduct').hide();
             $('#PartName').attr('readonly', true);
             //$('#Price').attr('readonly', true);
             $("#CVendor").hide();

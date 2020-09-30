@@ -42,10 +42,10 @@ namespace EDIS.Areas.WebService.Models
 
     public class PrudoctVModel
     {
-        [DisplayName("貨品代號")]
-        public string PRD_NO { get; set; }
-        [DisplayName("名稱")]
-        public string NAME { get; set; }
+        [DisplayName("品項編號")]
+        public string PRD_NO { get; set; }  //貨品代號
+        [DisplayName("品項名稱")]
+        public string NAME { get; set; }    //名稱
         [DisplayName("簡稱")]
         public string SNM { get; set; }
         [DisplayName("發票名稱")]
@@ -60,5 +60,7 @@ namespace EDIS.Areas.WebService.Models
         public string SPC_TAX { get; set; }
         [DisplayName("主供應商")]
         public string SUP1 { get; set; }
+        [DisplayName("主供應商統編")]
+        public string SUP1_UNI_NO { get; set; }
     }
 }

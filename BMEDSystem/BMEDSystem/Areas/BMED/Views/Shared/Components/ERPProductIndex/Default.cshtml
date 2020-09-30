@@ -24,6 +24,13 @@
         </div>
 
         <div class="form-group">
+            @Html.Label("qtyVUNITE", "廠商統編", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBox("qtyVUNITE", "", new { @class = "form-control" })
+            </div>
+        </div>
+
+        <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
                 <input id="btnERPQTY" type="button" value="查詢" class="btn btn-default" />
                 <img id="imgLOADING_PRODUCT" src="~/Images/opc-ajax-loader.gif" style="display: none" />

@@ -14,7 +14,7 @@
             .parent();    // Moves up from <td> to <tr>
         var partNo = $row.find("td:nth-child(1)").text().trim();
         var partName = $row.find("td:nth-child(2)").text().trim(); // Finds the 2nd <td> element
-        var unite = $row.find("td:nth-child(4)").text().trim();
+        var unite = $row.find("td:nth-child(3)").text().trim();
         //var price = $row.find("td:nth-child(4)").text().trim();
         $("#PartNo").val(partNo);
         $("#PartName").val(partName);
@@ -33,14 +33,17 @@
         <th>
             @Html.DisplayNameFor(model => model.FirstOrDefault().NAME)
         </th>
-        <th>
+        @*<th>
             @Html.DisplayNameFor(model => model.FirstOrDefault().SNM)
-        </th>
+        </th>*@
         <th>
             @Html.DisplayNameFor(model => model.FirstOrDefault().UT)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.FirstOrDefault().SUP1)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().SUP1_UNI_NO)
         </th>
         <th></th>
     </tr>
@@ -54,14 +57,17 @@
             <td>
                 @Html.DisplayFor(modelItem => item.NAME)
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.SNM)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.UT)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.SUP1)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.SUP1_UNI_NO)
             </td>
             <td>
                 <button type="button" class="btn btn-primary" value="@item.PRD_NO" id="setStockBtn" onclick="setProdValue(this)">選擇</button>

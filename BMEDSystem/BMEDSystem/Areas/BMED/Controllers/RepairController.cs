@@ -2274,9 +2274,10 @@ namespace EDIS.Areas.BMED.Controllers
         {
             string pno = fm["qtyPRODUCTNO"];
             string pname = fm["qtyPRODUCTNAME"];
+            string vno = fm["qtyVUNITE"];
 
             List<PrudoctVModel> pv = await GetERPProductsAsync(pno, pname);
-            if (string.IsNullOrEmpty(pno) && string.IsNullOrEmpty(pname))
+            if (string.IsNullOrEmpty(pno) && string.IsNullOrEmpty(pname) && string.IsNullOrEmpty(vno))
             {
                 pv = pv.ToList();
             }
@@ -2289,6 +2290,10 @@ namespace EDIS.Areas.BMED.Controllers
                 if (!string.IsNullOrEmpty(pname))
                 {
                     pv = pv.Where(d => d.NAME.Contains(pname)).ToList();
+                }
+                if (!string.IsNullOrEmpty(vno))
+                {
+                    pv = pv.Where(d => d.SUP1_UNI_NO != null).Where(d => d.SUP1_UNI_NO.Contains(vno)).ToList();
                 }
             }
 
@@ -2326,6 +2331,7 @@ namespace EDIS.Areas.BMED.Controllers
                     List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s2);
                     var vendor = vendors.First();
                     product.SUP1 = vendor.NAME;
+                    product.SUP1_UNI_NO = vendor.UNI_NO;
                 }
                 productList.Add(product);
             }
