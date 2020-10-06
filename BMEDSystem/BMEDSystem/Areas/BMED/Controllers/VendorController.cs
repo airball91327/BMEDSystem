@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using EDIS.Models;
 using Microsoft.AspNetCore.Authorization;
 using EDIS.Models.Identity;
+using EDIS.Areas.WebService.Models;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -186,9 +187,27 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         [HttpGet]
-        public JsonResult GetVendorByKeyName(string keyWord)
+        public async Task<JsonResult> GetVendorByKeyName(string keyWord)
         {
             List<SelectListItem> items = new List<SelectListItem>();
+            var ERPvendors = await new ERPVendors().GetERPVendorsByKeyNameAsync(keyWord, keyWord);
+            if (ERPvendors.Count() > 0)
+            {
+                foreach(var vendor in ERPvendors)   // Check the ERP vendor is in the BMEDVendors or not. If not, add to db.
+                {
+                    var vd = _context.BMEDVendors.Where(v => v.UniteNo == vendor.UNI_NO).FirstOrDefault();
+                    if (vd == null)
+                    {
+                        VendorModel bmedVendor = new VendorModel();
+                        bmedVendor.VendorId = Convert.ToInt32(vendor.UNI_NO);
+                        bmedVendor.VendorName = vendor.NAME;
+                        bmedVendor.UniteNo = vendor.UNI_NO;
+                        _context.BMEDVendors.Add(bmedVendor);
+                        _context.SaveChanges();
+                    }
+                }
+            }
+            //
             if (!string.IsNullOrEmpty(keyWord))
             {
                 _context.BMEDVendors.Where(v => v.VendorName.Contains(keyWord.Trim()) ||
