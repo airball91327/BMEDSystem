@@ -41,9 +41,16 @@ namespace EDIS.Controllers
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_BMEDcontext).GetUserLocation(ur);
+            //
+            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
+            if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
+            {
+                rps = _context.BMEDRepairs.ToList();
+                kps = _context.BMEDKeeps.ToList();
+            }
             //請修案件數
-            var BMEDrepairCount = _BMEDcontext.BMEDRepairs.Where(r => r.Loc == urLocation)
-                                              .Join(_BMEDcontext.BMEDRepairFlows, r => r.DocId, rf => rf.DocId,
+            var BMEDrepairCount = rps.Join(_BMEDcontext.BMEDRepairFlows, r => r.DocId, rf => rf.DocId,
                                               (r, rf) => new 
                                               { 
                                                   repair = r,
@@ -51,8 +58,7 @@ namespace EDIS.Controllers
                                               }).Where(f => f.repairflow.Status == "?")
                                                 .Where(f => f.repairflow.UserId == ur.Id).Count();
             //保養案件數
-            var BMEDkeepCount = _BMEDcontext.BMEDKeeps.Where(k => k.Loc == urLocation)
-                                              .Join(_BMEDcontext.BMEDKeepFlows, k => k.DocId, kf => kf.DocId,
+            var BMEDkeepCount = kps.Join(_BMEDcontext.BMEDKeepFlows, k => k.DocId, kf => kf.DocId,
                                               (k, kf) => new
                                               {
                                                   keep = k,

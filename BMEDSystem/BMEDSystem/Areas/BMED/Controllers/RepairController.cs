@@ -165,6 +165,10 @@ namespace EDIS.Areas.BMED.Controllers
             //
             // 依照院區搜尋Repair主檔
             var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
+            if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
+            {
+                rps = _context.BMEDRepairs.ToList();
+            }
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();
