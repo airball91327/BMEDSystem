@@ -56,6 +56,7 @@ $(function () {
             $("#pnlPETTY").show();
             $('label[for="AccountDate"]').text("發票日期");
             $("#pnlVENDOR").show();
+            $("#pnlTAXCLASS").show();
         }
         else if (item === "3") {        // 點選"簽單"
             $('#btnQtyProduct').show();
@@ -67,8 +68,8 @@ $(function () {
             $("#pnlACCDATE").show();
             $("#pnlSIGN").show();
             $('label[for="AccountDate"]').text("簽單日期");
-            $('input:radio[name="IsPetty"]')
-                .prop("disabled", true);
+            $('input:radio[name="IsPetty"]').prop("disabled", true);
+            $("#pnlTAXCLASS").hide();
         }
         else {
             $('#btnQtyStock').show();    // 點選"庫存"
@@ -82,6 +83,7 @@ $(function () {
             $("#pnlSIGN").hide();
             $("#pnlACCDATE").hide();
             $("#pnlVENDOR").hide();
+            $("#pnlTAXCLASS").hide();
         }
     });
     $('input:radio[name="StockType"]').trigger('click');

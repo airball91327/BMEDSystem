@@ -80,6 +80,9 @@ else
                 規格
             </th>
             <th>
+                @Html.DisplayNameFor(model => model.TaxClass)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.Qty)
             </th>
             <th>
@@ -117,6 +120,9 @@ else
                         @Html.DisplayFor(modelItem => item.PartName)
                         <br />
                         @Html.DisplayFor(modelItem => item.Standard)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.TaxClass)
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.Qty)

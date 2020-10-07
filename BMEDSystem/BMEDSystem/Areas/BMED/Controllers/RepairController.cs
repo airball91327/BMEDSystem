@@ -646,6 +646,7 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["AssignCls"] = new SelectList(listItem1, "Value", "Text");
             //
             var pageCount = rv.ToPagedList(page, pageSize).PageCount;
+            pageCount = pageCount == 0 ? 1 : pageCount; // If no page.
             if (rv.ToPagedList(page, pageSize).Count <= 0)  //If the page has no items.
                 return PartialView("List", rv.ToPagedList(pageCount, pageSize));
             return PartialView("List", rv.ToPagedList(page, pageSize));

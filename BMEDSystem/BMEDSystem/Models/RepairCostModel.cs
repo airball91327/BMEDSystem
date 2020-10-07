@@ -58,6 +58,8 @@ namespace EDIS.Models
 
         [Display(Name = "ERP廠商代號")]
         public string ERPVendorId { get; set; }
+        [Display(Name = "扣稅類別")]
+        public string TaxClass { get; set; }
 
         public TicketDtlModel TicketDtl { get; set; }
     }

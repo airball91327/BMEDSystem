@@ -42,5 +42,6 @@ namespace EDIS.Areas.WebService.Models
         public decimal AMT { get; set; } //金額
         public string INV_CUS_NO { get; set; } //進貨廠商代號(有進貨廠商代號，則產生進貨單。)
         public string ISPAY { get; set; } //是否立即付款
+        public string TAX_ID { get; set; } //1.不計稅，2.應稅內含3.應稅外加，如為空，則抓取銷貨客戶的扣稅類別。
     }
 }

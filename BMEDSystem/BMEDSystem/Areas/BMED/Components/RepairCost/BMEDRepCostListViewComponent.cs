@@ -33,6 +33,13 @@ namespace EDIS.Areas.BMED.Components.RepairCost
                     r.StockType = "發票";
                 else
                     r.StockType = "簽單";
+                //
+                if (r.TaxClass == "1")
+                    r.TaxClass = "收據";
+                else if (r.TaxClass == "2")
+                    r.TaxClass = "二聯式發票";
+                else
+                    r.TaxClass = "三聯式發票";
             });
             //
             var repair = _context.BMEDRepairs.Find(id);

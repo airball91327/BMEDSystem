@@ -35,6 +35,13 @@ namespace EDIS.Areas.BMED.Components.KeepCost
                     r.StockType = "發票";
                 else
                     r.StockType = "簽單";
+                //
+                if (r.TaxClass == "1")
+                    r.TaxClass = "收據";
+                else if (r.TaxClass == "2")
+                    r.TaxClass = "二聯式發票";
+                else
+                    r.TaxClass = "三聯式發票";
             });
 
             /* Check the device's contract. */

@@ -700,7 +700,8 @@ namespace EDIS.Areas.BMED.Controllers
                             UP = Convert.ToDecimal(stock.Price),
                             AMT = Convert.ToDecimal(stock.TotalCost),
                             INV_CUS_NO = ERPvendor.CUS_NO,
-                            ISPAY = isPay
+                            ISPAY = isPay,
+                            TAX_ID = stock.TaxClass
                         });
                         i++;
                     }

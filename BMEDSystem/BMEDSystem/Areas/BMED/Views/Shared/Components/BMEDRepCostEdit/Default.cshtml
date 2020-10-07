@@ -36,11 +36,11 @@
                     </label>
                 </div>
                 @*<div class="radio">
-                        <label>
-                            <input type="radio" name="StockType" id="StockType3" value="3">
-                            簽單
-                        </label>
-                    </div>*@
+                    <label>
+                        <input type="radio" name="StockType" id="StockType3" value="3">
+                        簽單
+                    </label>
+                </div>*@
             </div>
         </div>
         <div id="pnlPETTY" class="row">
@@ -72,6 +72,29 @@
                     <input asp-for="VendorName" hidden />
                     <span asp-validation-for="VendorId" class="text-danger"></span>
                     <span style="color:red" id="QryVendorErrorMsg"></span>
+                </div>
+            </div>
+        </div>
+        <div id="pnlTAXCLASS" class="row">
+            <div class="form-inline">
+                <label asp-for="TaxClass" class="control-title"></label>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="TaxClass" id="TaxClass1" value="1" checked>
+                        收據
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="TaxClass" id="TaxClass2" value="2">
+                        二聯式發票
+                    </label>
+                </div>
+                <div class="radio">
+                    <label>
+                        <input type="radio" name="TaxClass" id="TaxClass3" value="3">
+                        三聯式發票
+                    </label>
                 </div>
             </div>
         </div>
@@ -115,7 +138,7 @@
                     }
                     else
                     {
-                        <input asp-for="PartName" class="form-control"/>
+                        <input asp-for="PartName" class="form-control" />
                     }
                     <input type="button" value="選擇庫存品項" class="btn btn-default" data-toggle="modal" data-target="#modalSTOCK" id="btnQtyStock" />
                     <span style="color: #ff9c00;">*</span>
