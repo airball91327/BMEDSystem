@@ -112,7 +112,10 @@ else
                         @Html.DisplayFor(modelItem => item.TicketDtl.TicketDtlNo)
                     </td>
                     <td>
-                        @item.AccountDate.Value.ToString("yyyy/MM/dd")
+                        @if (item.AccountDate.HasValue)
+                        {
+                            @item.AccountDate.Value.ToString("yyyy/MM/dd")
+                        }
                     </td>
                     <td>
                         @Html.DisplayFor(modelItem => item.PartNo)
