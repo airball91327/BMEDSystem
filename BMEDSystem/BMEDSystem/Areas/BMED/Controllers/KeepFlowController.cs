@@ -658,11 +658,15 @@ namespace EDIS.Areas.BMED.Controllers
 
                     int i = 1;
                     List<ERPRepBody> body = new List<ERPRepBody>();
+                    ERPVendors ERPvendor = new ERPVendors();
                     foreach (var stock in stocks)
                     {
                         // get ERP vendor id.
-                        var vendor = _context.BMEDVendors.Find(stock.VendorId);
-                        var ERPvendor = await new ERPVendors().GetERPVendorAsync(vendor.UniteNo);
+                        if (stock.VendorId != null)
+                        {
+                            var vendor = _context.BMEDVendors.Find(stock.VendorId);
+                            ERPvendor = await new ERPVendors().GetERPVendorAsync(vendor.UniteNo);
+                        }
                         // 
                         var isPay = "F";
                         if (stock.IsPetty == "Y")
@@ -677,7 +681,7 @@ namespace EDIS.Areas.BMED.Controllers
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
                             AMT = Convert.ToDecimal(stock.TotalCost),
-                            INV_CUS_NO = ERPvendor.CUS_NO,
+                            INV_CUS_NO = stock.VendorId == null ? null : ERPvendor.CUS_NO,
                             ISPAY = isPay,
                             TAX_ID = stock.TaxClass
                         });

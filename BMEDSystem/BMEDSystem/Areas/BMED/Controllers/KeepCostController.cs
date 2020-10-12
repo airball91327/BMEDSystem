@@ -42,6 +42,7 @@ namespace EDIS.Areas.BMED.Controllers
         public async Task<IActionResult> Edit(KeepCostModel keepCost)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            var kdtl = _context.BMEDKeepDtls.Find(keepCost.DocId);
 
             /* Change to UpperCase.*/
             if (keepCost.TicketDtl.TicketDtlNo != null)
@@ -109,7 +110,6 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                         else
                         {
-                            var kdtl = _context.BMEDKeepDtls.Find(keepCost.DocId);
                             if (kdtl != null)
                             {
                                 if (kdtl.NotInExceptDevice == "N")  //非統包
@@ -177,7 +177,12 @@ namespace EDIS.Areas.BMED.Controllers
                     keepCost.Rtp = ur.Id;
                     keepCost.Rtt = DateTime.Now;
                     if (keepCost.StockType != "0")
-                        keepCost.PartNo = "";
+                    {
+                        if (kdtl.NotInExceptDevice == "N") //非統包
+                        {
+                            keepCost.PartNo = "";
+                        }
+                    }
 
                     _context.BMEDKeepCosts.Add(keepCost);
                     _context.SaveChanges();

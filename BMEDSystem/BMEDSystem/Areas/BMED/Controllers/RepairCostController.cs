@@ -55,6 +55,7 @@ namespace EDIS.Areas.BMED.Controllers
         public async Task<IActionResult> Edit(RepairCostModel repairCost)
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            var rdtl = _context.BMEDRepairDtls.Find(repairCost.DocId);
 
             /* Change to UpperCase.*/
             if (repairCost.TicketDtl.TicketDtlNo != null)
@@ -122,7 +123,6 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                         else
                         {
-                            var rdtl = _context.BMEDRepairDtls.Find(repairCost.DocId);
                             if (rdtl != null)
                             {
                                 if (rdtl.NotInExceptDevice == "N")  //非統包
@@ -190,7 +190,12 @@ namespace EDIS.Areas.BMED.Controllers
                     repairCost.Rtp = ur.Id;
                     repairCost.Rtt = DateTime.Now;
                     if (repairCost.StockType != "0")
-                        repairCost.PartNo = "";
+                    {
+                        if (rdtl.NotInExceptDevice == "N") //非統包
+                        {
+                            repairCost.PartNo = "";
+                        }
+                    }
 
                     _context.BMEDRepairCosts.Add(repairCost);
                     _context.SaveChanges();
