@@ -64,6 +64,16 @@ namespace EDIS.Areas.BMED.Controllers
                 });
             ViewData["BmedNo"] = new SelectList(listItem4, "Value", "Text", "");
 
+            List<SelectListItem> listItem5 = new List<SelectListItem>();
+            listItem5.Add(new SelectListItem { Text = "所有", Value = "所有" });
+            listItem5.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem5.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem5.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem5.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem5.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem5.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem5, "Value", "Text", "ALL");
+
             return View();
         }
 
@@ -78,6 +88,8 @@ namespace EDIS.Areas.BMED.Controllers
             qryAsset.DelivDpt = fm["DelivDpt"];
             qryAsset.Type = fm["Type"];
             qryAsset.BmedNo = fm["BmedNo"];
+            qryAsset.Location = fm["Location"];
+
             List<AssetModel> at = new List<AssetModel>();
             List<AssetModel> at2 = new List<AssetModel>();
             _context.BMEDAssets.GroupJoin(_context.Departments, a => a.DelivDpt, d => d.DptId,
@@ -104,8 +116,22 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(p =>
                 {
                     p.Asset.AccDptName = p.Department == null ? "" : p.Department.Name_C;
+                    p.Asset.Location = p.Department == null ? "" : p.Department.Loc;
                     at2.Add(p.Asset);
                 });
+            if (!string.IsNullOrEmpty(qryAsset.Location))
+            {
+                if (qryAsset.Location != "所有")
+                {
+                    string[] locList = new[] { "K", "P", "C" };
+                    if (qryAsset.Location != "總院")
+                    {
+                        Array.Clear(locList, 0, locList.Length);
+                        locList = new[] { qryAsset.Location };
+                    }
+                    at2 = at2.Where(a => locList.Contains(a.Location)).ToList();
+                }
+            }
             if (!string.IsNullOrEmpty(qryAsset.AssetNo))
             {
                 at2 = at2.Where(a => a.AssetNo == qryAsset.AssetNo).ToList();

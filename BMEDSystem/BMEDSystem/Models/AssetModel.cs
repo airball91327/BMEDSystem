@@ -113,6 +113,9 @@ namespace EDIS.Models
         [NotMapped]
         [Display(Name = "*保養起始年月(民國年+月份=>10512)")]
         public int? KeepYm { get; set; }
+        [NotMapped]
+        [Display(Name = "院區")]
+        public string Location { get; set; }
 
         public ICollection<EngsInAssetsModel> BMEDEngsInAssets { get; set; }
     }
@@ -131,5 +134,7 @@ namespace EDIS.Models
         public string AccDpt { get; set; }
         [Display(Name = "保管部門")]
         public string DelivDpt { get; set; }
+        [Display(Name = "院區")]
+        public string Location { get; set; }
     }
 }
