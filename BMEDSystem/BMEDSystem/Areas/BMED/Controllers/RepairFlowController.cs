@@ -649,6 +649,7 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var repair = _context.BMEDRepairs.Find(docId);
             ERPRepHead hd = new ERPRepHead();
+            hd.ZHANG_ID = "3";
             hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
@@ -671,6 +672,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             //Get repair doc's costs.
+            DateTime? ticketDate = null;
             var repairCosts = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId).ToList();
             if (repairCosts.Count() > 0)
             {
@@ -688,6 +690,18 @@ namespace EDIS.Areas.BMED.Controllers
                         {
                             var vendor = _context.BMEDVendors.Find(stock.VendorId);
                             ERPvendor = await new ERPVendors().GetERPVendorAsync(vendor.UniteNo);
+                        }
+                        // get ticket date.
+                        if (stock.AccountDate.HasValue)
+                        {
+                            if (ticketDate == null)
+                            {
+                                ticketDate = stock.AccountDate.Value.Date;
+                            }
+                            else if (stock.AccountDate.Value < ticketDate)
+                            {
+                                ticketDate = stock.AccountDate.Value.Date;
+                            }
                         }
                         // 
                         var isPay = "F";
@@ -708,6 +722,11 @@ namespace EDIS.Areas.BMED.Controllers
                             TAX_ID = stock.TaxClass
                         });
                         i++;
+                    }
+                    //
+                    if (ticketDate != null)
+                    {
+                        hd.PS_DD = ticketDate.Value;
                     }
                     //
                     string mf = JsonConvert.SerializeObject(hd);

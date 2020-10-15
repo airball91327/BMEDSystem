@@ -1373,7 +1373,7 @@ namespace EDIS.Areas.BMED.Controllers
                 DealDes = k.DealDes,
                 DealState = Convert.ToString(k.DealState),
                 EngNam = null,
-                ClsEmp = u.FullName,
+                ClsEmp = u.FullName + "(" + u.UserName + ")",
                 AssetClass = k.AssetClass
             }).ToList();
             //
@@ -1391,7 +1391,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
             //保養
             string str = "";
-            str += "SELECT '保養' AS DOCTYP,B.DOCID,B.ASSETNO, B.ASSETNAME,F.TYPE,B.SENTDATE AS APPLYDATE,D.FULLNAME AS CLSEMP,";
+            str += "SELECT '保養' AS DOCTYP,B.DOCID,B.ASSETNO, B.ASSETNAME,F.TYPE,B.SENTDATE AS APPLYDATE,(D.FULLNAME+'('+D.USERNAME+')')  AS CLSEMP,";
             str += "B.ACCDPT,E.NAME_C AS ACCDPTNAM, C.ENDDATE, CONVERT(varchar, C.RESULT) AS DEALSTATE,C.INOUT, ";
             str += "C.COST, G.KeepEngName AS ENGNAM, C.MEMO AS FAILFACTOR, CONVERT(varchar, B.CYCLE) AS TroubleDes, ";
             str += "C.MEMO AS DEALDES, F.ASSETCLASS ";
