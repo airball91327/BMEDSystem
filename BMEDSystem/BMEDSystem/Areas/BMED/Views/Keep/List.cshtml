@@ -217,7 +217,7 @@ else
                         {
                             @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
-                            if (item.FlowCls == "驗收人")
+                            if (item.FlowCls == "驗收人" && item.IsCharged == "N")
                             {
                                 <a href="#" onclick="closeKeepDoc(@item.DocId)">結案</a>
                                 @Html.Raw(" | ")
