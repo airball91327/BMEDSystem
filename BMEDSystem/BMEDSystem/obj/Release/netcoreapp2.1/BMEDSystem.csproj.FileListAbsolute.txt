@@ -2138,3 +2138,5 @@ J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\Razor
 J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\Razor\Views\_ViewImports.cshtml.g.cs
 J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\Razor\Views\_ViewStart.cshtml.g.cs
 J:\GitHub\Repos\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\BMEDSystem.genruntimeconfig.cache
+C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\Razor\Areas\BMED\Views\Repair\ERPProductList.cshtml.g.cs
+C:\Users\User\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Release\netcoreapp2.1\Razor\Areas\BMED\Views\Shared\Components\ERPProductIndex\Default.cshtml.g.cs

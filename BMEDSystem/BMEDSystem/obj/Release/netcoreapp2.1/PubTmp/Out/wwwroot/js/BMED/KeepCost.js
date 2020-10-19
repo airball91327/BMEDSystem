@@ -42,10 +42,11 @@ $(function () {
 
     /* According stock type to change labels and input textboxs. */
     $('input:radio[name="StockType"]').click(function () {
-        $('#PartName').attr("readonly", false);
+        //$('#PartName').attr("readonly", false);
         $('#Price').attr("readonly", false);
         var item = $(this).val();
         if (item === "2") {             // 點選"發票"
+            $('#btnQtyProduct').show();
             $('#btnQtyStock').hide();
             $("#SignNo").val('');
             $("#pnlSIGN").hide();
@@ -55,8 +56,10 @@ $(function () {
             $("#pnlPETTY").show();
             $('label[for="AccountDate"]').text("發票日期");
             $("#pnlVENDOR").show();
+            $("#pnlTAXCLASS").show();
         }
         else if (item === "3") {        // 點選"簽單"
+            $('#btnQtyProduct').show();
             $('#btnQtyStock').hide();
             $("#TicketDtl_TicketDtlNo").val('');
             $("#pnlTICKET").hide();
@@ -65,11 +68,12 @@ $(function () {
             $("#pnlACCDATE").show();
             $("#pnlSIGN").show();
             $('label[for="AccountDate"]').text("簽單日期");
-            $('input:radio[name="IsPetty"]')
-                .prop("disabled", true);
+            $('input:radio[name="IsPetty"]').prop("disabled", true);
+            $("#pnlTAXCLASS").hide();
         }
         else {
             $('#btnQtyStock').show();    // 點選"庫存"
+            $('#btnQtyProduct').hide();
             $('#PartName').attr('readonly', true);
             //$('#Price').attr('readonly', true);
             $("#CVendor").hide();
@@ -79,6 +83,7 @@ $(function () {
             $("#pnlSIGN").hide();
             $("#pnlACCDATE").hide();
             $("#pnlVENDOR").hide();
+            $("#pnlTAXCLASS").hide();
         }
     });
     $('input:radio[name="StockType"]').trigger('click');

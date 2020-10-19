@@ -6087,7 +6087,7 @@
       ]
     },
     "jQuery.Validation/1.8.0.1": {
-      "sha512": "cSBTW8FiNcFYy7h8jY38ffnJGia25HQH/z1TP3f8OKZhn1ZSGS7Bebz9nMevKbtsAjzHhDFp/Cq0cT+ixwiB5A==",
+      "sha512": "AZuOrSSmGTRqXOxoQ1nAOxJM77WXdH5mNE3jSlYrW1OdmbGCFvCF1gXJHTZuyG8L8sgpGhdVkSAegKUK7es9sQ==",
       "type": "package",
       "path": "jquery.validation/1.8.0.1",
       "files": [
@@ -8919,7 +8919,7 @@
       ]
     },
     "Microsoft.jQuery.Unobtrusive.Validation/3.2.11": {
-      "sha512": "8qGe1q3vV5Fwbpb0OSI8SxSiIBeFt9sgAvFvPwgZuuL+PZ+z0VsPB5yeqT+SrvPKpyVpN33MLhgvSW5Zf07IsQ==",
+      "sha512": "u2y+fTB8b1LwdX5O4D8tYsmwvY542WJwe5ZG47Pb0qBfKgWEI73R1G1+BLlTM2qvUIzH2jubqh1Oufw/W34quA==",
       "type": "package",
       "path": "microsoft.jquery.unobtrusive.validation/3.2.11",
       "files": [
@@ -12416,7 +12416,7 @@
       ]
     },
     "System.Linq.Queryable/4.3.0": {
-      "sha512": "In1Bmmvl/j52yPu3xgakQSI0YIckPUr870w4K5+Lak3JCCa8hl+my65lABOuKfYs4ugmZy25ScFerC4nz8+b6g==",
+      "sha512": "wdbQgzMijyDkBQySuqYnDcK/V70V6KIUUQdXpkXShHbgQRn0bn9wY3ar0VnsDwCcwu8ig6XBrpC2EU2xK+TuQg==",
       "type": "package",
       "path": "system.linq.queryable/4.3.0",
       "files": [
@@ -16030,7 +16030,7 @@
       ]
     },
     "X.PagedList/7.6.0": {
-      "sha512": "T6uZsHSixuE1dZj9Dtl9RXAH8Okigu+Kr327XEBbAKYt5cYpv+NRU70cGvqKmkg5qYN0VAb+9YbZtjz9p0onXg==",
+      "sha512": "JZiNGeQKLQl6MgJynKK4UTtrwQLpQtRO7VSkdlv1x3P4hMu7UWdgGwqZCT7ddqbJdjjUvdsm4R6kpnUTWZ5ogw==",
       "type": "package",
       "path": "x.pagedlist/7.6.0",
       "files": [
@@ -16045,7 +16045,7 @@
       ]
     },
     "X.PagedList.Mvc.Core/7.6.0": {
-      "sha512": "5fmLfdbnoIlitMdrXQ+a99xQinKNTq6HYo2GrML9MnM8dd99QqDWLzPWG7nBlki1dZIp4vO0f5JjVS1/JB2bJw==",
+      "sha512": "LGCVtN/bz3phZOuj8yMPmzUL6Ktznj3UBo9MS3Io/H/+AwHS4kZnF0Y3inAu6A1NAv4m2aP2U9dA1eiw6ljM3w==",
       "type": "package",
       "path": "x.pagedlist.mvc.core/7.6.0",
       "files": [
@@ -16122,23 +16122,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\Inori\\.nuget\\packages\\": {},
+    "C:\\Users\\User\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectUniqueName": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "projectName": "EDIS",
-      "projectPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-      "packagesPath": "C:\\Users\\Inori\\.nuget\\packages\\",
-      "outputPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+      "projectPath": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "packagesPath": "C:\\Users\\User\\.nuget\\packages\\",
+      "outputPath": "C:\\Users\\User\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\Inori\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\User\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -16276,7 +16276,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.402\\RuntimeIdentifierGraph.json"
       }
     }
   },
