@@ -455,11 +455,9 @@ namespace EDIS.Areas.BMED.Controllers
                 /* 不分流程的所有案件 */
                 case "請選擇":
                     /* Get all dealing repair docs. */
-                    _context.BMEDRepairFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
-                                            .Select(group => group.First())
-                    .Join(_context.BMEDRepairFlows, f1 => f1.DocId, f2 => f2.DocId, (f1, f2) => f2).GroupBy(f2 => f2.DocId)
-                                            .Select(group => group.OrderBy(g => g.StepId).Last()).ToList()
-                                            .Where(f2 => f2.Status != "3")
+                    string[] ss = new string[] { "?", "2" };
+                    _context.BMEDRepairFlows.Where(f => f.UserId == ur.Id).Select(f => f.DocId).Distinct()
+                    .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), f1 => f1, f2 => f2.DocId, (f1, f2) => f2)
                     .Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
                     (f, r) => new
                     {
