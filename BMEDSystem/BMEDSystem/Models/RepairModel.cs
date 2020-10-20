@@ -77,6 +77,8 @@ namespace EDIS.Models
         public string QryKeyName { get; set; }
         [Display(Name = "申請院區")]
         public string Loc { get; set; }
+        [Display(Name = "請購申請")]
+        public string IsPurchased { get; set; }
         [NotMapped]
         public string EngName { get; set; }
         [NotMapped]

@@ -76,7 +76,7 @@ namespace EDIS.Areas.BMED.Controllers
                 listItem2.Add(new SelectListItem
                 {
                     Text = item.Title,
-                    Value = item.Id.ToString()
+                    Value = item.Title
                 });
             }
             ViewData["DealStatus"] = new SelectList(listItem2, "Value", "Text");
@@ -404,40 +404,41 @@ namespace EDIS.Areas.BMED.Controllers
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
             // 依照院區搜尋Repair主檔
-            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
-            var repairFlows = _context.BMEDRepairFlows.ToList();
-            var repairDtls = _context.BMEDRepairDtls.ToList();
+            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
+            //var repairFlows = _context.BMEDRepairFlows.AsQueryable();
+            //var repairDtls = _context.BMEDRepairDtls.AsQueryable();
+            //var departments = _context.Departments.AsQueryable();
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();
-                rps = rps.Where(v => v.DocId == docid).ToList();
+                rps = rps.Where(v => v.DocId == docid);
             }
             if (!string.IsNullOrEmpty(ano))     //財產編號
             {
-                rps = rps.Where(v => v.AssetNo == ano).ToList();
+                rps = rps.Where(v => v.AssetNo == ano);
             }
             if (!string.IsNullOrEmpty(dptid))   //所屬部門編號
             {
-                rps = rps.Where(v => v.DptId == dptid).ToList();
+                rps = rps.Where(v => v.DptId == dptid);
             }
             if (!string.IsNullOrEmpty(acc))     //成本中心
             {
-                rps = rps.Where(v => v.AccDpt == acc).ToList();
+                rps = rps.Where(v => v.AccDpt == acc);
             }
             if (!string.IsNullOrEmpty(aname))   //財產名稱
             {
                 rps = rps.Where(v => v.AssetName != null)
-                         .Where(v => v.AssetName.Contains(aname)).ToList();
+                         .Where(v => v.AssetName.Contains(aname));
             }
             if (!string.IsNullOrEmpty(qtyTroubledes))   //故障描述
             {
                 rps = rps.Where(v => v.TroubleDes != null)
-                         .Where(v => v.TroubleDes.Contains(qtyTroubledes)).ToList();
+                         .Where(v => v.TroubleDes.Contains(qtyTroubledes));
             }
             if (!string.IsNullOrEmpty(qtyUserId))     //申請人
             {
                 int uid = Convert.ToInt32(qtyUserId);
-                rps = rps.Where(v => v.UserId == uid).ToList();
+                rps = rps.Where(v => v.UserId == uid);
             }
             if (!string.IsNullOrEmpty(qtyTicketNo))   //發票號碼
             {
@@ -447,7 +448,7 @@ namespace EDIS.Areas.BMED.Controllers
                                                            .Select(rc => rc.DocId).Distinct();
                 rps = (from r in rps
                        where resultDocIds.Any(val => r.DocId.Contains(val))
-                       select r).ToList();
+                       select r);
             }
             if (!string.IsNullOrEmpty(qtyVendor))   //廠商關鍵字
             {
@@ -456,17 +457,17 @@ namespace EDIS.Areas.BMED.Controllers
                                                            .Select(rc => rc.DocId).Distinct();
                 rps = (from r in rps
                        where resultDocIds.Any(val => r.DocId.Contains(val))
-                       select r).ToList();
+                       select r);
             }
             if (!string.IsNullOrEmpty(qtyEngCode))     //負責工程師
             {
-                rps = rps.Where(v => v.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                rps = rps.Where(v => v.EngId == Convert.ToInt32(qtyEngCode));
             }
             if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false)  //申請日
             {
                 if (qtyDateType == "申請日")
                 {
-                    rps = rps.Where(v => v.ApplyDate >= applyDateFrom && v.ApplyDate <= applyDateTo).ToList();
+                    rps = rps.Where(v => v.ApplyDate >= applyDateFrom && v.ApplyDate <= applyDateTo);
                 }
             }
             if (!string.IsNullOrEmpty(ftype))   //流程狀態
@@ -474,87 +475,119 @@ namespace EDIS.Areas.BMED.Controllers
                 switch (ftype)
                 {
                     case "未結案":
-                        repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status == "?")
-                                                                       .Select(group => group.Last()).ToList();
+                        var repairFlows = rps.Join(_context.BMEDRepairFlows.Where(f => f.Status == "?"), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+                        repairFlows.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => rv.Add(new RepairSearchListVModel
+                    {
+                        DocType = "請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                        DealDes = j.repdtl.DealDes,
+                        Cost = j.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
+                        EndDate = j.repdtl.EndDate,
+                        CloseDate = j.repdtl.CloseDate,
+                        IsCharged = j.repdtl.IsCharged,
+                        IsPurchase = j.repair.IsPurchased,
+                        repdata = j.repair
+                    }));
                         break;
                     case "已結案":
-                        repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status == "2")
-                                                                       .Select(group => group.Last()).ToList();
+                        var repairFlows2 = rps.Join(_context.BMEDRepairFlows.Where(f => f.Status == "2"), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+                        repairFlows2.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => rv.Add(new RepairSearchListVModel
+                    {
+                        DocType = "請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                        DealDes = j.repdtl.DealDes,
+                        Cost = j.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
+                        EndDate = j.repdtl.EndDate,
+                        CloseDate = j.repdtl.CloseDate,
+                        IsCharged = j.repdtl.IsCharged,
+                        IsPurchase = j.repair.IsPurchased,
+                        repdata = j.repair
+                    }));
                         break;
                 }
             }
-            else
-            {
-                repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status != "3")
-                                                               .Select(group => group.Last()).ToList(); ;
-            }
+            //else
+            //{
+            //    repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status != "3")
+            //                                                   .Select(group => group.Last());
+            //}
             if (!string.IsNullOrEmpty(qtyDealStatus))   //處理狀態
             {
-                repairDtls = repairDtls.Where(r => r.DealState == Convert.ToInt32(qtyDealStatus)).ToList();
+                rv = rv.Where(r => r.DealState == qtyDealStatus).ToList();
             }
             if (!string.IsNullOrEmpty(qtyIsCharged))    //有無費用
             {
-                repairDtls = repairDtls.Where(r => r.IsCharged == qtyIsCharged).ToList();
+                rv = rv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
-                repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
-                                         .Select(group => group.Last()).ToList();
+                rv = rv.Where(r => r.FlowUid == Convert.ToInt32(qtyClsUser)).ToList();
             }
 
             /* If no search result. */
-            if (rps.Count() == 0)
+            if (rv.Count() == 0)
             {
                 return PartialView("RepQryList", rv.ToPagedList(page, pageSize));
             }
-
-            rps.Join(repairFlows, r => r.DocId, f => f.DocId,
-                (r, f) => new
-                {
-                    repair = r,
-                    flow = f
-                })
-                .Join(repairDtls, m => m.repair.DocId, d => d.DocId,
-                (m, d) => new
-                {
-                    repair = m.repair,
-                    flow = m.flow,
-                    repdtl = d
-                })
-                .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
-                (j, d) => new
-                {
-                    repair = j.repair,
-                    flow = j.flow,
-                    repdtl = j.repdtl,
-                    dpt = d
-                })
-                .ToList()
-                .ForEach(j => rv.Add(new RepairSearchListVModel
-                {
-                    DocType = "請修",
-                    RepType = j.repair.RepType,
-                    DocId = j.repair.DocId,
-                    ApplyDate = j.repair.ApplyDate,
-                    PlaceLoc = j.repair.PlaceLoc,
-                    ApplyDpt = j.repair.DptId,
-                    AccDpt = j.repair.AccDpt,
-                    AccDptName = j.dpt.Name_C,
-                    TroubleDes = j.repair.TroubleDes,
-                    DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
-                    DealDes = j.repdtl.DealDes,
-                    Cost = j.repdtl.Cost,
-                    Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
-                    Flg = j.flow.Status,
-                    FlowUid = j.flow.UserId,
-                    FlowCls = j.flow.Cls,
-                    FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
-                    EndDate = j.repdtl.EndDate,
-                    CloseDate = j.repdtl.CloseDate,
-                    IsCharged = j.repdtl.IsCharged,
-                    repdata = j.repair
-                }));
-
+            
             /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
             foreach (var item in rv)
             {
@@ -575,26 +608,26 @@ namespace EDIS.Areas.BMED.Controllers
                     item.AssetName = repairDoc.AssetName;
                 }
                 // 檢查報廢案件是否已經請購
-                if (item.DealState == "報廢")
-                {
-                    HttpClient client = new HttpClient();
-                    client.BaseAddress = new Uri("http://dms.cch.org.tw/");
-                    string url = "Cchwebapi/api/purchase?docid=" + item.DocId;
-                    client.DefaultRequestHeaders.Accept.Clear();
-                    client.DefaultRequestHeaders.Accept.Add(
-                        new MediaTypeWithQualityHeaderValue("application/json"));
-                    HttpResponseMessage response = await client.GetAsync(url);
-                    string rstr = "";
-                    if (response.IsSuccessStatusCode)
-                    {
-                        rstr = await response.Content.ReadAsStringAsync();
-                        if (rstr == "true")
-                        {
-                            item.IsPurchase = "Y";
-                        }
-                    }
-                    client.Dispose();
-                }
+                //if (item.DealState == "報廢")
+                //{
+                //    HttpClient client = new HttpClient();
+                //    client.BaseAddress = new Uri("http://dms.cch.org.tw/");
+                //    string url = "Cchwebapi/api/purchase?docid=" + item.DocId;
+                //    client.DefaultRequestHeaders.Accept.Clear();
+                //    client.DefaultRequestHeaders.Accept.Add(
+                //        new MediaTypeWithQualityHeaderValue("application/json"));
+                //    HttpResponseMessage response = await client.GetAsync(url);
+                //    string rstr = "";
+                //    if (response.IsSuccessStatusCode)
+                //    {
+                //        rstr = await response.Content.ReadAsStringAsync();
+                //        if (rstr == "true")
+                //        {
+                //            item.IsPurchase = "Y";
+                //        }
+                //    }
+                //    client.Dispose();
+                //}
             }
 
             /* Search date by DateType. */
