@@ -42,29 +42,27 @@ namespace EDIS.Controllers
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_BMEDcontext).GetUserLocation(ur);
             //
-            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
-            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
+            var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
             if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
             {
-                rps = _context.BMEDRepairs.ToList();
-                kps = _context.BMEDKeeps.ToList();
+                rps = _context.BMEDRepairs;
+                kps = _context.BMEDKeeps;
             }
             //請修案件數
-            var BMEDrepairCount = rps.Join(_BMEDcontext.BMEDRepairFlows, r => r.DocId, rf => rf.DocId,
+            var BMEDrepairCount = rps.Join(_BMEDcontext.BMEDRepairFlows.Where(f => f.Status == "?" && f.UserId == ur.Id), r => r.DocId, rf => rf.DocId,
                                               (r, rf) => new 
                                               { 
                                                   repair = r,
                                                   repairflow = rf
-                                              }).Where(f => f.repairflow.Status == "?")
-                                                .Where(f => f.repairflow.UserId == ur.Id).Count();
+                                              }).Count();
             //保養案件數
-            var BMEDkeepCount = kps.Join(_BMEDcontext.BMEDKeepFlows, k => k.DocId, kf => kf.DocId,
+            var BMEDkeepCount = kps.Join(_BMEDcontext.BMEDKeepFlows.Where(f => f.Status == "?" && f.UserId == ur.Id), k => k.DocId, kf => kf.DocId,
                                               (k, kf) => new
                                               {
                                                   keep = k,
                                                   keepflow = kf
-                                              }).Where(f => f.keepflow.Status == "?")
-                                                .Where(f => f.keepflow.UserId == ur.Id).Count();
+                                              }).Count();
             //驗收案件數
             var BMEDdeliveryCount = _BMEDcontext.DelivFlows.Where(f => f.Status == "?")
                                                            .Where(f => f.UserId == ur.Id).Count();

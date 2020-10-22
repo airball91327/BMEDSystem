@@ -8,9 +8,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Areas\FORMS\**" />
     <Compile Remove="Views\Components\**" />
+    <Content Remove="Areas\FORMS\**" />
     <Content Remove="Views\Components\**" />
+    <EmbeddedResource Remove="Areas\FORMS\**" />
     <EmbeddedResource Remove="Views\Components\**" />
+    <None Remove="Areas\FORMS\**" />
     <None Remove="Views\Components\**" />
   </ItemGroup>
 

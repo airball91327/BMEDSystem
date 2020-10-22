@@ -98,7 +98,7 @@ namespace EDIS.Areas.BMED.Controllers
                                     .Where(a => a.DocId == attainFile.DocId).ToList();
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
 
-                    string WebRootPath = _hostingEnvironment.WebRootPath;
+                    //string WebRootPath = _hostingEnvironment.WebRootPath;
                     string path = Path.Combine(@"D:\" + s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
                     // Upload files.

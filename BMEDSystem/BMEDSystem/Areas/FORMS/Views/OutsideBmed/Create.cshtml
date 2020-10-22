@@ -1,0 +1,266 @@
+﻿@model EDIS.Areas.FORMS.Models.Instrument
+
+@{
+    ViewBag.Title = "Creat";
+}
+
+<div class="card mt-3">
+
+    <div class="card-header">外部醫療儀器使用申請單</div>
+
+    <div>
+        @using (Ajax.BeginForm("Create", "OutsideBmed",
+                            new AjaxOptions
+                            {
+                                HttpMethod = "POST",
+                                OnBegin = "presend",
+                                OnSuccess = "onSuccess",
+                                OnFailure = "onError"
+                            }))
+        {
+
+            @Html.AntiForgeryToken()
+            <div class="card-body">
+                @Html.HiddenFor(model => model.UserId)
+                @Html.HiddenFor(model => model.UserName)
+                @Html.HiddenFor(model => model.ApplyDate)
+                <div class="row">
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.DocId, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.DocId, new { htmlAttributes = new { @class = "form-control col-8", @readonly = "readonly" } })
+                            @Html.ValidationMessageFor(model => model.DocId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.Name, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.Name, new { htmlAttributes = new { @class = "form-control col-8" } })
+                            @Html.ValidationMessageFor(model => model.Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.Model, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.Model, new { htmlAttributes = new { @class = "form-control col-8" } })
+                            @Html.ValidationMessageFor(model => model.Model, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.UseUnit, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.UseUnit, new { htmlAttributes = new { @class = "form-control col-8", @readonly = "readonly" } })
+                            @Html.ValidationMessageFor(model => model.UseUnit, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.Serial, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.Serial, new { htmlAttributes = new { @class = "form-control col-8" } })
+                            @Html.ValidationMessageFor(model => model.Serial, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                    <div class="col-4">
+                        @Html.LabelFor(model => model.Label, htmlAttributes: new { @class = "control-label col" })
+                        <div class="col-auto">
+                            @Html.EditorFor(model => model.Label, new { htmlAttributes = new { @class = "form-control col-8" } })
+                            @Html.ValidationMessageFor(model => model.Label, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <br />
+                <div class="form-group">
+                    @Html.LabelFor(model => model.ToUserId, htmlAttributes: new { @class = "control-label col" })
+                    <div class="col-4">
+                        <div class="form-inline">
+                            @Html.TextBox("ToUserName", "", new { @class = "form-control col-5", placeholder = "姓名關鍵字" })
+                            <input id="btnQuid" type="button" value="查詢" class="btn btn-default" />
+                            @Html.DropDownListFor(model => model.ToUserId, null, "請選擇", new { @class = "form-control", @style = "width:auto;" })
+                            <br/>@Html.ValidationMessageFor(model => model.ToUserId, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Application, htmlAttributes: new { @class = "control-label col" })
+                    <ul id="btn" class="col-auto " style="list-style-type:none">
+                        <li>
+                            @Html.RadioButtonFor(model => model.Application, "單位試用", new { @checked = "checked" })單位試用(審核內容:1~5)
+                        </li>
+                        <li>
+                            @Html.RadioButtonFor(model => model.Application, "臨床試驗")臨床試驗(審核內容:1~5)
+                            <div id="ClinicalTrials">
+                                <div class="row">
+                                    <div class="col-4" style="padding-left:0;">
+                                        @Html.LabelFor(model => model.ProjectId, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            @Html.EditorFor(model => model.ProjectId, new { htmlAttributes = new { @class = "form-control col-8" } })
+                                            @Html.ValidationMessageFor(model => model.ProjectId, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        @Html.LabelFor(model => model.IRB_NO, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            @Html.EditorFor(model => model.IRB_NO, new { htmlAttributes = new { @class = "form-control col-8" } })
+                                            @Html.ValidationMessageFor(model => model.IRB_NO, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        @Html.LabelFor(model => model.TrialHost, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            @Html.EditorFor(model => model.TrialHost, new { htmlAttributes = new { @class = "form-control col-8" } })
+                                            @Html.ValidationMessageFor(model => model.TrialHost, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            @Html.RadioButtonFor(model => model.Application, "購入耗材")購入耗材,廠商提供設備或廠商借用、Demo儀器(審核內容:1~5)
+                        </li>
+                        <li>
+                            @Html.RadioButtonFor(model => model.Application, "患者自帶")患者自帶(審核內容6)
+                            <div id="PatientBring">
+                                <div>
+                                    <span class="col" style="color:blue;padding-left:0;">✯患者自帶設備免填</span>
+                                </div>
+                                <div class="row">
+                                    <div class="col-4" style="padding-left:0;">
+                                        @Html.LabelFor(model => model.Vendor, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            @Html.EditorFor(model => model.Vendor, new { htmlAttributes = new { @class = "form-control col-8" } })
+                                            @Html.ValidationMessageFor(model => model.Vendor, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control col-8" } })
+                                            @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                    <div class="col-4">
+                                        @Html.LabelFor(model => model.Personnel, htmlAttributes: new { @class = "control-label col" })
+                                        <div class="col-auto">
+                                            <div class="form-inline">
+                                                @Html.TextBox("PersonnelKeyCode", "", new { @class = "form-control col-5", placeholder = "員工代碼或關鍵字" })
+                                                <input type="button" value="查詢" class="btn btn-default" />
+                                                @Html.DropDownListFor(model => model.Personnel, null, "請選擇", new { @class = "form-control ", @style = "width:auto" })
+                                            <br />@Html.ValidationMessageFor(model => model.Personnel, "", new { @class = "text-danger" })
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        @Html.ValidationMessageFor(model => model.Application, "", new { @class = "text-danger" })
+                    </ul>
+                </div>
+
+                <div class="form-group">
+                    @Html.LabelFor(model => model.Description, new { @class = "control-label col" })
+                    <div class="col-auto">
+                        @Html.TextAreaFor(model => model.Description, 3, 20, new { @class = "form-control" })
+                        @Html.ValidationMessageFor(model => model.Description, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div id="ContentFile" class="form-group">
+                    @Html.LabelFor(model => model.Content, htmlAttributes: new { @class = "control-label col" })
+                    <div class="col-auto">
+                        @Html.RadioButtonFor(model => model.Content, "經衛生福利部醫療器材許可證")經衛生福利部醫療器材許可證(影本)
+                        <div id="license">
+                            <a data-toggle="modal" class="btn btn-primary mt-3" href="#modal-form">夾帶附件檔案</a>
+                        </div>
+                        <br />@Html.RadioButtonFor(model => model.Content, "貨品進口同意書")貨品進口同意書(影本，經衛生福利部核准)
+                        <div id="Consent">
+                            <a data-toggle="modal" class="btn btn-primary mt-3" href="#modal-form">夾帶附件檔案</a>
+                        </div>
+                        @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="qryBuyDayFrom" class="control-title col searchLabel">使用期間</label>
+                    <div class="col-auto form-inline">
+
+                        @Html.EditorFor(model => model.UseDayFrom, new { htmlAttributes = new { @class = "form-control", @type = "date", onChange = "Days()" } })
+                        @Html.ValidationMessageFor(model => model.UseDayFrom, "", new { @class = "text-danger" })
+
+                        <span>&nbsp;~&nbsp;</span>
+
+                        @Html.EditorFor(model => model.UseDayTo, new { htmlAttributes = new { @class = "form-control", @type = "date", onChange = "Days()" } })
+                        @Html.ValidationMessageFor(model => model.UseDayTo, "", new { @class = "text-danger" })
+
+                        <span>&nbsp;&nbsp;共</span>
+
+                        @Html.EditorFor(model => model.Day, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly", @style = "width:50px;" } })
+                        @Html.ValidationMessageFor(model => model.Day, "", new { @class = "text-danger" })
+
+                        <span>&nbsp;天</span>
+                    </div>
+
+                </div>
+
+                <div class="col-auto">
+                    <div>
+                        <input type="submit" value="確定送出" class="btn btn-primary" id="btnGO" />
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<div id="modal-form" class="modal fade" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                <h4 class="modal-title">選擇上傳檔案</h4>
+            </div>
+            <div class="modal-body">
+                @Html.Action("Upload", "AttainFiles", new { doctype = "OutsideBmed", docid = Model.DocId })
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">離開</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+
+    <script>
+        $("#PatientBring").show();
+        document.getElementById("Vendor").required = true;
+        document.getElementById("Phone").required = true;
+        document.getElementById("Personnel").required = true;
+        $("#ClinicalTrials").hide();
+        $("#license").hide();
+        $("#Consent").hide();
+
+         var url = '@Url.Content("~/Home/Index")';
+            function onSuccess() {
+                waitingDialog.hide('Loading Something...');
+                alert('表單建立成功');
+                location.replace(url);
+            };
+            function onError(data) {
+                waitingDialog.hide('Loading Something...');
+                document.getElementById('btnGO').disabled = false;
+                var msg = JSON.parse(data.responseText);
+                alert(msg.Error);
+
+            };
+    </script>
+    <script src="~/Scripts/bootstrap-waitingfor.js"></script>
+    <script src="~/Scripts/File/FileUpload.js"></script>
+    <script src="~/Scripts/MedEue/Create.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+}

@@ -1,0 +1,53 @@
+﻿@model MedEue.Models.Instrument
+
+@{
+  
+    ViewBag.Title = "預覽";
+}
+
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>預覽</h2>
+       
+    </div>
+</div>
+<div class="wrapper wrapper-content animated fadeInRight">
+
+    <div class="row card">
+        <div class="card-header">附件檔案</div>
+        <div class="row card-body">
+            @Html.HiddenFor(model => model.DocId)
+            <div id="pnlFILES" style="width:100%">
+                @Html.Action("PreviewList", "AttainFiles", new { @id = Model.DocId, typ = "OutsideBmed" })
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row card">
+
+        <div class="card-header">申請資料</div>
+        <div class="card-body">
+            @Html.Action("Details", "OutsideBmed", new { @id = Model.DocId })
+        </div>
+
+    </div>
+
+    <div class="row card">
+
+        <div class="card-header">審核內容</div>
+        <div class="card-body">
+            @Html.Action("NewContent", "OutsideBmed", new { @id = Model.DocId })
+        </div>
+
+    </div>
+    <div class="row card">
+
+        <div class="card-header">審核流程</div>
+        <div class="card-body">
+            @Html.Action("GetList", "OutsideBmedFlows", new { @id = Model.DocId })
+        </div>
+
+    </div>
+</div>

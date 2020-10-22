@@ -1,0 +1,195 @@
+﻿@model IEnumerable<MedEue.Models.OutsideBmedListModel>
+<style>
+    .btn {
+        font-size: 12px;
+    }
+    table{
+        width:1500px !important;
+        text-align:center;
+    }
+    th{
+         text-align:center;
+    }
+</style>
+
+<div class="card">
+
+    <div class="card-header">
+        案件列表
+
+        <a class="collapse-link" style="float:right;">
+            <i class="fa fa-chevron-up"></i>
+        </a>
+
+    </div>
+
+    <div class="card-body" style="overflow:scroll;overflow-y:hidden;">
+        <table class="table table-striped table-bordered table-hover dataTables">
+            <thead>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DocType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DocId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Topic)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Model)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseUnit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Serial)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Label)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ApplyDate)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseDayFrom)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseDayTo)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Rtt)
+                    </th>
+
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DocType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.DocId)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UserName)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Topic)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Model)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.UseUnit)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Serial)
+                        </td>
+                        <th>
+                            @Html.DisplayFor(modelItem => item.Label)
+                        </th>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ApplyDate)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.UseDayFrom)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.UseDayTo)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Status)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Rtt)
+                        </td>
+                        <td style=" text-align:left;">
+                            @Html.ActionLink("預覽", "PreviewData", "OutsideBmed", new { @id = item.DocId }, new { @class = "btn btn-default", target = "blank" }) &nbsp;
+                            @if (item.Status != "已結案")
+                            {
+                                @Ajax.ActionLink("轉給自己", "TransToMe", "OutsideBmedFlows", new { docid = item.DocId }, new AjaxOptions
+                                {
+                               HttpMethod = "POST",
+                               OnSuccess = "OnSuccess"
+                           }, new { @class = "btn btn-default",onsuccess="OnSuccess" })
+                            }
+
+                        </td>
+                    </tr>
+                }
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DocType)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.DocId)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UserName)
+                    </th>
+
+                    <th>
+                        @Html.DisplayNameFor(model => model.Topic)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Name)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Model)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseUnit)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Serial)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Label)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.ApplyDate)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseDayFrom)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.UseDayTo)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Status)
+                    </th>
+                    <th>
+                        @Html.DisplayNameFor(model => model.Rtt)
+                    </th>
+                    <th></th>
+                </tr>
+            </tfoot>
+        </table>
+    </div>
+
+</div>
+
+
+
+
+<script src="~/Scripts/MedEue/inspinia.js"></script>

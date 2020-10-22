@@ -1,0 +1,124 @@
+﻿@model MedEue.Models.Instrument
+
+@{
+    ViewBag.Title = "編輯|外部醫療儀器使用申請單";
+}
+
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>編輯</h2>
+        <h4>外部醫療儀器使用申請單</h4>
+    </div>
+</div>
+<div class="card">
+    <div class="card-body">
+        <div class="ibox float-e-margins">
+
+            <div class="card-header">附件檔案</div>
+
+            <div>
+                <div class="row">
+                    @Html.HiddenFor(model => model.DocId)
+                    <div id="pnlFILES" style="width:100%; padding-right:1.25rem">
+                        @Html.Action("List", "AttainFiles", new { @id = Model.DocId, typ = "OutsideBmed" })
+                    </div>
+                </div>
+                <a data-toggle="modal" class="btn btn-primary" href="#modal-form">夾帶附件</a>
+                <div id="modal-form" class="modal fade" aria-hidden="true">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <button type="button" class="close" data-dismiss="modal">&times;</button>
+                                <h4 class="modal-title">選擇上傳檔案</h4>
+                            </div>
+                            <div class="modal-body">
+                                @Html.Action("Upload", "AttainFiles", new { doctype = "OutsideBmed", docid = Model.DocId })
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-default" data-dismiss="modal">離開</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<br />
+<div class="card">
+    <div class="card-body">
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="tabs-container">
+                    <ul class="nav nav-tabs">
+                        <li class="active"><a data-toggle="tab" href="#tab-1"> 申請資料</a></li>
+                        <li class=""><a data-toggle="tab" href="#tab-2">外部醫療儀器使用</a></li>
+                    </ul>
+                    <div class="tab-content">
+                        <div id="tab-1" class="tab-pane active">
+                            <div class="panel-body">
+                                @Html.Action("Details", new { @id = Model.DocId })
+                            </div>
+                        </div>
+                        <div id="tab-2" class="tab-pane">
+
+                            <div class="panel-body">
+                                @Html.Action("NextFlow", "OutsideBmedFlows", new { @id = Model.DocId })
+                            </div>
+                            @*@if ((string)ViewData["Cls"] == "工程師")
+                                {
+                                    @Html.Action("NextFlow", "OutsideBmedFlows", new { @id = Model.DocId })
+                                }
+                                else
+                                {
+                                    @Html.Action("NextSFlow", "OutsideBmedFlows", new { @id = Model.DocId })
+                                }*@
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+@section Scripts {
+    <script>
+        function showmsg(data) {
+            waitingDialog.hide('Loading Something...');
+            $("#btnGO").attr("disabled", false);
+            if (!data.success) {
+                alert(data.error);
+            }
+            else {
+                alert("送出成功!");
+                window.close();
+                window.opener.location.reload();
+            }
+        }
+        function onError(data) {
+            waitingDialog.hide('Loading Something...');
+            document.getElementById('btnGO').disabled = false;
+            var msg = JSON.parse(data.responseText);
+            alert(msg.Error);
+
+        };
+        function presend() {
+            //alert('test');
+            document.getElementById('btnGO').disabled = true;
+        }
+
+    </script>
+
+    @*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+    <script src="~/Scripts/File/FileUpload2.js"></script>
+    <script src="~/Scripts/bootstrap-waitingfor.js"></script>
+    <script src="~/Scripts/MedEue/SignDataEdit.js"></script>
+    <script src="~/Scripts/OutsideBmed/OutsideBmedFlow.js"></script>
+    @Scripts.Render("~/bundles/jqueryval")
+}
+@*@section Styles {
+        @Styles.Render("~/Content/fileinput/css")
+    }*@
+
+
+
