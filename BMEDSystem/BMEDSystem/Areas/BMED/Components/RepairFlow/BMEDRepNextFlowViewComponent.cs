@@ -157,7 +157,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
             /* 驗收人員所屬部門搜尋的下拉選單資料 */
             //var dptList = new[] { "K", "P", "C" };   //本院部門
             //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
-            var departments = _context.Departments.ToList();
+            var departments = _context.Departments;
             List<SelectListItem> listItem5 = new List<SelectListItem>();
             foreach (var item in departments)
             {

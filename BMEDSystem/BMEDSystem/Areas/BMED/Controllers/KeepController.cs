@@ -389,33 +389,32 @@ namespace EDIS.Areas.BMED.Controllers
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
             // 依照院區搜尋Keep主檔
-            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
             if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
             {
-                kps = _context.BMEDKeeps.ToList();
+                kps = _context.BMEDKeeps;
             }
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();
-                kps = kps.Where(v => v.DocId == docid).ToList();
+                kps = kps.Where(v => v.DocId == docid);
             }
             if (!string.IsNullOrEmpty(ano))     //財產編號
             {
-                kps = kps.Where(v => v.AssetNo == ano).ToList();
+                kps = kps.Where(v => v.AssetNo == ano);
             }
             if (!string.IsNullOrEmpty(dptid))   //所屬部門編號
             {
-                kps = kps.Where(v => v.DptId == dptid).ToList();
+                kps = kps.Where(v => v.DptId == dptid);
             }
             if (!string.IsNullOrEmpty(acc))     //成本中心
             {
-                kps = kps.Where(v => v.AccDpt == acc).ToList();
+                kps = kps.Where(v => v.AccDpt == acc);
             }
             if (!string.IsNullOrEmpty(aname))   //財產名稱
             {
                 kps = kps.Where(v => !string.IsNullOrEmpty(v.AssetName))
-                         .Where(v => v.AssetName.Contains(aname))
-                         .ToList();
+                         .Where(v => v.AssetName.Contains(aname));
             }
             if (!string.IsNullOrEmpty(qtyTicketNo))   //發票號碼
             {
@@ -425,7 +424,7 @@ namespace EDIS.Areas.BMED.Controllers
                                                          .Select(kc => kc.DocId).Distinct();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
-                       select k).ToList();
+                       select k);
             }
             if (!string.IsNullOrEmpty(qtyVendor))   //廠商關鍵字
             {
@@ -435,14 +434,14 @@ namespace EDIS.Areas.BMED.Controllers
                                                          .Select(kc => kc.DocId).Distinct();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
-                       select k).ToList();
+                       select k);
             }
             /* Search date by DateType.(ApplyDate) */
             if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false)
             {
                 if (qtyDateType == "送單日")
                 {
-                    kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo).ToList();
+                    kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo);
                 }
             }
 
@@ -523,7 +522,7 @@ namespace EDIS.Areas.BMED.Controllers
                         }));
                         break;
                 case "已結案":
-                    List<KeepFlowModel> kf = _context.BMEDKeepFlows.Where(f => f.Status == "2").ToList();
+                    var kf = _context.BMEDKeepFlows.Where(f => f.Status == "2");
 
                     if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
                         userManager.IsInRole(User, "Manager") || userManager.IsInRole(User, "MedEngineer"))
@@ -531,19 +530,19 @@ namespace EDIS.Areas.BMED.Controllers
                         if (userManager.IsInRole(User, "Manager"))
                         {
                             kf = kf.Join(_context.BMEDKeeps.Where(r => r.AccDpt == ur.DptId),
-                            f => f.DocId, r => r.DocId, (f, r) => f).ToList();
+                            f => f.DocId, r => r.DocId, (f, r) => f);
                         }
                         /* If no other search values, search the docs belong the login engineer. */
                         if (userManager.IsInRole(User, "MedEngineer") && searchAllDoc == false)
                         {
                             kf = kf.Join(_context.BMEDKeepFlows.Where(f2 => f2.UserId == ur.Id),
-                            f => f.DocId, f2 => f2.DocId, (f, f2) => f).ToList();
+                            f => f.DocId, f2 => f2.DocId, (f, f2) => f);
                         }
                     }
                     else /* If normal user, search the docs belong himself. */
                     {
                         kf = kf.Join(_context.BMEDKeepFlows.Where(f2 => f2.UserId == ur.Id),
-                        f => f.DocId, f2 => f2.DocId, (f, f2) => f).ToList();
+                        f => f.DocId, f2 => f2.DocId, (f, f2) => f);
                     }
                     //
                     kf.Select(f => new
@@ -619,12 +618,13 @@ namespace EDIS.Areas.BMED.Controllers
                       break;
                 case "待簽核":
                     /* Get all dealing repair docs. */
-                    var keepFlows = _context.BMEDKeepFlows.Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
+                    var keepFlows = _context.BMEDKeepFlows.Where(f => f.Status == "?")
+                        .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                     (f, k) => new
                     {
                         keep = k,
                         flow = f
-                    }).ToList();
+                    });
 
                     if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
                         userManager.IsInRole(User, "MedEngineer"))
@@ -633,10 +633,10 @@ namespace EDIS.Areas.BMED.Controllers
                         /* Else return the docs belong the login engineer.  */
                         if (userManager.IsInRole(User, "MedEngineer") && searchAllDoc == true)
                         {
-                            keepFlows = keepFlows.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
+                            keepFlows = keepFlows.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師"));
                             if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                             {
-                                keepFlows = keepFlows.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                                keepFlows = keepFlows.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode));
                             }
                         }
                         else
@@ -647,7 +647,7 @@ namespace EDIS.Areas.BMED.Controllers
                             //                                  _context.AppUsers.Find(f.flow.UserId).DptId == ur.DptId)).ToList();
 
                             /* 個人案件 */
-                            keepFlows = keepFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id)).ToList();
+                            keepFlows = keepFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id));
                         }
                     }
                     else
@@ -658,7 +658,7 @@ namespace EDIS.Areas.BMED.Controllers
                         //                                  _context.AppUsers.Find(f.flow.UserId).DptId == ur.DptId)).ToList();
 
                         /* 個人案件 */
-                        keepFlows = keepFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id)).ToList();
+                        keepFlows = keepFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id));
                     }
 
                     keepFlows.Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
@@ -712,11 +712,9 @@ namespace EDIS.Areas.BMED.Controllers
                     break;
                 case "請選擇":
                     /* Get all dealing repair docs. */
-                     _context.BMEDKeepFlows.Where(f => f.UserId == ur.Id).GroupBy(f => f.DocId)
-                                            .Select(group => group.First())
-                    .Join(_context.BMEDKeepFlows, f1 => f1.DocId, f2 => f2.DocId, (f1, f2) => f2).GroupBy(f2 => f2.DocId)
-                                            .Select(group => group.OrderBy(g => g.StepId).Last()).ToList()
-                                            .Where(f2 => f2.Status != "3")
+                    string[] ss = new string[] { "?", "2" };
+                    _context.BMEDKeepFlows.Where(f => f.UserId == ur.Id).Select(f => f.DocId).Distinct()
+                    .Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), f1 => f1, f2 => f2.DocId, (f1, f2) => f2)
                     .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                     (f, k) => new
                     {
@@ -782,20 +780,17 @@ namespace EDIS.Areas.BMED.Controllers
                 /* 其他工程師的案件 */
                 case "其他工程師案件":
                     /* Get all dealing repair docs. */
-                    var keepFlows2 = _context.BMEDKeepFlows.Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
+                    var keepFlows2 = _context.BMEDKeepFlows.Where(f => f.Status == "?")
+                        .Join(kps.DefaultIfEmpty(), f => f.DocId, k => k.DocId,
                     (f, k) => new
                     {
                         keep = k,
                         flow = f
-                    }).ToList();
-                    /* search all KeepDocs which doc is not closed. */
-                    keepFlows2 = keepFlows2.GroupBy(f => f.flow.DocId)
-                                           .Where(group => group.OrderBy(g => g.flow.StepId).Last().flow.Status == "?")
-                                           .Select(group => group.Last()).ToList();
+                    });
                     //keepFlows2 = keepFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                     {
-                        keepFlows2 = keepFlows2.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                        keepFlows2 = keepFlows2.Where(f => f.keep.EngId == Convert.ToInt32(qtyEngCode));
                     }
 
                     keepFlows2.Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,

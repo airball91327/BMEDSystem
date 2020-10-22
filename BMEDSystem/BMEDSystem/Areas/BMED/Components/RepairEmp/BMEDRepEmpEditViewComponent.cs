@@ -32,7 +32,7 @@ namespace EDIS.Areas.BMED.Components.RepairEmp
 
         public async Task<IViewComponentResult> InvokeAsync(string docId)
         {
-            var repairEmps = _context.BMEDRepairEmps.ToList();
+            var repairEmps = _context.BMEDRepairEmps.AsQueryable();
             RepairEmpModel emp = repairEmps.Where(p => p.DocId == docId)
                                            .FirstOrDefault();
             var ur = _userRepo.Find(us => us.UserName == this.User.Identity.Name).FirstOrDefault();

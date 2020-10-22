@@ -736,31 +736,30 @@ namespace EDIS.Areas.BMED.Controllers
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
             // 依照院區搜尋Keep主檔
-            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation).ToList();
-            var keepFlows = _context.BMEDKeepFlows.ToList();
-            var keepDtls = _context.BMEDKeepDtls.ToList();
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
+            var keepFlows = _context.BMEDKeepFlows.AsQueryable();
+            var keepDtls = _context.BMEDKeepDtls.AsQueryable();
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
                 docid = docid.Trim();
-                kps = kps.Where(v => v.DocId == docid).ToList();
+                kps = kps.Where(v => v.DocId == docid);
             }
             if (!string.IsNullOrEmpty(ano))     //財產編號
             {
-                kps = kps.Where(v => v.AssetNo == ano).ToList();
+                kps = kps.Where(v => v.AssetNo == ano);
             }
             if (!string.IsNullOrEmpty(dptid))   //所屬部門編號
             {
-                kps = kps.Where(v => v.DptId == dptid).ToList();
+                kps = kps.Where(v => v.DptId == dptid);
             }
             if (!string.IsNullOrEmpty(acc))     //成本中心
             {
-                kps = kps.Where(v => v.AccDpt == acc).ToList();
+                kps = kps.Where(v => v.AccDpt == acc);
             }
             if (!string.IsNullOrEmpty(aname))   //財產名稱
             {
                 kps = kps.Where(v => v.AssetName != null)
-                         .Where(v => v.AssetName.Contains(aname))
-                         .ToList();
+                         .Where(v => v.AssetName.Contains(aname));
             }
             if (!string.IsNullOrEmpty(qtyTicketNo))   //發票號碼
             {
@@ -770,7 +769,7 @@ namespace EDIS.Areas.BMED.Controllers
                                                          .Select(kc => kc.DocId).Distinct();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
-                       select k).ToList();
+                       select k);
             }
             if (!string.IsNullOrEmpty(qtyVendor))   //廠商關鍵字
             {
@@ -779,18 +778,18 @@ namespace EDIS.Areas.BMED.Controllers
                                                          .Select(kc => kc.DocId).Distinct();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
-                       select k).ToList();
+                       select k);
             }
             if (!string.IsNullOrEmpty(qtyEngCode))     //負責工程師
             {
-                kps = kps.Where(v => v.EngId == Convert.ToInt32(qtyEngCode)).ToList();
+                kps = kps.Where(v => v.EngId == Convert.ToInt32(qtyEngCode));
             }
             /* Search date by DateType.(ApplyDate) */
             if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false) //送單日
             {
                 if (qtyDateType == "送單日")
                 {
-                    kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo).ToList();
+                    kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo);
                 }
             }
 
@@ -799,24 +798,21 @@ namespace EDIS.Areas.BMED.Controllers
                 switch (ftype)
                 {
                     case "未結案":
-                        keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status == "?")
-                                                                   .Select(group => group.Last()).ToList();
+                        keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "?");
                         break;
                     case "已結案":
-                        keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status == "2")
-                                                                   .Select(group => group.Last()).ToList();
+                        keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "2");
                         break;
                 }
             }
             else
             {
-                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status != "3")
-                                                           .Select(group => group.Last()).ToList(); ;
+                keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2");
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
                 keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
-                                     .Select(group => group.Last()).ToList();
+                                     .Select(group => group.Last());
             }
 
             /* If no search result. */
@@ -1024,14 +1020,14 @@ namespace EDIS.Areas.BMED.Controllers
         {
             List<DeliveryListVModel> dv = new List<DeliveryListVModel>();
             List<DelivFlowModel> rf = new List<DelivFlowModel>();
-            List<DelivFlowModel> rf2;
+            IQueryable<DelivFlowModel> rf2;
             // Get Login User's details.
             var ur = _userRepo.Find(usr => usr.UserName == User.Identity.Name).FirstOrDefault();
             switch (cls)
             {
                 case "已處理":
                     rf2 = _context.DelivFlows.Where(df => df.Status == "?")
-                                             .Where(m => m.UserId != ur.Id).ToList();
+                                             .Where(m => m.UserId != ur.Id);
                     if (!userManager.IsInRole(User, "Usual"))
                     {
                         rf.AddRange(rf2);
@@ -1049,7 +1045,7 @@ namespace EDIS.Areas.BMED.Controllers
 
                     break;
                 case "已結案":
-                    rf2 = _context.DelivFlows.Where(df => df.Status == "2").ToList();
+                    rf2 = _context.DelivFlows.Where(df => df.Status == "2");
                     if (!userManager.IsInRole(User, "Usual"))
                     {
                         rf.AddRange(rf2);
@@ -1066,7 +1062,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     break;
                 case "所有":
-                    rf2 = _context.DelivFlows.Where(df => df.Status == "2" || df.Status == "?").ToList();
+                    rf2 = _context.DelivFlows.Where(df => df.Status == "2" || df.Status == "?");
                     if (!userManager.IsInRole(User, "Usual"))
                     {
                         rf.AddRange(rf2);
@@ -1083,7 +1079,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     break;
                 case "查詢":
-                    rf2 = _context.DelivFlows.Where(df => df.Status == "?").ToList();
+                    rf2 = _context.DelivFlows.Where(df => df.Status == "?");
                     DeliveryModel r;
                     foreach (DelivFlowModel f in rf2)
                     {

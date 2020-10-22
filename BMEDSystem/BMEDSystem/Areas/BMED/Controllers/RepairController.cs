@@ -508,16 +508,17 @@ namespace EDIS.Areas.BMED.Controllers
                 /* 其他工程師的案件 */
                 case "其他工程師案件":
                     /* Get all dealing repair docs. */
-                    var repairFlows2 = _context.BMEDRepairFlows.Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
+                    var repairFlows2 = _context.BMEDRepairFlows.Where(f => f.Status == "?")
+                        .Join(rps.DefaultIfEmpty(), f => f.DocId, r => r.DocId,
                     (f, r) => new
                     {
                         repair = r,
                         flow = f
                     });
                     /* search all RepairDocs which doc is not closed. */
-                    repairFlows2 = repairFlows2.GroupBy(f => f.flow.DocId)
-                                               .Where(group => group.OrderBy(g => g.flow.StepId).Last().flow.Status == "?")
-                                               .Select(group => group.Last());
+                    //repairFlows2 = repairFlows2.GroupBy(f => f.flow.DocId)
+                    //                           .Where(group => group.OrderBy(g => g.flow.StepId).Last().flow.Status == "?")
+                    //                           .Select(group => group.Last());
                     //repairFlows2 = repairFlows2.Where(f => f.flow.Status == "?" && f.flow.Cls.Contains("工程師")).ToList();
                     if (!string.IsNullOrEmpty(qtyEngCode))  //工程師搜尋
                     {
@@ -2175,7 +2176,7 @@ namespace EDIS.Areas.BMED.Controllers
 
             /* 所有尚未指派工程師的案件 */
             var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師"))
-                                              .Where(r => r.UserId == 0).ToList();
+                                              .Where(r => r.UserId == 0);
             //var rps = _context.BMEDRepairs.Where(r => r.EngId == 0)
             //                              .Join(rfs, r => r.DocId, rf => rf.DocId,
             //                              (r, rf) => r).ToList();
