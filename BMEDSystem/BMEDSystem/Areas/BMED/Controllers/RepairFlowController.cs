@@ -155,15 +155,18 @@ namespace EDIS.Areas.BMED.Controllers
                     if (rep.Loc == "總院")
                     {
                         string smsg = SyncToOracleBatch(assign.DocId);
-                        if (smsg == "1")
-                            throw new Exception("同步OracleBatch失敗!");
+                        //if (smsg == "1")
+                        //    throw new Exception("同步OracleBatch失敗!");
                     }
 
                     // Save stock to ERP system.
-                    var ERPreponse = await SaveToERPAsync(assign.DocId);
-                    if (!ERPreponse.Contains("成功"))
+                    if (repairDtl.NotInExceptDevice == "Y") //該案件為統包
                     {
-                        throw new Exception(ERPreponse);
+                        var ERPreponse = await SaveToERPAsync(assign.DocId);
+                        if (!ERPreponse.Contains("成功"))
+                        {
+                            throw new Exception(ERPreponse);
+                        }
                     }
                     _context.SaveChanges();
 
