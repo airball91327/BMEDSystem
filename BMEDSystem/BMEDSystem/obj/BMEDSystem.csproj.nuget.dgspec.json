@@ -1,24 +1,25 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
+    "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
+    "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "projectUniqueName": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
         "projectName": "EDIS",
-        "projectPath": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-        "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+        "projectPath": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\mac\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
+          "C:\\Microsoft\\Xamarin\\NuGet\\"
         ],
         "configFilePaths": [
-          "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
+          "C:\\Users\\mac\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -155,7 +156,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.403\\RuntimeIdentifierGraph.json"
         }
       }
     }

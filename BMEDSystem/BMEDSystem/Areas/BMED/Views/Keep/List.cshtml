@@ -200,20 +200,26 @@ else
                 </th>
             </tr>
 
-            @{int i = 0; }
+            @{
+                int i = 0;
+                var dptid = UserManager.GetCurrentUserDptId(User);
+                var uid = UserManager.GetCurrentUserId(User);
+                var fname = UserManager.GetUserFullName(User);
+                var isEng = UserManager.IsInRole(User, "MedEngineer");
+            }
             @foreach (var item in Model)
             {
                 <tr>
                     <td style="text-align:center">
-                        @if ((item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "7084") ||
-                            (item.Flg != "2" && UserManager.GetCurrentUserDptId(User) == "8420")) //其他案件
+                        @if ((item.Flg != "2" && dptid == "7084") ||
+                           (item.Flg != "2" && dptid == "8420")) //其他案件
                         {
                             @Html.Hidden("transKData[" + i + "].DocId", item.DocId)
                             @Html.CheckBox("transKData[" + i + "].IsSelected", item.IsSelected, new { @class = "IsSelected3" })
                         }
                     </td>
                     <td width="100px">
-                        @if (item.Flg == "?" && item.FlowUid == UserManager.GetCurrentUserId(User))
+                        @if (item.Flg == "?" && item.FlowUid == uid)
                         {
                             @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
@@ -223,8 +229,8 @@ else
                                 @Html.Raw(" | ")
                             }
                         }
-                        else if ((item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "7084") ||
-                                 (item.Flg == "?" && item.FlowCls.Contains("工程師") && UserManager.GetCurrentUserDptId(User) == "8420")) //其他工程師案件
+                        else if ((item.Flg == "?" && item.FlowCls.Contains("工程師") && dptid == "7084") ||
+                                 (item.Flg == "?" && item.FlowCls.Contains("工程師") && dptid == "8420")) //其他工程師案件
                         {
                             @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
@@ -235,7 +241,7 @@ else
                             @Html.Raw(" |")
                         }
                         @Html.ActionLink("列印", "PrintKeepDoc", "Keep", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
-                        @if (item.Flg == "?" && item.FlowUid == UserManager.GetCurrentUserId(User) && item.FlowCls == "申請人")
+                        @if (item.Flg == "?" && item.FlowUid == uid && item.FlowCls == "申請人")
                         {
                             @Html.Raw(" |")
                             @Html.ActionLink("廢除", "Delete", "Keep", new { Area = "BMED", id = item.DocId })
@@ -271,7 +277,7 @@ else
                         @Html.DisplayFor(modelItem => item.Memo)
                     </td>
                     <td>
-                        @if (UserManager.GetCurrentUserDptId(User) == "7084" || UserManager.GetCurrentUserDptId(User) == "8420")
+                        @if (dptid == "7084" || dptid == "8420")
                         {
                             @Html.DisplayFor(modelItem => item.Cost)
                         }

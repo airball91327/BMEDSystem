@@ -30,7 +30,7 @@ namespace EDIS.Models
         [Display(Name = "數量")]
         public int Qty { get; set; }
         [DisplayFormat(DataFormatString = "{0:N0}")]
-        [Display(Name = "總金額")]
+        [Display(Name = "金額")]
         public decimal TotalCost { get; set; }
         [Required(ErrorMessage = "必填寫欄位")]
         [Display(Name = "費用別")]

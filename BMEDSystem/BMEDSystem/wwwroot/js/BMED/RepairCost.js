@@ -214,6 +214,7 @@ $(function () {
     //});
     /* According TaxClass to change btnGETSEQ. */
     $('input:radio[name="TaxClass"]').click(function () {
+        $('#TicketDtl_TicketDtlNo').val('');
         var item = $(this).val();
         if (item === "1") {             // 點選"收據"
             $('#btnGETSEQ').show();
