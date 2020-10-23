@@ -112,14 +112,21 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.Entry(kf).State = EntityState.Modified;
                     _context.Entry(kd).State = EntityState.Modified;
 
-                    _context.SaveChanges();
                     //sync to oracleBatch
                     string smsg = SyncToOracleBatch(assign.DocId);
                     //if (smsg == "1")
                     //    throw new Exception("同步OracleBatch失敗!");
 
                     // Save stock to ERP system.
-                    var ERPreponse = await SaveToERPAsync(assign.DocId);
+                    if (keepDtl.NotInExceptDevice == "Y") //該案件為統包
+                    {
+                        var ERPreponse = await SaveToERPAsync(assign.DocId);
+                        if (!ERPreponse.Contains("成功"))
+                        {
+                            throw new Exception(ERPreponse);
+                        }
+                    }
+                    _context.SaveChanges();
 
                     //Send Mail
                     //To all users in this keep's flow.
@@ -722,14 +729,22 @@ namespace EDIS.Areas.BMED.Controllers
                             _context.Entry(keep).State = EntityState.Modified;
                             _context.SaveChanges();
                         }
+                        msg = "成功";
                     }
                     else
                     {
-                        msg = "寫入ERP失敗!";
+                        var rtnMsg = objs["RtnMsg"].ToString().Replace(Environment.NewLine, "");
+                        msg = "寫入ERP失敗!" + Environment.NewLine + "請將錯誤訊息【" + rtnMsg + "】告知ERP管理人員協助處理。";
                     }
                 }
+                msg = "無費用明細，寫入ERP失敗!";
+                return msg;
             }
-            return msg;
+            else
+            {
+                msg = "無費用明細，寫入ERP失敗!";
+                return msg;
+            }
         }
 
         private string SyncToOracleBatch(string docid)
