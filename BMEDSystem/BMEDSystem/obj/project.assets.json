@@ -16122,23 +16122,23 @@
     ]
   },
   "packageFolders": {
-    "C:\\Users\\user\\.nuget\\packages\\": {},
+    "C:\\Users\\Inori\\.nuget\\packages\\": {},
     "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder": {}
   },
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectUniqueName": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "projectName": "EDIS",
-      "projectPath": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-      "packagesPath": "C:\\Users\\user\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\user\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+      "projectPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "packagesPath": "C:\\Users\\Inori\\.nuget\\packages\\",
+      "outputPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
       ],
       "configFilePaths": [
-        "C:\\Users\\user\\AppData\\Roaming\\NuGet\\NuGet.Config",
+        "C:\\Users\\Inori\\AppData\\Roaming\\NuGet\\NuGet.Config",
         "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
       ],
       "originalTargetFrameworks": [
@@ -16276,7 +16276,7 @@
         ],
         "assetTargetFallback": true,
         "warn": true,
-        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.302\\RuntimeIdentifierGraph.json"
+        "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
       }
     }
   },

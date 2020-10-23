@@ -112,7 +112,6 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.Entry(kf).State = EntityState.Modified;
                     _context.Entry(kd).State = EntityState.Modified;
 
-                    _context.SaveChanges();
                     //sync to oracleBatch
                     string smsg = SyncToOracleBatch(assign.DocId);
                     //if (smsg == "1")
@@ -120,6 +119,11 @@ namespace EDIS.Areas.BMED.Controllers
 
                     // Save stock to ERP system.
                     var ERPreponse = await SaveToERPAsync(assign.DocId);
+                    if (!ERPreponse.Contains("成功"))
+                    {
+                        throw new Exception(ERPreponse);
+                    }
+                    _context.SaveChanges();
 
                     //Send Mail
                     //To all users in this keep's flow.
@@ -722,10 +726,12 @@ namespace EDIS.Areas.BMED.Controllers
                             _context.Entry(keep).State = EntityState.Modified;
                             _context.SaveChanges();
                         }
+                        msg = "成功";
                     }
                     else
                     {
-                        msg = "寫入ERP失敗!";
+                        var rtnMsg = objs["RtnMsg"].ToString().Replace(Environment.NewLine, "");
+                        msg = "寫入ERP失敗!" + Environment.NewLine + "請將錯誤訊息【" + rtnMsg + "】告知ERP管理人員協助處理。";
                     }
                 }
             }
