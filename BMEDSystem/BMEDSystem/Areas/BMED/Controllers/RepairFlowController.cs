@@ -759,8 +759,14 @@ namespace EDIS.Areas.BMED.Controllers
                         msg = "寫入ERP失敗!" + Environment.NewLine + "請將錯誤訊息【" + rtnMsg + "】告知ERP管理人員協助處理。";
                     }
                 }
+                msg = "無費用明細，寫入ERP失敗!";
+                return msg;
             }
-            return msg;
+            else
+            {
+                msg = "無費用明細，寫入ERP失敗!";
+                return msg;
+            }
         }
 
     }
