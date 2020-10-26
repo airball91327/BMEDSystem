@@ -638,6 +638,23 @@ namespace EDIS.Areas.BMED.Controllers
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
+            //Get SAL_NO
+            var salStocks = _context.BMEDKeepCosts.Where(rc => rc.DocId == docId)
+                                                  .Where(rc => rc.StockType == "0").ToList();
+            var salTickets = _context.BMEDKeepCosts.Where(rc => rc.DocId == docId)
+                                                   .Where(rc => rc.StockType == "2").ToList();
+            if (salStocks.Count() > 0)
+            {
+                var salId = salStocks.FirstOrDefault().Rtp;
+                var user = _context.AppUsers.Find(salId);
+                hd.SAL_NO = user.UserName;
+            }
+            else
+            {
+                var salId = salTickets.OrderByDescending(s => s.Rtt).FirstOrDefault().Rtp;
+                var user = _context.AppUsers.Find(salId);
+                hd.SAL_NO = user.UserName;
+            }
 #if DEBUG
             hd.SAL_NO = "344033";
 #endif
