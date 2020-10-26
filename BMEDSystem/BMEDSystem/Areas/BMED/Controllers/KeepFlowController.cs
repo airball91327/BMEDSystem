@@ -118,7 +118,7 @@ namespace EDIS.Areas.BMED.Controllers
                     //    throw new Exception("同步OracleBatch失敗!");
 
                     // Save stock to ERP system.
-                    if (keepDtl.NotInExceptDevice == "Y") //該案件為統包
+                    if (keepDtl.NotInExceptDevice == "Y" && keepDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
                         var ERPreponse = await SaveToERPAsync(assign.DocId);
                         if (!ERPreponse.Contains("成功"))

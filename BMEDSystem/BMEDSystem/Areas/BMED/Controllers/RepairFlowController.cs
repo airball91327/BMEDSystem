@@ -160,7 +160,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
 
                     // Save stock to ERP system.
-                    if (repairDtl.NotInExceptDevice == "Y") //該案件為統包
+                    if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
                         var ERPreponse = await SaveToERPAsync(assign.DocId);
                         if (!ERPreponse.Contains("成功"))
