@@ -936,8 +936,22 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(p =>
                 {
                     p.Asset.AccDptName = p.Department == null ? "" : p.Department.Name_C;
+                    p.Asset.Location = p.Department == null ? "" : p.Department.Loc;
                     at.Add(p.Asset);
                 });
+            if (!string.IsNullOrEmpty(qryAsset.Location))
+            {
+                if (qryAsset.Location != "所有")
+                {
+                    string[] locList = new[] { "K", "P", "C" };
+                    if (qryAsset.Location != "總院")
+                    {
+                        Array.Clear(locList, 0, locList.Length);
+                        locList = new[] { qryAsset.Location };
+                    }
+                    at = at.Where(a => locList.Contains(a.Location)).ToList();
+                }
+            }
             if (!string.IsNullOrEmpty(qryAsset.AssetNo))
             {
                 at = at.Where(a => a.AssetNo == qryAsset.AssetNo).ToList();
