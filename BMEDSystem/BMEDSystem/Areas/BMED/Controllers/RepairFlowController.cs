@@ -415,6 +415,11 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         s = roleManager.GetUsersInRole("Manager").OrderBy(x => x).ToList();
                         list = new List<SelectListItem>();
+                        li = new SelectListItem();
+                        li.Text = "請選擇";
+                        li.Value = "請選擇";
+                        list.Add(li);
+                        //
                         locList = new[] { "K", "P", "C" };
                         if (r.Loc != "總院")
                         {
