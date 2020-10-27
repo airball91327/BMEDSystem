@@ -968,6 +968,15 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 at = at.Where(a => a.Type == qryAsset.Type).ToList();
             }
+            if (!string.IsNullOrEmpty(qryAsset.DelivDpt))
+            {
+                at = at.Where(a => a.DelivDpt == qryAsset.DelivDpt).ToList();
+            }
+            if (!string.IsNullOrEmpty(qryAsset.BmedNo))
+            {
+                at = at.Where(a => a.BmedNo != null)
+                       .Where(a => a.BmedNo.Contains(qryAsset.BmedNo)).ToList();
+            }
 
             at = at.GroupBy(a => a.AssetNo).Select(g => g.First()).ToList();
 
