@@ -160,7 +160,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
 
                     // Save stock to ERP system.
-                    if (repairDtl.NotInExceptDevice == "Y") //該案件為統包
+                    if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
                         var ERPreponse = await SaveToERPAsync(assign.DocId);
                         if (!ERPreponse.Contains("成功"))
@@ -415,6 +415,11 @@ namespace EDIS.Areas.BMED.Controllers
                     {
                         s = roleManager.GetUsersInRole("Manager").OrderBy(x => x).ToList();
                         list = new List<SelectListItem>();
+                        li = new SelectListItem();
+                        li.Text = "請選擇";
+                        li.Value = "請選擇";
+                        list.Add(li);
+                        //
                         locList = new[] { "K", "P", "C" };
                         if (r.Loc != "總院")
                         {
@@ -661,6 +666,23 @@ namespace EDIS.Areas.BMED.Controllers
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
+            //Get SAL_NO
+            var salStocks = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
+                                                    .Where(rc => rc.StockType == "0").ToList();
+            var salTickets = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
+                                                     .Where(rc => rc.StockType == "2").ToList();
+            if (salStocks.Count() > 0)
+            {
+                var salId = salStocks.FirstOrDefault().Rtp;
+                var user = _context.AppUsers.Find(salId);
+                hd.SAL_NO = user.UserName;
+            }
+            else
+            {
+                var salId = salTickets.OrderByDescending(s => s.Rtt).FirstOrDefault().Rtp;
+                var user = _context.AppUsers.Find(salId);
+                hd.SAL_NO = user.UserName;
+            }
 #if DEBUG
             hd.SAL_NO = "344033";
 #endif
