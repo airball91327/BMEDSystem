@@ -15,6 +15,8 @@ using System.Net.Http;
 using Newtonsoft.Json;
 using System.Text;
 using X.PagedList;
+using System.Data;
+using OfficeOpenXml;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -692,7 +694,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
             string qtyInOut = qdata.BMEDKInOut;
-
+            TempData["qry"] = qdata;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -938,6 +940,326 @@ namespace EDIS.Areas.BMED.Controllers
                 return PartialView("KeepQryList", kv.ToPagedList(1, pageSize));
             return PartialView("KeepQryList", kv.ToPagedList(page, pageSize));
             //return View("KeepQryList", kv);
+        }
+        public List<KeepSearchListViewModel> GetKeepQryData(QryKeepListData qdata)
+        {
+            string docid = qdata.BMEDKqtyDOCID;
+            string ano = qdata.BMEDKqtyASSETNO;
+            string acc = qdata.BMEDKqtyACCDPT;
+            string aname = qdata.BMEDKqtyASSETNAME;
+            string ftype = qdata.BMEDKqtyFLOWTYPE;
+            string dptid = qdata.BMEDKqtyDPTID;
+            string qtyDate1 = qdata.BMEDKqtyApplyDateFrom;
+            string qtyDate2 = qdata.BMEDKqtyApplyDateTo;
+            string qtyKeepResult = qdata.BMEDKqtyKeepResult;
+            string qtyIsCharged = qdata.BMEDKqtyIsCharged;
+            string qtyDateType = qdata.BMEDKqtyDateType;
+            bool searchAllDoc = qdata.BMEDKqtySearchAllDoc;
+            string qtyEngCode = qdata.BMEDKqtyEngCode;
+            string qtyTicketNo = qdata.BMEDKqtyTicketNo;
+            string qtyVendor = qdata.BMEDKqtyVendor;
+            string qtyClsUser = qdata.BMEDKqtyClsUser;
+            string qtyInOut = qdata.BMEDKInOut;
+
+            DateTime applyDateFrom = DateTime.Now;
+            DateTime applyDateTo = DateTime.Now;
+            /* Dealing search by date. */
+            if (qtyDate1 != null && qtyDate2 != null)// If 2 date inputs have been insert, compare 2 dates.
+            {
+                DateTime date1 = DateTime.Parse(qtyDate1);
+                DateTime date2 = DateTime.Parse(qtyDate2);
+                int result = DateTime.Compare(date1, date2);
+                if (result < 0)
+                {
+                    applyDateFrom = date1.Date;
+                    applyDateTo = date2.Date;
+                }
+                else if (result == 0)
+                {
+                    applyDateFrom = date1.Date;
+                    applyDateTo = date1.Date;
+                }
+                else
+                {
+                    applyDateFrom = date2.Date;
+                    applyDateTo = date1.Date;
+                }
+            }
+            else if (qtyDate1 == null && qtyDate2 != null)
+            {
+                applyDateFrom = DateTime.Parse(qtyDate2);
+                applyDateTo = DateTime.Parse(qtyDate2);
+            }
+            else if (qtyDate1 != null && qtyDate2 == null)
+            {
+                applyDateFrom = DateTime.Parse(qtyDate1);
+                applyDateTo = DateTime.Parse(qtyDate1);
+            }
+
+
+            List<KeepSearchListViewModel> kv = new List<KeepSearchListViewModel>();
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            // 依照院區搜尋Keep主檔
+            var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
+            var keepFlows = _context.BMEDKeepFlows.AsQueryable();
+            var keepDtls = _context.BMEDKeepDtls.AsQueryable();
+            if (!string.IsNullOrEmpty(docid))   //表單編號
+            {
+                docid = docid.Trim();
+                kps = kps.Where(v => v.DocId == docid);
+            }
+            if (!string.IsNullOrEmpty(ano))     //財產編號
+            {
+                kps = kps.Where(v => v.AssetNo == ano);
+            }
+            if (!string.IsNullOrEmpty(dptid))   //所屬部門編號
+            {
+                kps = kps.Where(v => v.DptId == dptid);
+            }
+            if (!string.IsNullOrEmpty(acc))     //成本中心
+            {
+                kps = kps.Where(v => v.AccDpt == acc);
+            }
+            if (!string.IsNullOrEmpty(aname))   //財產名稱
+            {
+                kps = kps.Where(v => v.AssetName != null)
+                         .Where(v => v.AssetName.Contains(aname));
+            }
+            if (!string.IsNullOrEmpty(qtyTicketNo))   //發票號碼
+            {
+                qtyTicketNo = qtyTicketNo.ToUpper();
+                var resultDocIds = _context.BMEDKeepCosts.Include(kc => kc.TicketDtl)
+                                                         .Where(kc => kc.TicketDtl.TicketDtlNo == qtyTicketNo)
+                                                         .Select(kc => kc.DocId).Distinct();
+                kps = (from k in kps
+                       where resultDocIds.Any(val => k.DocId.Contains(val))
+                       select k);
+            }
+            if (!string.IsNullOrEmpty(qtyVendor))   //廠商關鍵字
+            {
+                var resultDocIds = _context.BMEDKeepCosts.Include(kc => kc.TicketDtl)
+                                                         .Where(kc => kc.VendorName.Contains(qtyVendor))
+                                                         .Select(kc => kc.DocId).Distinct();
+                kps = (from k in kps
+                       where resultDocIds.Any(val => k.DocId.Contains(val))
+                       select k);
+            }
+            if (!string.IsNullOrEmpty(qtyEngCode))     //負責工程師
+            {
+                kps = kps.Where(v => v.EngId == Convert.ToInt32(qtyEngCode));
+            }
+            /* Search date by DateType.(ApplyDate) */
+            if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false) //送單日
+            {
+                if (qtyDateType == "送單日")
+                {
+                    kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(ftype))   //流程狀態
+            {
+                switch (ftype)
+                {
+                    case "未結案":
+                        keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "?");
+                        break;
+                    case "已結案":
+                        keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "2");
+                        break;
+                }
+            }
+            else
+            {
+                keepFlows = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2");
+            }
+            if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
+            {
+                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
+                                     .Select(group => group.Last());
+            }
+
+            /* If no search result. */
+            if (kps.Count() == 0)
+            {
+                return kv;
+            }
+
+            kps.Join(keepFlows, k => k.DocId, f => f.DocId,
+                (k, f) => new
+                {
+                    keep = k,
+                    flow = f
+                })
+                .Join(_context.BMEDKeepDtls, m => m.keep.DocId, d => d.DocId,
+                (m, d) => new
+                {
+                    keep = m.keep,
+                    flow = m.flow,
+                    keepdtl = d
+                })
+                .Join(_context.Departments, j => j.keep.AccDpt, d => d.DptId,
+                (j, d) => new
+                {
+                    keep = j.keep,
+                    flow = j.flow,
+                    keepdtl = j.keepdtl,
+                    dpt = d
+                }).ToList()
+                .ForEach(j => kv.Add(new KeepSearchListViewModel
+                {
+                    DocType = "保養",
+                    DocId = j.keep.DocId,
+                    AssetNo = j.keep.AssetNo,
+                    AssetName = j.keep.AssetName,
+                    //Brand = j.asset.Brand,
+                    //Type = j.asset.Type,
+                    PlaceLoc = j.keep.PlaceLoc,
+                    ApplyDpt = j.keep.DptId,
+                    AccDpt = j.keep.AccDpt,
+                    AccDptName = j.dpt.Name_C,
+                    Result = (j.keepdtl.Result == null || j.keepdtl.Result == 0) ? "" : _context.BMEDKeepResults.Find(j.keepdtl.Result).Title,
+                    InOut = j.keepdtl.InOut == "0" ? "自行" :
+                    j.keepdtl.InOut == "1" ? "委外" :
+                    j.keepdtl.InOut == "2" ? "租賃" :
+                    j.keepdtl.InOut == "3" ? "保固" : "",
+                    Memo = j.keepdtl.Memo,
+                    Cost = j.keepdtl.Cost,
+                    Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
+                    Flg = j.flow.Status,
+                    FlowUid = j.flow.UserId,
+                    FlowCls = j.flow.Cls,
+                    FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
+                    Src = j.keep.Src,
+                    SentDate = j.keep.SentDate,
+                    EndDate = j.keepdtl.EndDate,
+                    CloseDate = j.keepdtl.CloseDate,
+                    IsCharged = j.keepdtl.IsCharged,
+                    keepdata = j.keep
+                }));
+            /* 設備編號"有"、"無"的對應，"有"讀取table相關data，"無"只顯示申請人輸入的設備名稱 */
+            foreach (var item in kv)
+            {
+                if (item.AssetNo != null)
+                {
+                    var asset = _context.BMEDAssets.Where(a => a.AssetNo == item.AssetNo).FirstOrDefault();
+                    if (asset != null)
+                    {
+                        item.AssetNo = asset.AssetNo;
+                        item.AssetName = asset.Cname;
+                        item.Brand = asset.Brand;
+                        item.Type = asset.Type;
+                    }
+                }
+            }
+            /* Search date by DateType. */
+            if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false)
+            {
+                if (qtyDateType == "結案日")
+                {
+                    kv = kv.Where(v => v.CloseDate >= applyDateFrom && v.CloseDate <= applyDateTo).ToList();
+                }
+                else if (qtyDateType == "完工日")
+                {
+                    kv = kv.Where(v => v.EndDate >= applyDateFrom && v.EndDate <= applyDateTo).ToList();
+                }
+            }
+
+            /* Sorting search result. */
+            if (kv.Count() != 0)
+            {
+                if (qtyDateType == "結案日")
+                {
+                    kv = kv.OrderByDescending(r => r.CloseDate).ThenByDescending(r => r.DocId).ToList();
+                }
+                else if (qtyDateType == "完工日")
+                {
+                    kv = kv.OrderByDescending(r => r.EndDate).ThenByDescending(r => r.DocId).ToList();
+                }
+                else
+                {
+                    kv = kv.OrderByDescending(r => r.SentDate).ThenByDescending(r => r.DocId).ToList();
+                }
+            }
+
+            /* Search Keep InOut. */
+            if (!string.IsNullOrEmpty(qtyInOut))
+            {
+                kv = kv.Where(k => k.InOut == qtyInOut).ToList();
+            }
+            /* Search KeepResults. */
+            if (!string.IsNullOrEmpty(qtyKeepResult))
+            {
+                kv = kv.Where(r => r.Result == _context.BMEDKeepResults.Find(Convert.ToInt32(qtyKeepResult)).Title).ToList();
+            }
+            /* Search IsCharged. */
+            if (!string.IsNullOrEmpty(qtyIsCharged))
+            {
+                kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
+            }
+            //
+           
+            return kv;
+            //return View("KeepQryList", kv);
+        }
+        public IActionResult QryKeepListExcel(QryKeepListData qdata)
+        {
+            
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("表單編號");
+            dt.Columns.Add("申請日期");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("財產編號");
+            dt.Columns.Add("儀器名稱");
+            dt.Columns.Add("放置地點");
+            dt.Columns.Add("保養方式");
+            dt.Columns.Add("保養結果");
+            dt.Columns.Add("保養描述");
+            dt.Columns.Add("文件狀態");
+            dt.Columns.Add("關卡人員");
+
+            List<KeepSearchListViewModel> mv = GetKeepQryData(qdata);
+            
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.DocId;
+                dw[1] = m.SentDate;
+                dw[2] = m.AccDptName;
+                dw[3] = m.AssetNo;
+                dw[4] = m.AssetName;
+                dw[5] = m.PlaceLoc;
+                dw[6] = m.InOut;
+                dw[7] = m.Result;
+                dw[8] = m.Memo;
+                dw[9] = m.Flg == "?" ? "未結案" : "已結案";
+                dw[10] = m.FlowUidName;
+        
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("全院保養查詢清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "全院保養查詢清單.xlsx"
+            );
         }
 
         /// <summary>
