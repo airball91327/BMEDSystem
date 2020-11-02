@@ -208,7 +208,8 @@
         </tr>
         @{
             var role = "";
-            if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin"))
+            if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                UserManager.IsInRole(User, "MedAssetMgr"))
             {
                 role = "admin";
             }

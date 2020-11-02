@@ -3347,11 +3347,11 @@ namespace EDIS.Areas.BMED.Controllers
             List<DepartmentModel> departments = null;
             if (location == "總院")
             {
-                departments = departments.Where(d => d.Loc == "C" || d.Loc == "P" || d.Loc == "K").ToList();
+                departments = _context.Departments.Where(d => d.Loc == "C" || d.Loc == "P" || d.Loc == "K").ToList();
             }
             else
             {
-                departments = departments.Where(d => d.Loc == location).ToList();
+                departments = _context.Departments.Where(d => d.Loc == location).ToList();
             }
             return departments;
         }
