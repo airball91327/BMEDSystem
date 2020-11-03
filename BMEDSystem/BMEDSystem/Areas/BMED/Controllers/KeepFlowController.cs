@@ -111,12 +111,14 @@ namespace EDIS.Areas.BMED.Controllers
                     kf.Rtp = ur.Id;
                     _context.Entry(kf).State = EntityState.Modified;
                     _context.Entry(kd).State = EntityState.Modified;
-
-                    //sync to oracleBatch
-                    string smsg = SyncToOracleBatch(assign.DocId);
-                    //if (smsg == "1")
-                    //    throw new Exception("同步OracleBatch失敗!");
-
+                    KeepModel keep = _context.BMEDKeeps.Find(assign.DocId);
+                    if (keep.Loc == "總院" || keep.Loc == "K")
+                    {
+                        //sync to oracleBatch
+                        string smsg = SyncToOracleBatch(assign.DocId);
+                        //if (smsg == "1")
+                        //    throw new Exception("同步OracleBatch失敗!");
+                    }
                     // Save stock to ERP system.
                     if (keepDtl.NotInExceptDevice == "Y" && keepDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
@@ -134,7 +136,7 @@ namespace EDIS.Areas.BMED.Controllers
                     string body = "";
                     string sto = "";
                     AppUserModel u;
-                    KeepModel keep = _context.BMEDKeeps.Find(assign.DocId);
+                    
                     mail.from = new System.Net.Mail.MailAddress(ur.Email); //u.Email
                     _context.BMEDKeepFlows.Where(f => f.DocId == assign.DocId)
                             .ToList()
