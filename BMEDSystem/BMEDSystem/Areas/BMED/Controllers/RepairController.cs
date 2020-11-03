@@ -1267,6 +1267,14 @@ namespace EDIS.Areas.BMED.Controllers
                             {
                                 engineer = _context.AppUsers.Find(eid.EngId);
                             }
+                            else
+                            {
+                                eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
+                                if (eid != null)
+                                {
+                                    engineer = _context.AppUsers.Find(eid.EngId);
+                                }
+                            }
                         }
                         else   //設備無保管部門
                         {
@@ -2318,7 +2326,7 @@ namespace EDIS.Areas.BMED.Controllers
             string sv = qryVendor.Body.GetVendorResult;
             List<ERPVendors> qryVendors = JsonConvert.DeserializeObject<List<ERPVendors>>(sv);
             var qryVendorId = "";
-            if (qryVendors.Count() > 0)
+            if (qryVendors.Count() > 0 && !string.IsNullOrEmpty(vuniteno))
             {
                 qryVendorId = qryVendors.FirstOrDefault().CUS_NO;
             }
