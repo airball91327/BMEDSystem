@@ -1267,6 +1267,14 @@ namespace EDIS.Areas.BMED.Controllers
                             {
                                 engineer = _context.AppUsers.Find(eid.EngId);
                             }
+                            else
+                            {
+                                eid = _context.EngsInDpts.Where(e => e.AccDptId == usr.DptId).FirstOrDefault();
+                                if (eid != null)
+                                {
+                                    engineer = _context.AppUsers.Find(eid.EngId);
+                                }
+                            }
                         }
                         else   //設備無保管部門
                         {
@@ -2280,7 +2288,7 @@ namespace EDIS.Areas.BMED.Controllers
             string pname = fm["qtyPRODUCTNAME"];
             string vno = fm["qtyVUNITE"];
 
-            List<PrudoctVModel> pv = await GetERPProductsAsync(pno, pname);
+            List<PrudoctVModel> pv = await GetERPProductsAsync(pno, pname, vno);
             if (string.IsNullOrEmpty(pno) && string.IsNullOrEmpty(pname) && string.IsNullOrEmpty(vno))
             {
                 pv = pv.ToList();
@@ -2307,13 +2315,23 @@ namespace EDIS.Areas.BMED.Controllers
             return PartialView("ERPProductList", pv.ToPagedList(page, pageSize));
         }
 
-        private async Task<List<PrudoctVModel>> GetERPProductsAsync(string pno, string pname)
+        private async Task<List<PrudoctVModel>> GetERPProductsAsync(string pno, string pname, string vuniteno)
         {
             PrudoctVModel product;
             List<PrudoctVModel> productList = new List<PrudoctVModel>();
 
             ERPservicesSoapClient ERPWebServices = new ERPservicesSoapClient(ERPservicesSoapClient.EndpointConfiguration.ERPservicesSoap);
-            var objs = await ERPWebServices.GetProductAsync(pno, pname, "");
+            //
+            var qryVendor = await ERPWebServices.GetVendorAsync("", vuniteno, "");
+            string sv = qryVendor.Body.GetVendorResult;
+            List<ERPVendors> qryVendors = JsonConvert.DeserializeObject<List<ERPVendors>>(sv);
+            var qryVendorId = "";
+            if (qryVendors.Count() > 0 && !string.IsNullOrEmpty(vuniteno))
+            {
+                qryVendorId = qryVendors.FirstOrDefault().CUS_NO;
+            }
+
+            var objs = await ERPWebServices.GetProductAsync(pno, pname, qryVendorId);
             string s = objs.Body.GetProductResult;
             List<Prdts> PrdtsList = JsonConvert.DeserializeObject<List<Prdts>>(s);
             foreach (var item in PrdtsList)
@@ -2332,10 +2350,16 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     var objs2 = await ERPWebServices.GetVendorAsync(item.SUP1, "", "");
                     string s2 = objs2.Body.GetVendorResult;
-                    List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s2);
-                    var vendor = vendors.First();
-                    product.SUP1 = vendor.NAME;
-                    product.SUP1_UNI_NO = vendor.UNI_NO;
+                    if (!s2.Contains("無資料"))
+                    {
+                        List<ERPVendors> vendors = JsonConvert.DeserializeObject<List<ERPVendors>>(s2);
+                        var vendor = vendors.FirstOrDefault();
+                        if (vendor != null)
+                        {
+                            product.SUP1 = vendor.NAME;
+                            product.SUP1_UNI_NO = vendor.UNI_NO;
+                        }
+                    }
                 }
                 productList.Add(product);
             }

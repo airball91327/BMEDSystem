@@ -760,6 +760,7 @@ namespace EDIS.Areas.BMED.Controllers
                         var rtnMsg = objs["RtnMsg"].ToString().Replace(Environment.NewLine, "");
                         msg = "寫入ERP失敗!" + Environment.NewLine + "請將錯誤訊息【" + rtnMsg + "】告知ERP管理人員協助處理。";
                     }
+                    return msg;
                 }
                 msg = "無費用明細，寫入ERP失敗!";
                 return msg;
