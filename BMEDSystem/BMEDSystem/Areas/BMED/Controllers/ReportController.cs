@@ -1375,7 +1375,7 @@ namespace EDIS.Areas.BMED.Controllers
                 DealState = Convert.ToString(k.DealState),
                 EngNam = null,
                 ClsEmp = u.FullName + "(" + u.UserName + ")",
-                AssetClass = k.PlantClass
+                AssetClass = ""
             }).ToList();
             //
             foreach (UnSignListVModel s in sv)
@@ -1466,7 +1466,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = lk.Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+            //sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -1584,12 +1584,12 @@ namespace EDIS.Areas.BMED.Controllers
                     Uid = re.UserId,
                     Hour = rd.Hour,
                     InOut = rd.InOut,
-                    AssetClass = rd.PlantClass,
+                    AssetClass = "",
                     ApplyDate = rd.ApplyDate,
                     EndDate = rd.EndDate.Value,
                     AccDpt = rd.AccDpt
                 })
-            .Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
@@ -1993,7 +1993,7 @@ namespace EDIS.Areas.BMED.Controllers
                AccDptNam = k.k.Name_C,
                ApplyDate = k.k.ApplyDate,
                AssetNo = k.k.AssetNo == "000" ? "無財編" : k.k.AssetNo,
-               AssetNam = k.k.AssetNo == "000" ? k.k.AssetName : "",
+               AssetNam = k.k.AssetName,
                Cost = k.k.Cost,
                EndDate = k.k.EndDate,
                FailFactor = Convert.ToString(k.k.FailFactor),
@@ -2001,14 +2001,13 @@ namespace EDIS.Areas.BMED.Controllers
                DealState = Convert.ToString(k.k.DealState),
                InOut = k.k.InOut,
                TroubleDes = k.k.TroubleDes,
-               //Type = k.k.Type,
+               Type = "",
                EngNam = u.FullName,
-                //AssetClass = k.k.AssetClass,
-               AssetClass = k.k.PlantClass,
+               AssetClass = "",
                Hour = k.k.Hour,
                PlantClass = k.k.PlantClass
            })
-            .Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .ToList();
 
             if (!string.IsNullOrEmpty(v.AccDpt))
@@ -2742,7 +2741,6 @@ namespace EDIS.Areas.BMED.Controllers
                     rd.DocId,
                     r.AccDpt,
                     r.AssetNo,
-                    r.PlantClass
                 })
                 //.Join(_context.BMEDAssets, rd => rd.AssetNo, r => r.AssetNo,
                 //(rd, r) => new
@@ -2751,7 +2749,7 @@ namespace EDIS.Areas.BMED.Controllers
                 //    rd.AccDpt,
                 //    r.AssetClass
                 //})
-                .Where(r => r.PlantClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                //.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                 .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                 (rd, c) => new
                 {
@@ -3083,7 +3081,7 @@ namespace EDIS.Areas.BMED.Controllers
                 Price = k.Price,
                 TotalPrice = k.TotalCost,
                 EngNam = u.FullName,
-                AssetClass = k.PlantClass
+                AssetClass = ""
             }).ToList();
             //
             foreach (StokCostVModel s in sv)
@@ -3250,7 +3248,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+            //sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             sv = sv.GroupJoin(_context.BMEDDeptStocks, s => s.StokNo, d => d.StockNo,
                 (s, d) => new { s, d })
                 .SelectMany(k => k.d.DefaultIfEmpty(),
