@@ -1307,6 +1307,7 @@ namespace EDIS.Areas.BMED.Controllers
                 k.AccDpt,
                 k.ApplyDate,
                 k.AssetNo,
+                k.AssetName,
                 rd.Cost,
                 rd.EndDate,
                 rd.CloseDate,
@@ -1315,26 +1316,26 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.DealState,
                 k.TroubleDes
             }).Where(k => k.ApplyDate >= v.Sdate && k.ApplyDate <= v.Edate)
-            .Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
-            (k, at) => new
-            {
-                k.DocId,
-                k.UserId,
-                k.Cls,
-                k.AccDpt,
-                k.ApplyDate,
-                k.AssetNo,
-                at.Cname,
-                k.Cost,
-                k.EndDate,
-                k.CloseDate,
-                k.TroubleDes,
-                k.FailFactor,
-                k.DealDes,
-                k.DealState,
-                at.Type,
-                at.AssetClass
-            })
+            //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
+            //(k, at) => new
+            //{
+            //    k.DocId,
+            //    k.UserId,
+            //    k.Cls,
+            //    k.AccDpt,
+            //    k.ApplyDate,
+            //    k.AssetNo,
+            //    at.Cname,
+            //    k.Cost,
+            //    k.EndDate,
+            //    k.CloseDate,
+            //    k.TroubleDes,
+            //    k.FailFactor,
+            //    k.DealDes,
+            //    k.DealState,
+            //    at.Type,
+            //    at.AssetClass
+            //})
              .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
             (k, c) => new
             {
@@ -1344,7 +1345,7 @@ namespace EDIS.Areas.BMED.Controllers
                 k.AccDpt,
                 k.ApplyDate,
                 k.AssetNo,
-                k.Cname,
+                k.AssetName,
                 k.Cost,
                 k.EndDate,
                 k.CloseDate,
@@ -1352,8 +1353,6 @@ namespace EDIS.Areas.BMED.Controllers
                 k.FailFactor,
                 k.DealDes,
                 k.DealState,
-                k.Type,
-                k.AssetClass,
                 c.Name_C
             })
             .Join(_context.AppUsers, k => k.UserId, u => u.Id,
@@ -1364,8 +1363,8 @@ namespace EDIS.Areas.BMED.Controllers
                 AccDpt = k.AccDpt,
                 AccDptNam = k.Name_C,
                 AssetNo = k.AssetNo,
-                AssetName = k.Cname,
-                Type = k.Type,
+                AssetName = k.AssetName,
+                Type = "",
                 ApplyDate = k.ApplyDate,
                 EndDate = k.EndDate,
                 TroubleDes = k.TroubleDes,
@@ -1374,7 +1373,7 @@ namespace EDIS.Areas.BMED.Controllers
                 DealState = Convert.ToString(k.DealState),
                 EngNam = null,
                 ClsEmp = u.FullName + "(" + u.UserName + ")",
-                AssetClass = k.AssetClass
+                AssetClass = ""
             }).ToList();
             //
             foreach (UnSignListVModel s in sv)
@@ -1465,7 +1464,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = lk.Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+            //sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -1553,17 +1552,19 @@ namespace EDIS.Areas.BMED.Controllers
                     r.ApplyDate,
                     r.AccDpt,
                     r.AssetNo
-                }).Join(_context.BMEDAssets, k => k.AssetNo, c => c.AssetNo,
-                (k, c) => new
-                {
-                    k.DocId,
-                    k.Hour,
-                    k.EndDate,
-                    k.InOut,
-                    k.ApplyDate,
-                    k.AccDpt,
-                    c.AssetClass
-                }).Join(_context.Departments, k => k.AccDpt, c => c.DptId,
+                })
+                //.Join(_context.BMEDAssets, k => k.AssetNo, c => c.AssetNo,
+                //(k, c) => new
+                //{
+                //    k.DocId,
+                //    k.Hour,
+                //    k.EndDate,
+                //    k.InOut,
+                //    k.ApplyDate,
+                //    k.AccDpt,
+                //    c.AssetClass
+                //})
+                .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
             (k, c) => new
             {
                 k.DocId,
@@ -1571,7 +1572,7 @@ namespace EDIS.Areas.BMED.Controllers
                 k.EndDate,
                 k.InOut,
                 k.ApplyDate,
-                k.AssetClass,
+                //k.AssetClass,
                 k.AccDpt
             }).Join(_context.BMEDRepairEmps, rd => rd.DocId, re => re.DocId,
                 (rd, re) => new UserHour
@@ -1579,11 +1580,13 @@ namespace EDIS.Areas.BMED.Controllers
                     Uid = re.UserId,
                     Hour = rd.Hour,
                     InOut = rd.InOut,
-                    AssetClass = rd.AssetClass,
+                    AssetClass = "",
                     ApplyDate = rd.ApplyDate,
                     EndDate = rd.EndDate.Value,
                     AccDpt = rd.AccDpt
-                }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+                })
+            //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            .ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -1908,27 +1911,27 @@ namespace EDIS.Areas.BMED.Controllers
                rd.Hour,
                k.PlantClass
            })
-           .Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
-           (k, at) => new
-           {
-               k.DocId,
-               k.AccDpt,
-               k.ApplyDate,
-               k.AssetNo,
-               at.Cname,
-               k.Cost,
-               k.EndDate,
-               k.TroubleDes,
-               k.FailFactor,
-               k.DealDes,
-               k.DealState,
-               k.InOut,
-               at.Type,
-               at.AssetClass,
-               k.AssetName,
-               k.Hour,
-               k.PlantClass
-           })
+           //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
+           //(k, at) => new
+           //{
+           //    k.DocId,
+           //    k.AccDpt,
+           //    k.ApplyDate,
+           //    k.AssetNo,
+           //    at.Cname,
+           //    k.Cost,
+           //    k.EndDate,
+           //    k.TroubleDes,
+           //    k.FailFactor,
+           //    k.DealDes,
+           //    k.DealState,
+           //    k.InOut,
+           //    at.Type,
+           //    at.AssetClass,
+           //    k.AssetName,
+           //    k.Hour,
+           //    k.PlantClass
+           //})
            .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
            (k, c) => new
            {
@@ -1937,7 +1940,7 @@ namespace EDIS.Areas.BMED.Controllers
                c.Name_C,
                ApplyDate = k.ApplyDate,
                k.AssetNo,
-               k.Cname,
+               //k.Cname,
                Cost = k.Cost,
                EndDate = k.EndDate,
                k.FailFactor,
@@ -1945,8 +1948,8 @@ namespace EDIS.Areas.BMED.Controllers
                k.DealDes,
                k.DealState,
                k.InOut,
-               k.Type,
-               k.AssetClass,
+               //k.Type,
+               //k.AssetClass,
                k.AssetName,
                k.Hour,
                k.PlantClass
@@ -1961,7 +1964,7 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.Name_C,
                k.k.ApplyDate,
                k.k.AssetNo,
-               k.k.Cname,
+               //k.k.Cname,
                k.k.Cost,
                k.k.EndDate,
                k.k.TroubleDes,
@@ -1969,8 +1972,8 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.DealDes,
                k.k.DealState,
                k.k.InOut,
-               k.k.Type,
-               k.k.AssetClass,
+               //k.k.Type,
+               //k.k.AssetClass,
                ke.UserId,
                k.k.AssetName,
                k.k.Hour,
@@ -1986,7 +1989,7 @@ namespace EDIS.Areas.BMED.Controllers
                AccDptNam = k.k.Name_C,
                ApplyDate = k.k.ApplyDate,
                AssetNo = k.k.AssetNo == "000" ? "無財編" : k.k.AssetNo,
-               AssetNam = k.k.AssetNo == "000" ? k.k.AssetName : k.k.Cname,
+               AssetNam = k.k.AssetNo == "000" ? k.k.AssetName : "",
                Cost = k.k.Cost,
                EndDate = k.k.EndDate,
                FailFactor = Convert.ToString(k.k.FailFactor),
@@ -1994,12 +1997,14 @@ namespace EDIS.Areas.BMED.Controllers
                DealState = Convert.ToString(k.k.DealState),
                InOut = k.k.InOut,
                TroubleDes = k.k.TroubleDes,
-               Type = k.k.Type,
+               //Type = k.k.Type,
                EngNam = u.FullName,
-               AssetClass = k.k.AssetClass,
+               //AssetClass = k.k.AssetClass,
                Hour = k.k.Hour,
                PlantClass = k.k.PlantClass
-           }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+           })
+            //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            .ToList();
 
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -2077,27 +2082,28 @@ namespace EDIS.Areas.BMED.Controllers
                k.AccDpt,
                k.SentDate,
                k.AssetNo,
+               k.AssetName,
                k.Cycle,
                rd.Cost,
                rd.EndDate,
                rd.Memo,
                rd.InOut
            })
-           .Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
-           (k, at) => new
-           {
-               k.DocId,
-               k.AccDpt,
-               k.SentDate,
-               k.AssetNo,
-               at.Cname,
-               k.Cycle,
-               k.Cost,
-               k.EndDate,
-               k.Memo,
-               k.InOut,
-               at.AssetClass
-           })
+           //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
+           //(k, at) => new
+           //{
+           //    k.DocId,
+           //    k.AccDpt,
+           //    k.SentDate,
+           //    k.AssetNo,
+           //    at.Cname,
+           //    k.Cycle,
+           //    k.Cost,
+           //    k.EndDate,
+           //    k.Memo,
+           //    k.InOut,
+           //    at.AssetClass
+           //})
            .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
            (k, c) => new
            {
@@ -2106,13 +2112,14 @@ namespace EDIS.Areas.BMED.Controllers
                c.Name_C,
                SentDate = k.SentDate.Value,
                k.AssetNo,
-               k.Cname,
+               //k.Cname,
                k.Cycle,
                Cost = k.Cost == null ? 0 : k.Cost.Value,
                EndDate = k.EndDate.Value,
                k.Memo,
                k.InOut,
-               k.AssetClass
+               k.AssetName
+               //k.AssetClass
            })
            .GroupJoin(_context.BMEDKeepEmps, k => k.DocId, ke => ke.DocId,
             (k, ke) => new { k, ke })
@@ -2124,13 +2131,14 @@ namespace EDIS.Areas.BMED.Controllers
                 k.k.Name_C,
                 k.k.SentDate,
                 k.k.AssetNo,
-                k.k.Cname,
+                k.k.AssetName,
+                //k.k.Cname,
                 k.k.Cycle,
                 k.k.Cost,
                 k.k.EndDate,
                 k.k.Memo,
                 k.k.InOut,
-                k.k.AssetClass,
+                //k.k.AssetClass,
                 ke.UserId
             })
             .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
@@ -2143,15 +2151,17 @@ namespace EDIS.Areas.BMED.Controllers
                 AccDptNam = k.k.Name_C,
                 SentDate = k.k.SentDate,
                 AssetNo = k.k.AssetNo,
-                AssetNam = k.k.Cname,
+                AssetNam = k.k.AssetName,
                 Cycle = k.k.Cycle,
                 Cost = k.k.Cost,
                 EndDate = k.k.EndDate,
                 DealDes = k.k.Memo,
                 InOut = k.k.InOut,
-                AssetClass = k.k.AssetClass,
+                AssetClass = "",
                 EngNam = u.FullName
-            }).Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList()
+            })
+            //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            .ToList()
             .ForEach(m =>
             {
                 switch (m.InOut)
@@ -2727,13 +2737,15 @@ namespace EDIS.Areas.BMED.Controllers
                     rd.DocId,
                     r.AccDpt,
                     r.AssetNo
-                }).Join(_context.BMEDAssets, rd => rd.AssetNo, r => r.AssetNo,
-                (rd, r) => new
-                {
-                    rd.DocId,
-                    rd.AccDpt,
-                    r.AssetClass
-                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                })
+                //.Join(_context.BMEDAssets, rd => rd.AssetNo, r => r.AssetNo,
+                //(rd, r) => new
+                //{
+                //    rd.DocId,
+                //    rd.AccDpt,
+                //    r.AssetClass
+                //})
+                //.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                 .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                 (rd, c) => new
                 {
@@ -2760,13 +2772,15 @@ namespace EDIS.Areas.BMED.Controllers
                     rd.DocId,
                     r.AccDpt,
                     r.AssetNo
-                }).Join(_context.BMEDAssets, rd => rd.AssetNo, r => r.AssetNo,
-                (rd, r) => new
-                {
-                    rd.DocId,
-                    rd.AccDpt,
-                    r.AssetClass
-                }).Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                })
+                //.Join(_context.BMEDAssets, rd => rd.AssetNo, r => r.AssetNo,
+                //(rd, r) => new
+                //{
+                //    rd.DocId,
+                //    rd.AccDpt,
+                //    r.AssetClass
+                //})
+                //.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                 .Join(_context.Departments, rd => rd.AccDpt, c => c.DptId,
                 (rd, c) => new
                 {
@@ -2938,6 +2952,7 @@ namespace EDIS.Areas.BMED.Controllers
                 k.AccDpt,
                 k.ApplyDate,
                 k.AssetNo,
+                k.AssetName,
                 rd.Cost,
                 rd.EndDate,
                 rd.CloseDate,
@@ -2945,23 +2960,23 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.DealDes,
                 k.TroubleDes
             })
-            .Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
-            (k, at) => new
-            {
-                k.DocId,
-                k.AccDpt,
-                k.ApplyDate,
-                k.AssetNo,
-                at.Cname,
-                k.Cost,
-                k.EndDate,
-                k.CloseDate,
-                k.FailFactor,
-                k.TroubleDes,
-                k.DealDes,
-                at.Type,
-                at.AssetClass
-            })
+            //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
+            //(k, at) => new
+            //{
+            //    k.DocId,
+            //    k.AccDpt,
+            //    k.ApplyDate,
+            //    k.AssetNo,
+            //    at.Cname,
+            //    k.Cost,
+            //    k.EndDate,
+            //    k.CloseDate,
+            //    k.FailFactor,
+            //    k.TroubleDes,
+            //    k.DealDes,
+            //    at.Type,
+            //    at.AssetClass
+            //})
             .GroupJoin(_context.BMEDRepairCosts, k => k.DocId, rc => rc.DocId,
             (k, rc) => new { k, rc })
             .SelectMany(oi => oi.rc.DefaultIfEmpty(),
@@ -2971,15 +2986,16 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.AccDpt,
                k.k.ApplyDate,
                k.k.AssetNo,
-               k.k.Cname,
+               k.k.AssetName,
+               //k.k.Cname,
                k.k.Cost,
                k.k.EndDate,
                k.k.CloseDate,
                k.k.FailFactor,
                k.k.TroubleDes,
                k.k.DealDes,
-               k.k.Type,
-               k.k.AssetClass,
+               //k.k.Type,
+               //k.k.AssetClass,
                PartNo = rc.PartNo != null ? rc.PartNo : "",
                PartNam = rc.PartName != null ? rc.PartName : "",
                Qty = rc.Qty != null ? rc.Qty : 0,
@@ -2993,17 +3009,18 @@ namespace EDIS.Areas.BMED.Controllers
                 k.AccDpt,
                 k.ApplyDate,
                 k.AssetNo,
-                k.Cname,
+                k.AssetName,
+                //k.Cname,
                 k.Cost,
                 k.EndDate,
                 k.CloseDate,
                 k.FailFactor,
                 k.TroubleDes,
                 k.DealDes,
-                k.Type,
+                //k.Type,
                 k.PartNo,
                 k.PartNam,
-                k.AssetClass,
+                //k.AssetClass,
                 k.Qty,
                 k.Price,
                 k.TotalCost,
@@ -3016,17 +3033,18 @@ namespace EDIS.Areas.BMED.Controllers
                 k.AccDpt,
                 k.ApplyDate,
                 k.AssetNo,
-                k.Cname,
+                k.AssetName,
+                //k.Cname,
                 k.Cost,
                 k.EndDate,
                 k.CloseDate,
                 k.FailFactor,
                 k.TroubleDes,
                 k.DealDes,
-                k.Type,
+                //k.Type,
                 k.PartNo,
                 k.PartNam,
-                k.AssetClass,
+                //k.AssetClass,
                 k.Qty,
                 k.Price,
                 k.TotalCost,
@@ -3041,8 +3059,8 @@ namespace EDIS.Areas.BMED.Controllers
                 AccDpt = k.AccDpt,
                 AccDptNam = k.Name_C,
                 AssetNo = k.AssetNo,
-                AssetNam = k.Cname,
-                Type = k.Type,
+                AssetNam = k.AssetName,
+                Type = "",
                 ApplyDate = k.ApplyDate,
                 EndDate = k.EndDate,
                 CloseDate = k.CloseDate,
@@ -3055,7 +3073,7 @@ namespace EDIS.Areas.BMED.Controllers
                 Price = k.Price,
                 TotalPrice = k.TotalCost,
                 EngNam = u.FullName,
-                AssetClass = k.AssetClass
+                AssetClass = ""
             }).ToList();
             //
             foreach (StokCostVModel s in sv)
@@ -3073,28 +3091,29 @@ namespace EDIS.Areas.BMED.Controllers
                k.AccDpt,
                k.SentDate,
                k.AssetNo,
+               k.AssetName,
                rd.Cost,
                rd.EndDate,
                rd.CloseDate,
                rd.Result,
                k.Cycle
            })
-           .Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
-           (k, at) => new
-           {
-               k.DocId,
-               k.AccDpt,
-               k.SentDate,
-               k.AssetNo,
-               at.Cname,
-               k.Cost,
-               k.EndDate,
-               k.CloseDate,
-               k.Result,
-               k.Cycle,
-               at.Type,
-               at.AssetClass
-           })
+           //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
+           //(k, at) => new
+           //{
+           //    k.DocId,
+           //    k.AccDpt,
+           //    k.SentDate,
+           //    k.AssetNo,
+           //    at.Cname,
+           //    k.Cost,
+           //    k.EndDate,
+           //    k.CloseDate,
+           //    k.Result,
+           //    k.Cycle,
+           //    at.Type,
+           //    at.AssetClass
+           //})
             .GroupJoin(_context.BMEDKeepCosts, k => k.DocId, rc => rc.DocId,
             (k, rc) => new { k, rc })
             .SelectMany(oi => oi.rc.DefaultIfEmpty(),
@@ -3104,14 +3123,15 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.AccDpt,
                k.k.SentDate,
                k.k.AssetNo,
-               k.k.Cname,
+               k.k.AssetName,
+               //k.k.Cname,
                k.k.Cost,
                k.k.EndDate,
                k.k.CloseDate,
                k.k.Result,
                k.k.Cycle,
-               k.k.Type,
-               k.k.AssetClass,
+               //k.k.Type,
+               //k.k.AssetClass,
                PartNo = rc.PartNo != null ? rc.PartNo : "",
                PartNam = rc.PartName != null ? rc.PartName : "",
                Qty = rc.Qty != null ? rc.Qty : 0,
@@ -3125,19 +3145,20 @@ namespace EDIS.Areas.BMED.Controllers
                k.AccDpt,
                k.SentDate,
                k.AssetNo,
-               k.Cname,
+               k.AssetName,
+               //k.Cname,
                k.Cost,
                k.EndDate,
                k.CloseDate,
                k.Result,
                k.Cycle,
-               k.Type,
+               //k.Type,
                k.PartNo,
                k.PartNam,
                k.Qty,
                k.Price,
                k.TotalCost,
-               k.AssetClass,
+               //k.AssetClass,
                //c.GroupId,
                c.Name_C
            })
@@ -3150,20 +3171,21 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.AccDpt,
                k.k.SentDate,
                k.k.AssetNo,
-               k.k.Cname,
+               k.k.AssetName,
+               //k.k.Cname,
                k.k.Cost,
                k.k.EndDate,
                k.k.CloseDate,
                k.k.Result,
                k.k.Cycle,
-               k.k.Type,
+               //k.k.Type,
                k.k.PartNo,
                k.k.PartNam,
                k.k.Qty,
                k.k.Price,
                k.k.TotalCost,
                k.k.Name_C,
-               k.k.AssetClass,
+               //k.k.AssetClass,
                UserId = ke.UserId != null ? ke.UserId : 0
            })
            .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
@@ -3176,8 +3198,8 @@ namespace EDIS.Areas.BMED.Controllers
                AccDpt = k.k.AccDpt,
                AccDptNam = k.k.Name_C,
                AssetNo = k.k.AssetNo,
-               AssetNam = k.k.Cname,
-               Type = k.k.Type,
+               AssetNam = k.k.AssetName,
+               Type = "",
                ApplyDate = k.k.SentDate.Value,
                EndDate = k.k.EndDate,
                CloseDate = k.k.CloseDate,
@@ -3188,7 +3210,7 @@ namespace EDIS.Areas.BMED.Controllers
                Price = k.k.Price,
                TotalPrice = k.k.TotalCost,
                EngNam = u.Id != 0 ? u.FullName : "",
-               AssetClass = k.k.AssetClass
+               AssetClass = ""
            }).ToList();
             //
             foreach (StokCostVModel s in sv2)
@@ -3217,7 +3239,7 @@ namespace EDIS.Areas.BMED.Controllers
                     s.Cost = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
-            sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
+            //sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             sv = sv.GroupJoin(_context.BMEDDeptStocks, s => s.StokNo, d => d.StockNo,
                 (s, d) => new { s, d })
                 .SelectMany(k => k.d.DefaultIfEmpty(),
