@@ -1281,10 +1281,11 @@ namespace EDIS.Areas.BMED.Controllers
             }
             //
             List<UnSignListVModel> sv = new List<UnSignListVModel>();
+            List<UnSignListVModel> sv1 = new List<UnSignListVModel>();
             List<UnSignListVModel> sv2 = new List<UnSignListVModel>();
             TempData["qry"] = JsonConvert.SerializeObject(v); ;
 
-            sv = _context.BMEDRepairFlows.Where(f => f.Status == "?")
+            _context.BMEDRepairFlows.Where(f => f.Status == "?")
             .Join(_context.BMEDRepairDtls, f => f.DocId, rd => rd.DocId,
             (f, rd) => new
             {
@@ -1296,7 +1297,8 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.CloseDate,
                 rd.FailFactor,
                 rd.DealDes,
-                rd.DealState
+                rd.DealState,
+                rd.InOut
             })
             .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
             (rd, k) => new
@@ -1315,7 +1317,8 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.FailFactor,
                 rd.DealDes,
                 rd.DealState,
-                k.TroubleDes
+                k.TroubleDes,
+                rd.InOut
             }).Where(k => k.ApplyDate >= v.Sdate && k.ApplyDate <= v.Edate)
             //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
             //(k, at) => new
@@ -1355,45 +1358,69 @@ namespace EDIS.Areas.BMED.Controllers
                 k.FailFactor,
                 k.DealDes,
                 k.DealState,
+                k.InOut,
                 c.Name_C
-            })
-            .Join(_context.AppUsers, k => k.UserId, u => u.Id,
+            }).Join(_context.BMEDDealStatuses, k => k.DealState, s => s.Id,
+            (k, s) => new { k, title = s.Title })
+            .Join(_context.BMEDFailFactors, k => k.k.FailFactor, s => s.Id,
+            (k, s) => new { k = k.k, ff = s.Title, title = k.title})
+            .Join(_context.AppUsers, k => k.k.UserId, u => u.Id,
             (k, u) => new UnSignListVModel
             {
                 DocTyp = "請修",
-                DocId = k.DocId,
-                AccDpt = k.AccDpt,
-                AccDptNam = k.Name_C,
-                AssetNo = k.AssetNo,
-                AssetName = k.AssetName,
+                DocId = k.k.DocId,
+                AccDpt = k.k.AccDpt,
+                AccDptNam = k.k.Name_C,
+                AssetNo = k.k.AssetNo,
+                AssetName = k.k.AssetName,
                 Type = "",
-                ApplyDate = k.ApplyDate,
-                EndDate = k.EndDate,
-                TroubleDes = k.TroubleDes,
-                FailFactor = Convert.ToString(k.FailFactor),
-                DealDes = k.DealDes,
-                DealState = Convert.ToString(k.DealState),
+                ApplyDate = k.k.ApplyDate,
+                EndDate = k.k.EndDate,
+                TroubleDes = k.k.TroubleDes,
+                FailFactor = k.ff,
+                DealDes = k.k.DealDes,
+                DealState = k.title,
+                InOut = k.k.InOut,
                 EngNam = null,
                 ClsEmp = u.FullName + "(" + u.UserName + ")",
                 AssetClass = ""
-            }).ToList();
+            }).ToList()
+            .GroupJoin(_context.BMEDRepairEmps.Join(_context.AppUsers, b => b.UserId, u => u.Id, (b, u) => new { b, u}), u => u.DocId, p => p.b.DocId,
+            (u, p) => new { u, p}).SelectMany(x => x.p.DefaultIfEmpty(),
+            (o, g) => new { data = o.u, g})
+            .ToList()
+            .ForEach(y => {
+                y.data.EngNam = y.g == null ? "" : y.g.u.FullName;
+                sv1.Add(y.data);
+            });
+            sv1.GroupJoin(_context.BMEDRepairCosts.GroupBy(x => x.DocId).Select(x => new { docid = x.Key , cost = x.Sum(y => y.TotalCost)}),
+                s => s.DocId, c => c.docid, (s, c) => new { s, c }).SelectMany(x => x.c.DefaultIfEmpty(),
+                (o, g) => new { data = o.s, g }).ToList()
+                .ForEach( d => {
+                    d.data.Cost = d.g == null ? 0 : d.g.cost;
+                    sv.Add(d.data);
+                });
             //
-            foreach (UnSignListVModel s in sv)
-            {
-                RepairEmpModel kp = _context.BMEDRepairEmps.Where(p => p.DocId == s.DocId).ToList()
-                   .FirstOrDefault();
-                if (kp != null)
-                {
-                    s.EngNam = _context.AppUsers.Find(kp.UserId).FullName;
-                }
-                List<RepairCostModel> lk = _context.BMEDRepairCosts.Where(r => r.DocId == s.DocId).ToList();
-                if (lk != null)
-                    s.Cost = lk.Sum(r => r.TotalCost);
-            }
+            //foreach (UnSignListVModel s in sv)
+            //{
+            //    RepairEmpModel kp = _context.BMEDRepairEmps.Where(p => p.DocId == s.DocId).ToList()
+            //       .FirstOrDefault();
+            //    if (kp != null)
+            //    {
+            //        s.EngNam = _context.AppUsers.Find(kp.UserId).FullName;
+            //    }
+            //    List<RepairCostModel> lk = _context.BMEDRepairCosts.Where(r => r.DocId == s.DocId).ToList();
+            //    if (lk != null)
+            //        s.Cost = lk.Sum(r => r.TotalCost);
+            //}
             //保養
             string str = "";
             str += "SELECT '保養' AS DOCTYP,B.DOCID,B.ASSETNO, B.ASSETNAME,F.TYPE,B.SENTDATE AS APPLYDATE,(D.FULLNAME+'('+D.USERNAME+')')  AS CLSEMP,";
-            str += "B.ACCDPT,E.NAME_C AS ACCDPTNAM, C.ENDDATE, CONVERT(varchar, C.RESULT) AS DEALSTATE,C.INOUT, ";
+            str += "B.ACCDPT,E.NAME_C AS ACCDPTNAM, C.ENDDATE, ";// CONVERT(varchar, C.RESULT) AS DEALSTATE,C.INOUT, ";
+            str += "CASE C.RESULT WHEN 1 THEN '功能正常' WHEN 2 THEN '預防處理' WHEN 3 THEN '異常處理' WHEN 4 THEN '維修時保養' WHEN 5 THEN '退件' ";
+            str += "ELSE '' END AS DEALSTATE, ";
+            str += "CASE C.INOUT WHEN '0' THEN '自行' WHEN '1' THEN '委外' WHEN '2' THEN '租賃' WHEN '3'THEN '保固' WHEN '4' THEN '借用' ";
+            str += "ELSE '' END AS INOUT, ";
             str += "C.COST, G.KeepEngName AS ENGNAM, C.MEMO AS FAILFACTOR, CONVERT(varchar, B.CYCLE) AS TroubleDes, ";
             str += "C.MEMO AS DEALDES, F.ASSETCLASS ";
             str += "FROM BMEDKEEPFLOWS AS A JOIN BMEDKEEPS AS B ON A.DOCID = B.DOCID ";
@@ -1402,6 +1429,8 @@ namespace EDIS.Areas.BMED.Controllers
             str += "JOIN DEPARTMENTS AS E ON B.ACCDPT = E.DPTID "; ;
             str += "LEFT JOIN BMEDASSETS AS F ON B.AssetNo = F.AssetNo ";
             str += "LEFT JOIN BMEDASSETKEEPS AS G ON B.AssetNo = G.AssetNo ";
+            str += "LEFT JOIN BMEDKEEPEMPS AS H ON A.DOCID = H.DOCID ";
+            str += "LEFT JOIN APPUSERS AS U ON H.USERID = U.ID ";
             str += "WHERE A.STATUS = '?' AND (B.SENTDATE BETWEEN @D1 AND @D2) ";
             str += "AND B.LOC = @D3 ";
 
@@ -1409,62 +1438,62 @@ namespace EDIS.Areas.BMED.Controllers
                 new SqlParameter("D1", v.Sdate),
                 new SqlParameter("D2", v.Edate),
                 new SqlParameter("D3", urLocation)).ToList();
-            foreach (UnSignListVModel s in sv2)
-            {
-                switch (s.DealState)
-                {
-                    case "1":
-                        s.DealState = "功能正常";
-                        break;
-                    case "2":
-                        s.DealState = "預防處理";
-                        break;
-                    case "3":
-                        s.DealState = "異常處理";
-                        break;
-                    case "4":
-                        s.DealState = "維修時保養";
-                        break;
-                    case "5":
-                        s.DealState = "退件";
-                        break;
-                    default:
-                        s.DealState = "";
-                        break;
-                }
-                switch (s.InOut)
-                {
-                    case "0":
-                        s.InOut = "自行";
-                        break;
-                    case "1":
-                        s.InOut = "委外";
-                        break;
-                    case "2":
-                        s.InOut = "租賃";
-                        break;
-                    case "3":
-                        s.InOut = "保固";
-                        break;
-                    case "4":
-                        s.InOut = "借用";
-                        break;
-                    default:
-                        s.InOut = "";
-                        break;
-                }
-                s.TroubleDes = _context.BMEDKeeps.Find(s.DocId).Cycle.ToString();
-                s.FailFactor = "";
-                KeepEmpModel kp = _context.BMEDKeepEmps.Where(p => p.DocId == s.DocId).ToList()
-                    .FirstOrDefault();
-                if (kp != null)
-                {
-                    s.EngNam = _context.AppUsers.Find(kp.UserId).FullName;
-                }
-                List<KeepCostModel> lk = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).ToList();
-                if (lk != null)
-                    s.Cost = lk.Sum(r => r.TotalCost);
-            }
+            //foreach (UnSignListVModel s in sv2)
+            //{
+            //    switch (s.DealState)
+            //    {
+            //        case "1":
+            //            s.DealState = "功能正常";
+            //            break;
+            //        case "2":
+            //            s.DealState = "預防處理";
+            //            break;
+            //        case "3":
+            //            s.DealState = "異常處理";
+            //            break;
+            //        case "4":
+            //            s.DealState = "維修時保養";
+            //            break;
+            //        case "5":
+            //            s.DealState = "退件";
+            //            break;
+            //        default:
+            //            s.DealState = "";
+            //            break;
+            //    }
+            //    switch (s.InOut)
+            //    {
+            //        case "0":
+            //            s.InOut = "自行";
+            //            break;
+            //        case "1":
+            //            s.InOut = "委外";
+            //            break;
+            //        case "2":
+            //            s.InOut = "租賃";
+            //            break;
+            //        case "3":
+            //            s.InOut = "保固";
+            //            break;
+            //        case "4":
+            //            s.InOut = "借用";
+            //            break;
+            //        default:
+            //            s.InOut = "";
+            //            break;
+            //    }
+            //    s.TroubleDes = _context.BMEDKeeps.Find(s.DocId).Cycle.ToString();
+            //    s.FailFactor = "";
+            //    KeepEmpModel kp = _context.BMEDKeepEmps.Where(p => p.DocId == s.DocId).ToList()
+            //        .FirstOrDefault();
+            //    if (kp != null)
+            //    {
+            //        s.EngNam = _context.AppUsers.Find(kp.UserId).FullName;
+            //    }
+            //    List<KeepCostModel> lk = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).ToList();
+            //    if (lk != null)
+            //        s.Cost = lk.Sum(r => r.TotalCost);
+            //}
             sv.AddRange(sv2);
             //sv = sv.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
             //

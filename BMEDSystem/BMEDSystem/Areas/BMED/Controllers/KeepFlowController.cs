@@ -16,6 +16,7 @@ using EDIS.Areas.WebService.Models;
 using WebService;
 using System.Net.Http;
 using Newtonsoft.Json.Linq;
+using System.Net.Http.Headers;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -115,7 +116,7 @@ namespace EDIS.Areas.BMED.Controllers
                     if (keep.Loc == "總院" || keep.Loc == "K")
                     {
                         //sync to oracleBatch
-                        string smsg = SyncToOracleBatch(assign.DocId);
+                        string smsg = await SyncToOracleBatchAsync(assign.DocId);
                         //if (smsg == "1")
                         //    throw new Exception("同步OracleBatch失敗!");
                     }
@@ -772,22 +773,26 @@ namespace EDIS.Areas.BMED.Controllers
             }
         }
 
-        private string SyncToOracleBatch(string docid)
+        private async Task<string> SyncToOracleBatchAsync(string docid)
         {
             string responseString = "";
 
             using (var client = new HttpClient())
             {
-                string urlstr = "http://dms.cch.org.tw/CchWebApi/api/SyncBatch/KeepCloseCase";
-                urlstr += "?docid=" + docid;
-                var url = new Uri(urlstr, UriKind.Absolute);
-                //string json = JsonConvert.SerializeObject(apps);
-                //HttpContent contentPost = new StringContent(json);
-                //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                string urlstr = "";
+                //
+                UriBuilder builder = new UriBuilder("http://dms.cch.org.tw/CchWebApi2/api/SyncBatch/KeepCloseCase");
+                builder.Query = "docid=" + docid + "";
+                //
+                urlstr = "api/SyncBatch/KeepCloseCase?docid=" + docid;
+                //client.BaseAddress = new Uri("http://dms.cch.org.tw/CchWebApi2/");
+                client.DefaultRequestHeaders.Accept.Clear();
+                client.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
                 try
                 {
-                    var response = client.GetAsync(url); //
-                    responseString = response.Result.Content.ReadAsStringAsync().Result;
+                    var response = client.GetAsync(builder.Uri).Result; //
+                    response.EnsureSuccessStatusCode();
+                    responseString = await response.Content.ReadAsStringAsync();
                     var msg = JsonConvert.DeserializeObject<SystemMsg>(responseString);
                     return msg.MsgCode;
                 }

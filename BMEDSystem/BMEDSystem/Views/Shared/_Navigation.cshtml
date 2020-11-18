@@ -58,9 +58,9 @@
                                 <a href="@Url.Action("Create", "Keep", new { Area = "BMED" })">保養單</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                               UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                               UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                               UserManager.IsInRole(User, "MedToDo"))
+                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                              UserManager.IsInRole(User, "MedToDo"))
                             {
                                 <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                     <a href="@Url.Action("Create", "Delivery", new { Area = "BMED" })">驗收單</a>
@@ -73,9 +73,9 @@
                     </li>
 
                     @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                        UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                        UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                        UserManager.IsInRole(User, "MedToDo"))
+                       UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                       UserManager.IsInRole(User, "MedToDo"))
                     {
                         <li class="@Html.IsSelected(controller: "Budget", area: "BMED")">
                             <a href="@Url.Action("Index", "Budget", new { Area = "BMED" })"><i class="fa fa-money"></i><span class="nav-label">預算</span></a>
@@ -99,9 +99,11 @@
                             </li>
                         </ul>
                     </li>
-
                     <li class="">
-                        <a href="#"><i class="fa fa-download"></i><span class="nav-label">說明手冊下載</span><span class="fa arrow"></span></a>
+                        <a href="http://dms.cch.org.tw/MvcMedEngMgr/Manuals"><span class="nav-label">設備手冊查詢</span></a>
+                    </li>
+                    <li class="">
+                        <a href="#"><i class="fa fa-download"></i><span class="nav-label">系統操作手冊</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level collapse">
                             <li>
                                 <a href="~/Files/Manual/BMED_Rep_UserManual.pptx" target="_blank">一般版</a>
@@ -128,9 +130,9 @@
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })">設備保養排程年報</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                               UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                               UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
-                               UserManager.IsInRole(User, "DeviceMgr"))
+                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
+                              UserManager.IsInRole(User, "DeviceMgr"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })">月故障率統計表</a>

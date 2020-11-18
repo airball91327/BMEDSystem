@@ -973,7 +973,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return StatusCode(404);
             }
-            return View(repair);
+            return View("ViewOnePage",repair);
         }
 
         [HttpPost]
