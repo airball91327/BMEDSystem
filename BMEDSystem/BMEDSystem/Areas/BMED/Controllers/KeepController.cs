@@ -1031,7 +1031,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return StatusCode(404);
             }
-            return View(keep);
+            return View("ViewOnePage", keep);
         }
 
         // GET: BMED/Keep/GetKeepCounts

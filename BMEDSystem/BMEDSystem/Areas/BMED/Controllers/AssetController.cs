@@ -397,7 +397,9 @@ namespace EDIS.Areas.BMED.Controllers
             //
             if (asset.VendorId != null)
             {
-                asset.VendorName = _context.BMEDVendors.Where(v => v.VendorId == asset.VendorId).FirstOrDefault().VendorName;
+                var vendor = _context.BMEDVendors.Where(v => v.VendorId == asset.VendorId).FirstOrDefault();
+                if(vendor != null)
+                    asset.VendorName = vendor.VendorName;
             }
 
             return View(asset);
