@@ -16127,11 +16127,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectUniqueName": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "projectName": "EDIS",
-      "projectPath": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectPath": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "packagesPath": "C:\\Users\\PmDavid\\.nuget\\packages\\",
-      "outputPath": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+      "outputPath": "F:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\PmDavid\\AppData\\Roaming\\NuGet\\NuGet.Config",

@@ -30,7 +30,11 @@ namespace EDIS.Areas.BMED.Components.RepairCost
                 if (r.StockType == "0")
                     r.StockType = "庫存";
                 else if (r.StockType == "2")
+                {
                     r.StockType = "發票";
+                    if (r.IsPetty == "Y")
+                        r.StockType = "發票(零用金)";
+                }
                 else
                     r.StockType = "簽單";
                 //
