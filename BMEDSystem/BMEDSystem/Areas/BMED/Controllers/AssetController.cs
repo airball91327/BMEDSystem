@@ -294,9 +294,12 @@ namespace EDIS.Areas.BMED.Controllers
                     asset.DelivEmp = asset.DelivUid == null ? "" : _context.AppUsers.Find(asset.DelivUid).FullName;
                     asset.AssetEngName = asset.AssetEngId == 0 ? "" : _context.AppUsers.Find(asset.AssetEngId).FullName;
                     _context.BMEDAssets.Add(asset);
-                    AssetKeepModel ak = new AssetKeepModel();
-                    ak.AssetNo = asset.AssetNo;
-                    _context.BMEDAssetKeeps.Add(ak);
+                    if (_context.BMEDAssetKeeps.Find(asset.AssetNo) == null)
+                    {
+                        AssetKeepModel ak = new AssetKeepModel();
+                        ak.AssetNo = asset.AssetNo;
+                        _context.BMEDAssetKeeps.Add(ak);
+                    }
                     _context.SaveChanges();
                 }
                 catch (Exception e)
