@@ -112,14 +112,6 @@ namespace EDIS.Areas.BMED.Controllers
                     kf.Rtp = ur.Id;
                     _context.Entry(kf).State = EntityState.Modified;
                     _context.Entry(kd).State = EntityState.Modified;
-                    KeepModel keep = _context.BMEDKeeps.Find(assign.DocId);
-                    if (keep.Loc == "總院" || keep.Loc == "K")
-                    {
-                        //sync to oracleBatch
-                        string smsg = await SyncToOracleBatchAsync(assign.DocId);
-                        //if (smsg == "1")
-                        //    throw new Exception("同步OracleBatch失敗!");
-                    }
                     // Save stock to ERP system.
                     if (keepDtl.NotInExceptDevice == "Y" && keepDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
@@ -130,6 +122,14 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     _context.SaveChanges();
+                    KeepModel keep = _context.BMEDKeeps.Find(assign.DocId);
+                    if (keep.Loc == "總院" || keep.Loc == "K")
+                    {
+                        //sync to oracleBatch
+                        string smsg = await SyncToOracleBatchAsync(assign.DocId);
+                        //if (smsg == "1")
+                        //    throw new Exception("同步OracleBatch失敗!");
+                    }
 
                     //Send Mail
                     //To all users in this keep's flow.
@@ -641,7 +641,7 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var keep = _context.BMEDKeeps.Find(docId);
             ERPRepHead hd = new ERPRepHead();
-            hd.ZHANG_ID = "3";
+            hd.ZHANG_ID = "2";
             hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
@@ -727,7 +727,7 @@ namespace EDIS.Areas.BMED.Controllers
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
                             AMT = Convert.ToDecimal(stock.TotalCost),
-                            INV_CUS_NO = stock.VendorId == null ? null : ERPvendor.CUS_NO,
+                            INV_CUS_NO = stock.VendorId == null || stock.StockType == "0" ? null : ERPvendor.CUS_NO,
                             ISPAY = isPay,
                             TAX_ID = stock.TaxClass
                         });
@@ -781,7 +781,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 string urlstr = "";
                 //
-                UriBuilder builder = new UriBuilder("http://dms.cch.org.tw/CchWebApi2/api/SyncBatch/KeepCloseCase");
+                UriBuilder builder = new UriBuilder("http://dms.cch.org.tw/CchWebApi/api/SyncBatch/KeepCloseCase");
                 builder.Query = "docid=" + docid + "";
                 //
                 urlstr = "api/SyncBatch/KeepCloseCase?docid=" + docid;

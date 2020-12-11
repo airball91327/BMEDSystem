@@ -39,6 +39,8 @@ namespace EDIS.Models
         public string DelivDpt { get; set; }
         [Display(Name = "零件名稱")]
         public string StockName { get; set; }
+        [Display(Name = "工程師")]
+        public string EngId { get; set; }
     }
     //
     public class UserHour
@@ -138,26 +140,26 @@ namespace EDIS.Models
     //月故障率報表
     public class MonthFailRateVModel
     {
-        [Display(Name = "財產編號")]
-        public string AssetNo { get; set; }
-        [Display(Name = "中文名稱")]
-        public string Cname { get; set; }
+        //[Display(Name = "財產編號")]
+        //public string AssetNo { get; set; }
+        //[Display(Name = "中文名稱")]
+        //public string Cname { get; set; }
         [Display(Name = "單位代號")]
         public string CustId { get; set; }
         [Display(Name = "單位名稱")]
         public string CustNam { get; set; }
-        [Display(Name = "維修工時(分)")]
-        public decimal RepairMins { get; set; }
-        [Display(Name = "總工時(分)")]
-        public decimal TotalMins { get; set; }
+        //[Display(Name = "維修工時(分)")]
+        //public decimal RepairMins { get; set; }
+        //[Display(Name = "總工時(分)")]
+        //public decimal TotalMins { get; set; }
         [Display(Name = "故障率")]
         public string FailRate { get; set; }
         //[Display(Name = "廠牌")]
         //public string Brand { get; set; }
-        //[Display(Name = "設備件數")]
-        //public int PlantAmt { get; set; }
-        //[Display(Name = "月維修件數")]
-        //public int RepairAmt { get; set; }
+        [Display(Name = "設備件數")]
+        public int PlantAmt { get; set; }
+        [Display(Name = "維修件數")]
+        public int RepairAmt { get; set; }
 
 
         //public List<MonthFailRateVModel> GetList(string gid, DateTime sdate, DateTime edate, string cls)
@@ -260,6 +262,8 @@ namespace EDIS.Models
         public string Brand { get; set; }
         [Display(Name = "型號")]
         public string Type { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
         [Display(Name = "一月")]
         public string Jan { get; set; }
         [Display(Name = "二月")]
@@ -2603,6 +2607,10 @@ namespace EDIS.Models
         public string AccDptName { get; set; }
         [Display(Name = "存放地點")]
         public string LeaveSite { get; set; }
+        [Display(Name = "起始年月")]
+        public int? YYYMM { get; set; }
+        [Display(Name = "週期")]
+        public int? Cycle { get; set; }
         [Display(Name = "保固起始日")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
@@ -2617,6 +2625,8 @@ namespace EDIS.Models
         public string Edate { get; set; }
         [Display(Name = "備註")]
         public string Note { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
     }
     //成效指標
     public class EffectRatio

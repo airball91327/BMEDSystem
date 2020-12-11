@@ -6,4 +6,93 @@ https://go.microsoft.com/fwlink/?LinkID=208121.
   <PropertyGroup>
     <_PublishTargetUrl>C:\Users\user\Publish</_PublishTargetUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <File Include="wwwroot/js/BMED/AssetCreate.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/AssetEdit.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/AssetFileUpload.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/BudgetChoose.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/BuyNextFlow.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/DelivNextFlow.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/FileChoose.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/FileChoose2.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/FileChooseVendor.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/FileUpload3.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/jquery.form.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepCost.js">
+      <publishTime>12/01/2020 14:10:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepCostList.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepCreate.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepDtl.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepEmp.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepNextFlow.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/KeepRecordEdit.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/MutiFileUpload.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/QryVendor.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepairCost.js">
+      <publishTime>12/01/2020 14:03:59</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepairCostList.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepairDtl.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepairEmp.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepCreate.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/RepNextFlow.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/Report.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/TransToBuyEvaluate.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+    <File Include="wwwroot/js/BMED/VendorChoose.js">
+      <publishTime>09/29/2020 08:31:26</publishTime>
+    </File>
+  </ItemGroup>
 </Project>

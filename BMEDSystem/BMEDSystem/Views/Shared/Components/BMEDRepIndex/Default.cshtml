@@ -60,6 +60,11 @@
             if ($("#BMEDqtySearchAllDoc").is(':checked') == true) {
                 SearchAllDoc = true;
             }
+            $.Toast.showToast({
+                'title': '作業進行中，請稍待...',
+                'icon': 'loading',
+                'duration': 0
+            })
 
             $.ajax({
                 url: "@Url.Action("ExportToExcel", "Repair", new { Area = "BMED" })",
@@ -78,19 +83,28 @@
                     SearchAllDoc: SearchAllDoc,
                     EngCode: EngCode,
                     TicketNo: TicketNo,
-                    Vendor: Vendor,
-                },
-                success: function (response, textStatus, jqXHR) {
+                    Vendor: Vendor
+                }
+                @*success: function (response, textStatus, jqXHR) {
 
                     window.location.href = '@Url.Action("ExportToExcel", "Repair", new { Area = "BMED" })' + '?qtyDocId=' + DocId + '&qtyAssetNo=' + AssetNo
                         + '&qtyAccDpt=' + AccDpt + '&qtyAssetName=' + AssetName + '&qtyFlowType=' + FlowType + '&qtyDptId=' + DptId
                         + '&Date1=' + Date1 + '&Date2=' + Date2 + '&DealStatus=' + DealStatus + '&IsCharged=' + IsCharged
                         + '&DateType=' + DateType + '&SearchAllDoc=' + SearchAllDoc + '&EngCode=' + EngCode + '&TicketNo=' + TicketNo + '&Vendor=' + Vendor;
+                    $.Toast.hideToast();
                 },
                 error: function (xhr, status, error) {
+                    $.Toast.hideToast();
                     alert(error);
+                }*@
+            }).done(function (data) {
+                $.Toast.hideToast();
+               //接收返回的檔案路徑，此檔案這時已儲存到伺服器上了
+               if (data.fileName != "") {
+                  //通過呼叫 window.location.href 直接跳轉到下載 action 進行檔案下載操作
+                  window.location.href = "@Url.RouteUrl(new { Controller = "Excels", Action = "Download"})/?file=" + data.fileName;
                 }
-            });
+            });;
         });
     });
     function BMEDRepReSubmit() {

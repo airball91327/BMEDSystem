@@ -135,7 +135,7 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 {
                     if (repairDtl != null)
                     {
-                        if (repairDtl.IsCharged == "N")
+                        if (repairDtl.IsCharged == "N" && repairDtl.DealState != 4)
                         {
                             listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                         }
