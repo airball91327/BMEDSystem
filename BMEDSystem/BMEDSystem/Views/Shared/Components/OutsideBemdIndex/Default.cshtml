@@ -1,0 +1,228 @@
+﻿@model EDIS.Models.QryOsbListData
+@using EDIS.Models.Identity
+@using EDIS.Models
+
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+@{
+    var user = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+}
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+<script src="~/js/FORMS/OutsideBmedIndex.js" asp-append-version="true"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        $('.FORMScombobox').combobox();
+        //$("#BMEDrepSearchForm").submit();
+        /* Only first visit the page, will submit the form. */
+        var count = 0;
+        $('.nav-tabs a[href="#menu6"]').on('shown.bs.tab', function (event) {
+            if (count == 0) {
+                $("#FORMSOutsideBmedForm").submit();
+                count++;
+            };
+        });
+
+        $("#FORMSexportExcelBtn").click(function () {
+            var DocId = $("#FORMSqtyDOCID").val();
+            //var AssetNo = $("#FORMSqtyASSETNO").val();
+            //var AccDpt = $("#FORMSqtyACCDPT").val();
+            var AssetName = $("#FORMSqtyASSETNAME").val();
+            var FlowType = $("#FORMSqtyFLOWTYPE").val();
+            var DptId = $("#FORMSqtyDPTID").val();
+            var Date1 = $("#FORMSqtyApplyDateFrom").val();
+            var Date2 = $("#FORMSqtyApplyDateTo").val();
+            //var DealStatus = $("#FORMSqtyDealStatus").val();
+            //var IsCharged = $("#FORMSqtyIsCharged").val();
+            var DateType = $("#FORMSqtyDateType").val();
+            var SearchAllDoc = false;
+            //var EngCode = $("#FORMSqtyEngCode").val();
+            var ClsUser = $("#FORMSqtyClsUser").val();
+            var Vendor = $("#FORMSqtyVendor").val();
+
+            //if ($("#FORMSqtySearchAllDoc").is(':checked') == true) {
+            //    SearchAllDoc = true;
+            //}
+
+            $.ajax({
+                url: "@Url.Action("ExportToExcel", "OutsideBmed", new { Area = "FORMS" })",
+                data: {
+                    qtyDocId: DocId,
+                    qtyAssetName: AssetName,
+                    qtyDptId: DptId,
+                    Date1: Date1,
+                    Date2: Date2,
+                    DateType: DateType,
+                    SearchAllDoc: SearchAllDoc,
+                    ClsUser: ClsUser,
+                    Vendor: Vendor,
+                    qtyFlowType: FlowType,
+                },
+                success: function (response, textStatus, jqXHR) {
+
+                        window.location.href = '@Url.Action("ExportToExcel", "OutsideBmed", new { Area = "FORMS" })' + '?qtyDocId=' + DocId  
+                        + '&qtyAssetName=' + AssetName + '&qtyDptId=' + DptId + '&Date1=' + Date1 + '&Date2=' + Date2 + '&qtyFlowType=' + FlowType 
+                        + '&DateType=' + DateType + '&SearchAllDoc=' + SearchAllDoc + '&ClsUser=' + ClsUser +'&Vendor=' + Vendor;
+                },
+                error: function (xhr, status, error) {
+                    alert(error);
+                }
+            });
+        });
+    });
+    
+
+    // Use ajax to fetch page.
+    var fetchPageOSB = function (page) {
+        var pagedPartialUrl = '@Url.Action("Index", "OutsideBmed", new { Area = "FORMS" })';
+        var s = $('#FORMSOutsideBmedForm').serialize();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page,
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#FORMSOutsideBmedLIST').html(data);
+
+                $('#FORMSOutsideBmedLIST .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPageOSB(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
+            }
+        });
+
+    };
+</script>
+
+
+<form asp-controller="OutsideBmed" asp-action="Index" asp-area="FORMS" data-ajax="true"
+      data-ajax-update="#FORMSOutsideBmedLIST" data-ajax-method="POST" id="FORMSOutsideBmedForm"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'查詢中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-complete="$.Toast.hideToast()"
+      data-ajax-failure="onFailed">
+
+    <h4>查詢條件 - 個人案件</h4>
+    <div class="container">
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="FORMSqtyDOCID" class="control-title">表單編號</label>
+                    <input asp-for="FORMSqtyDOCID" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label class="control-title">申請部門</label>
+                    <input type="text" placeholder="輸入關鍵字或部門代碼查詢" class="form-control" id="FORMSqtyDPTIDQry" />
+                    <button type="button" class="btn btn-default" id="FORMSqtyDPTIDbtn" data-request-url="@Url.Action("GetRoleByKeyname", "UseUnitFind",new { Area="FORMS"})">查詢</button>
+                    <select asp-for="FORMSqtyDPTID" asp-items="@ViewData["FORMSqtyDPTID"] as SelectList" class="form-control" style="width:auto">
+                        <option disabled selected>請選擇</option>
+                    </select>
+                    <span asp-validation-for="FORMSqtyDPTID" class="text-danger"></span>
+                    <span style="color:red" id="FORMSqtyDPTIDNoErrorMsg"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="FORMSqtyASSETNAME" class="control-title">型號<br />(關鍵字)</label>
+                    <input asp-for="FORMSqtyASSETNAME" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label  class="control-title">目前關卡人員</label>
+                    <input type="text" placeholder="輸入關鍵字或員工代碼查詢" class="form-control" id="FORMSqtyClsUserQry" />
+                    <button type="button" class="btn btn-default" id="FORMSqtyClsUserbtn" data-request-url="@Url.Action("GetToNameByKeyname", "UseUnitFind",new { Area="FORMS"})">查詢</button>
+                    <select asp-for="FORMSqtyClsUser" asp-items="@ViewData["FORMSqtyClsUser"] as SelectList" class="form-control" style="width: auto">
+                        <option disabled selected>請選擇</option>
+                    </select>
+                    <span asp-validation-for="FORMSqtyClsUser" class="text-danger"></span>
+                    <span style="color:red" id="FORMSqtyClsUserNoErrorMsg"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="FORMSqtyVendor" class="control-title">廠商(關鍵字)</label>
+                    <input asp-for="FORMSqtyVendor" class="form-control" />
+                </div>
+
+
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="FORMSqtyFLOWTYPE" class="control-title">流程狀態</label>
+                    <select asp-for="FORMSqtyFLOWTYPE" asp-items="@ViewData["FORMSFlowType"] as SelectList" class="form-control-s"></select>
+                </div>
+
+            </div>
+        </div>
+        @*@if (user.DptId == "8420" || user.DptId == "7084" ||
+          UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
+        {
+            <div class="row">
+                <div class=form-inline>
+                    <div class="form-group">
+                        <label class="control-title">查詢所有<br />工程師案件</label>
+                        <input type="checkbox" asp-for="FORMSqtySearchAllDoc" style="margin: 7px 0px 0px 7px;" />
+                    </div>
+                </div>
+            </div>
+        }*@
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label for="qtyApplyDateFrom" class="control-title">日期查詢</label>
+                    <span>
+                        <select asp-for="FORMSqtyDateType" asp-items="@ViewData["FORMSDateType"] as SelectList" class="form-control-s"></select>
+                    </span>
+                    <input asp-for="FORMSqtyApplyDateFrom" class="form-control" />
+                    <span> ~ </span>
+                    <input asp-for="FORMSqtyApplyDateTo" class="form-control" />
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group col-md-offset-1 col-md-1">
+                    <div>
+                        <input id="FORMSbtnQTY" type="submit" value="查詢" class="btn btn-default btn-group-justified" />
+                    </div>
+                </div>
+                <div class="form-group">
+                    <div>
+                        <input type="button" class="btn btn-primary" id="FORMSexportExcelBtn" value="匯出Excel" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+<div id="FORMSOutsideBmedLIST"></div>

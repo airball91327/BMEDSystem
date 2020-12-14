@@ -10,24 +10,28 @@ using EDIS.Models;
 using EDIS.Repositories;
 using EDIS.Models.Identity;
 using System.Text.RegularExpressions;
+using EDIS.Areas.FORMS.Data;
 
 namespace EDIS.Controllers
 {
     public class HomeController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly BMEDDBContext _db;
         private readonly ApplicationDbContext _BMEDcontext;
         private readonly IRepository<RepairModel, string> _repRepo;
         private readonly IRepository<AppUserModel, int> _userRepo;
         private readonly CustomUserManager userManager;
 
         public HomeController(ApplicationDbContext context,
+                              BMEDDBContext db,
                               ApplicationDbContext BMEDcontext,
                               IRepository<RepairModel, string> repairRepo,
                               IRepository<AppUserModel, int> userRepo,
                               CustomUserManager customUserManager)
         {
             _context = context;
+            _db = db;
             _BMEDcontext = BMEDcontext;
             _repRepo = repairRepo;
             _userRepo = userRepo;
@@ -38,6 +42,8 @@ namespace EDIS.Controllers
         public IActionResult Index()
         {
             /* Get user details. */
+            
+            
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_BMEDcontext).GetUserLocation(ur);
@@ -70,11 +76,17 @@ namespace EDIS.Controllers
             var BMEDbuyCount = _BMEDcontext.BuyFlows.Where(f => f.Status == "?")
                                                     .Where(f => f.UserId == ur.Id).Count();
 
+            //外部醫療儀器使用申請案件數
+            var FORMSoutsidebmedCount = _db.OutsideBmedFlows.Where(f => f.Status == "?")
+                                                    .Where(f => f.UserId == ur.Id).Count();
+
+
             UnsignCounts v = new UnsignCounts();
             v.RepairCount = BMEDrepairCount;
             v.KeepCount = BMEDkeepCount;
             v.DeliveryCount = BMEDdeliveryCount;
             v.BuyEvalateCount = BMEDbuyCount;
+            v.OutsideBmedCount = FORMSoutsidebmedCount;
 
             //if (fBrowserIsMobile())
             //{

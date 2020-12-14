@@ -1,0 +1,426 @@
+﻿@model EDIS.Models.OutsideBmedPrintVModel
+@{
+    Layout = "_Layout";
+}
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <style type="text/css">
+        .style1 {
+            width: 700px;
+        }
+
+        .style2 {
+            width: 100%;
+            font-size: 10pt;
+        }
+
+        .style3 {
+            height: 30px;
+            width: 100px;
+        }
+
+        .style4 {
+            height: 30px;
+            text-align: center;
+        }
+
+        .style5 {
+            text-align: center;
+            height: 25px;
+        }
+
+        .style6 {
+            width: 100%;
+        }
+
+        .style7 {
+            text-align: center;
+            height: 75px;
+        }
+
+        @@media print {
+            Footer {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body style="margin:0px" onload='window.print(); setTimeout(window.close, 500); '>
+    <div>
+
+        <table cellpadding="0" cellspacing="0" class="style1">
+            <tr>
+                <td>
+                    <table cellpadding="0" cellspacing="0" class="style2"
+                           style="border: 2px solid #000000">
+                        <tr>
+                            <td colspan="5" align="center"
+                                style="border-bottom-style: solid; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                外&nbsp;部&nbsp;醫&nbsp;療&nbsp;儀&nbsp;器&nbsp;使&nbsp;用&nbsp;申&nbsp;請&nbsp;單
+                            </td>
+                            <td colspan="2"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                <barcode:BarcodeLabel ID="BarcodeLabel1" runat="server"
+                                                      BarcodeEncoding="Code39NC" BarMaxHeight="40" BarMaxWidth="2" BarMinWidth="1"
+                                                      Text="1234" ShowLabel="False">
+                                </barcode:BarcodeLabel>
+                                <img src="@ViewBag.Img" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="50">
+                                申請單號
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.DocId)
+                            </td>
+
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                性質
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                使用申請
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="50">
+                                申請部門
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Company)
+                            </td>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                使用日期
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @{
+                                    string printApplyDate = (Model.ApplyDate.Value.Year - 1911).ToString() + "年" + Model.ApplyDate.Value.Month + "月" + Model.ApplyDate.Value.Day + "日";
+                                    string printEndDate = (Model.EndDate.Value.Year - 1911).ToString() + "年" + Model.EndDate.Value.Month + "月" + Model.EndDate.Value.Day + "日";
+
+                                }
+                                @printApplyDate
+                                &nbsp;~&nbsp;
+                                @printEndDate
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="50">
+                                申請人員
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                (@Html.DisplayFor(model => model.UserAccount))
+                                @Html.DisplayFor(model => model.UserName)
+                            </td>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                聯絡電話
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Contact)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="50">
+                                品名
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.AssetNam)
+                            </td>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                廠牌
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Label)
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                型號
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Model)
+                            </td>
+                            <td colspan="2" rowspan="3" valign="top">
+                                <table cellpadding="0" cellspacing="0" class="style6">
+                                    <tr>
+                                        <td class="style5" rowspan="3" colspan="1"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="20">
+                                            患者自帶設備免填
+                                        </td>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            廠商
+                                        </td>
+                                        <td colspan="3"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                            @Html.DisplayFor(model => model.Vendor)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            廠商電話
+                                        </td>
+                                        <td colspan="3"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                            @Html.DisplayFor(model => model.Phone)
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            試用人員
+                                        </td>
+                                        <td colspan="3"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                            @Html.DisplayFor(model => model.Personnel)
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                序號
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Serial)
+                            </td>
+
+                        </tr>
+                        <tr>
+                            <td class="style5"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                width="92">
+                                使用天數
+                            </td>
+                            <td colspan="3"
+                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                @Html.DisplayFor(model => model.Day)
+                                天
+                            </td>
+                        </tr>
+
+
+                        <tr>
+                            <td colspan="10" rowspan="1" valign="top">
+                                <table cellpadding="0" cellspacing="0" class="style6">
+                                    <tr>
+                                        <td class="style5" rowspan="3" colspan="1"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="20">
+                                            用途說明
+                                        </td>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            用途項目
+                                        </td>
+                                        <td colspan="5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                            @Html.DisplayFor(model => model.Application)
+                                        </td>
+                                    </tr>
+                                    @if (Model.Application == "臨床試驗(審核內容:1~5)")
+                                    {
+                                        <tr>
+                                            <td class="style5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                                width="71">
+                                                計畫編號
+                                            </td>
+                                            <td colspan="1"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                @Html.DisplayFor(model => model.Phone)
+                                            </td>
+                                            <td class="style5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                                width="71">
+                                                IRB_NO
+                                            </td>
+                                            <td colspan="1"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                @Html.DisplayFor(model => model.Phone)
+                                            </td>
+                                            <td class="style5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                                width="71">
+                                                試驗主持人
+                                            </td>
+                                            <td colspan="1"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                @Html.DisplayFor(model => model.Phone)
+                                            </td>
+                                        </tr>
+                                    }
+                                    <tr>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            說明
+                                        </td>
+                                        <td colspan="5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                            @Html.DisplayFor(model => model.Description)
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="10" rowspan="1" valign="top">
+                                <table cellpadding="0" cellspacing="0" class="style6">
+                                    <tr>
+                                        <td class="style5" rowspan="3" colspan="1"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="20">
+                                            審核內容
+                                        </td>
+                                        <td class="style5"
+                                            style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                            width="71">
+                                            審核項目
+                                        </td>
+                                        @if (Model.Application == "患者自帶(審核內容:6)")
+                                        {
+                                            <td colspan="5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                醫工安全性檢查
+                                            </td>
+                                        }
+                                        else
+                                        {
+                                            if (Model.item1 == true)
+                                            {
+                                                <td colspan="5"
+                                                    style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                    <br />
+                                                    <label>✓@Model.Content</label><br />
+
+                                                    <label>✓特殊水、電、氣的需求,請提供資料(須會工務部)</label><br />
+
+                                                    <label>✓為游離輻射設備(須會輻安室)</label><br />
+
+                                                    <label>✓儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</label>
+                                                </td>
+                                            }
+                                            else
+                                            {
+                                                <td colspan="5"
+                                                    style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                    <br />
+                                                    <label>✕@Model.Content</label><br />
+
+                                                    <label>✕特殊水、電、氣的需求,請提供資料(須會工務部)</label><br />
+
+                                                    <label>✕為游離輻射設備(須會輻安室)</label><br />
+
+                                                    <label>✕儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</label>
+
+                                                </td>
+                                            }
+                                        }
+                                    </tr>
+                                    @if (Model.Application == "患者自帶(審核內容:6)")
+                                    {
+                                        <tr>
+                                            <td class="style5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000"
+                                                width="71">
+                                                醫工安全性檢查
+                                            </td>
+                                            <td colspan="3"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                <br />
+                                                @if (Model.item4 == true && Model.item7 == false)
+                                                {
+                                                    <label>✓電線接頭無破損</label><br />
+
+                                                    <label>✓電線無破損裸露</label><br />
+
+                                                    <label>✓機器外觀無破損</label><br />
+
+                                                    <label>✕檢測無符合上述需求,儀器不可使用</label>
+                                                }
+                                                else if (Model.item7 == true && Model.item4 == false)
+                                                {
+                                                    <label>✕電線接頭無破損</label><br />
+
+                                                    <label>✕電線無破損裸露</label><br />
+
+                                                    <label>✕機器外觀無破損</label><br />
+
+                                                    <label>✓檢測無符合上述需求,儀器不可使用</label>
+
+                                                }
+                                                else
+                                                {
+                                                    <label>✕電線接頭無破損</label>
+                                                    <br />
+
+                                                    <label>✕電線無破損裸露</label>
+                                                    <br />
+
+                                                    <label>✕機器外觀無破損</label>
+                                                    <br />
+
+                                                    <label>✕檢測無符合上述需求,儀器不可使用</label>
+                                                    <br />
+                                                }
+                                                <div style="text-align:right">
+                                                    <label>醫工簽名_________________</label>
+                                                    <label>單位簽名_________________</label>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
+        <div>
+            @await Component.InvokeAsync("FORMSOsbFlowList", new { id = Model.DocId })
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,144 +1,167 @@
-﻿@model MedEue.Models.Instrument
+﻿@model EDIS.Areas.FORMS.Models.Instrument
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewBag.Title = "預覽|外部醫療儀器使用申請單";
+}
 
-<div>
-    <h4>外部醫療儀器使用申請單申請單</h4>
-    <dl class="dl-horizontal">
-        <dt>
-            @Html.DisplayNameFor(model => model.UserName)
-        </dt>
+    <div>
+        <h4>外部醫療儀器使用申請單申請單</h4>
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.UserName)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.UserName)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.UserName)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.UseUnit)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Ext)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.UseUnit)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Ext)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Name)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.UseUnit)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Name)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.UseUnit)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Model)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Name)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Model)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Name)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Serial)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Model)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Serial)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Model)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Label)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Serial)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Label)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Serial)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Vendor)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Label)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Vendor)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Label)
+            </dd>
+            @if(Model.Application != "患者自帶") { 
+                <dt>
+                    @Html.DisplayNameFor(model => model.Vendor)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Phone)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Vendor)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.Phone)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Phone)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Personnel)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Phone)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.Personnel)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.Personnel)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.ProjectId)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.Personnel)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.ProjectId)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.ProjectId)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.IRB_NO)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.ProjectId)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.IRB_NO)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.IRB_NO)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.TrialHost)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.IRB_NO)
+                </dd>
 
-        <dd>
-            @Html.DisplayFor(model => model.TrialHost)
-        </dd>
+                <dt>
+                    @Html.DisplayNameFor(model => model.TrialHost)
+                </dt>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Application)
-        </dt>
+                <dd>
+                    @Html.DisplayFor(model => model.TrialHost)
+                </dd>
+            }
+            <dt>
+                @Html.DisplayNameFor(model => model.Application)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Application)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Application)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Description)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Description)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Description)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Description)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.UseDayFrom)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.UseDayFrom)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.UseDayFrom)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.UseDayFrom)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.UseDayTo)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.UseDayTo)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.UseDayTo)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.UseDayTo)
+            </dd>
 
-        <dt>
-            @Html.DisplayNameFor(model => model.Day)
-        </dt>
+            <dt>
+                @Html.DisplayNameFor(model => model.Day)
+            </dt>
 
-        <dd>
-            @Html.DisplayFor(model => model.Day)
-        </dd>
+            <dd>
+                @Html.DisplayFor(model => model.Day)
+            </dd>
 
-       
-    </dl>
-</div>
+
+        </dl>
+        <div>
+            @await Component.InvokeAsync("FORMSOsbFlowList", new { id = Model.DocId })
+        </div>
+        <div>
+            @await Component.InvokeAsync("FORMSosbNewContent", new { id = Model.DocId })
+        </div>
+        <div>
+            <a class="btn btn-default" href="@Url.Action("Index", "Home", new { Area = "" } )" id="homeBtn">回到簽核列表</a>
+            <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "OutsideBmed", new { Area = "FORMS", DocId = Model.DocId } )" target="_blank">列印</a>
+            <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "OutsideBmed", new { Area = "FORMS", DocId = Model.DocId, printType = 1 } )" target="_blank">一頁式列印</a>
+        </div>
+    </div>

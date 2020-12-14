@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.AspNetCore.Http;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
@@ -35,5 +36,7 @@ namespace EDIS.Areas.FORMS.Models
         public string UserName { get; set; }
         [Display(Name = "異動時間")]
         public DateTime Rtt { get; set; }
+        [NotMapped]
+        public List<IFormFile> Files { get; set; }
     }
 }

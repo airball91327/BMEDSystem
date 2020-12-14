@@ -8,13 +8,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Remove="Areas\FORMS\**" />
     <Compile Remove="Views\Components\**" />
-    <Content Remove="Areas\FORMS\**" />
     <Content Remove="Views\Components\**" />
-    <EmbeddedResource Remove="Areas\FORMS\**" />
     <EmbeddedResource Remove="Views\Components\**" />
-    <None Remove="Areas\FORMS\**" />
     <None Remove="Views\Components\**" />
   </ItemGroup>
 
@@ -64,6 +60,18 @@
     <Folder Include="wwwroot\Files\BMED\Delivery\" />
     <Folder Include="wwwroot\Files\BMED\Keep\" />
     <Folder Include="wwwroot\Files\BMED\Repair\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Areas\FORMS\Views\AttainFiles\Create.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\Delete.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\Details.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\Edit.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\NewContent.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\OutsideBmedEdit.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\PreviewData.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\QryDataList.cshtml" />
+    <None Include="Areas\FORMS\Views\OutsideBmed\QtyData.cshtml" />
   </ItemGroup>
 
   <ItemGroup>

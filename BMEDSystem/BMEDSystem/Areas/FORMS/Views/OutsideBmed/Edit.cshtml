@@ -1,75 +1,100 @@
-﻿@model MedEue.Models.Instrument
+﻿@model EDIS.Areas.FORMS.Models.OutsideBmedFlow
+
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+@inject CustomRoleManager RoleManager
 
 @{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
     ViewBag.Title = "編輯|外部醫療儀器使用申請單";
+    if (TempData["SendMsg"] != null)
+    {
+        <script>
+            var message = @Json.Serialize(TempData["SendMsg"]);
+            alert(message);
+        </script>
+    }
 }
 
-<div class="row wrapper border-bottom white-bg page-heading">
-    <div class="col-lg-10">
-        <h2>編輯</h2>
-        <h4>外部醫療儀器使用申請單</h4>
+
+<h2>編輯</h2>
+<h4>外部醫療儀器使用申請單</h4>
+<hr />
+@if (Model.Cls == "申請者" && Model.Status == "?")
+{
+    <div id="pnlFILES" style="margin: 10pt">
+        @await Component.InvokeAsync("FORMSAttainFileList", new { id = Model.DocId, typ = "3", viewType = "Edit" })
     </div>
-</div>
-<div class="card">
-    <div class="card-body">
-        <div class="ibox float-e-margins">
-
-            <div class="card-header">附件檔案</div>
-
-            <div>
-                <div class="row">
-                    @Html.HiddenFor(model => model.DocId)
-                    <div id="pnlFILES" style="width:100%; padding-right:1.25rem">
-                        @Html.Action("PreviewList", "AttainFiles", new { @id = Model.DocId, typ = "OutsideBmed" })
-                    </div>
+    <div class="form-group">
+        <div>
+            <input id="btnFILES" type="button" value="夾帶附件檔案" class="btn btn-default" data-toggle="modal" data-target="#modalFILES">
+        </div>
+    </div>
+    <!-- 夾帶檔案 Modal -->
+    <div id="modalFILES" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">選擇上傳檔案</h4>
+                </div>
+                <div class="modal-body">
+                    @await Component.InvokeAsync("FORMSAttainFileUpload", new { doctype = "3", docid = Model.DocId, viewType = "" })
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">離開</button>
                 </div>
             </div>
         </div>
     </div>
-</div>
-<br />
-<div class="card">
-    <div class="card-body">
-        <div class="row">
-            <div class="col-lg-12">
-                <div class="tabs-container">
-                    <ul class="nav nav-tabs">
-                        <li class="active"><a data-toggle="tab" href="#tab-1"> 申請資料</a></li>
-                        <li class=""><a data-toggle="tab" href="#tab-2">審核內容</a></li>
-                        <li class=""><a data-toggle="tab" href="#tab-3">外部醫療儀器使用</a></li>
-                    </ul>
-                    <div class="tab-content">
-                        <div id="tab-1" class="tab-pane active">
-                            <div class="panel-body">
-                                @Html.Action("Details", new { @id = Model.DocId })
-                            </div>
-                        </div>
-                        <div id="tab-2" class="tab-pane">
-                            <div class="panel-body">
-                                @Html.Action("NewContent", new { @id = Model.DocId })
-                            </div>
-                        </div>
-                        <div id="tab-3" class="tab-pane">
+}
+else
+{
+    <div id="pnlFILES" style="margin: 10pt">
+        @await Component.InvokeAsync("FORMSAttainFilePList", new { id = Model.DocId, typ = "3", viewType = "Edit" })
+    </div>
+}
 
-                            <div class="panel-body">
-                                @Html.Action("NextSFlow", "OutsideBmedFlows", new { @id = Model.DocId })
-                            </div>
-                            @*@if ((string)ViewData["Cls"] == "工程師")
-                                {
-                                    @Html.Action("NextFlow", "OutsideBmedFlows", new { @id = Model.DocId })
-                                }
-                                else
-                                {
-                                    @Html.Action("NextSFlow", "OutsideBmedFlows", new { @id = Model.DocId })
-                                }*@
-                        </div>
-                    </div>
-                </div>
-            </div>
+
+
+
+<ul class="nav nav-pills" style="font-size:120%">
+    <li role="presentation" id="page1" class="active"><a href="#repairdtl" data-toggle="tab" style="padding-left:20px">申請資料</a></li>
+    <li role="presentation" id="page2"><a href="#repaircontent" data-toggle="tab" style="padding-left:20px">審核內容</a></li>
+    <li role="presentation" id="page3"><a href="#repairflow" data-toggle="tab" style="padding-left:20px">簽核作業</a></li>
+</ul>
+
+<hr />
+<div class="tab-content">
+    <div id="repairdtl" class="tab-pane fad in active">
+        <div>
+            @await Component.InvokeAsync("FORMSosbDtlDetails", new { id = Model.DocId })
         </div>
-
+        <div>
+            <a class="btn btn-default" href="@Url.Action("Index", "Home", new { Area = "" } )" id="homeBtn">回到簽核列表</a>
+            <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "OutsideBmed", new { Area = "FORMS", DocId = Model.DocId } )" target="_blank">列印</a>
+            <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "OutsideBmed", new { Area = "FORMS", DocId = Model.DocId, printType = 1 } )" target="_blank">一頁式列印</a>
+        </div>
+    </div>
+    <div id="repaircontent" class="tab-pane fade">
+        <div>
+            @await Component.InvokeAsync("FORMSosbNewContent", new { id = Model.DocId })
+            
+        </div>
+    </div>
+    <div id="repairflow" class="tab-pane fade" >
+        <div>
+            @await Component.InvokeAsync("FORMSosbNextFlow", new { id = Model.DocId })
+        </div>
+        <div>
+            @await Component.InvokeAsync("FORMSOsbFlowList", new { id = Model.DocId })
+        </div>
     </div>
 </div>
+
+
+
+
 @section Scripts {
     <script>
         function showmsg(data) {
@@ -96,11 +121,24 @@
             document.getElementById('btnGO').disabled = true;
         }
 
-    </script>
+        $('#modalFILES').on('hidden.bs.modal', function () {
+            var docid = $("#DocId").val();
+            $.ajax({
+                url: '../../AttainFiles/List',
+                type: "POST",
+                data: { docid: docid, typ: "3" },
+                success: function (data) {
+                    $("#pnlFILES").html(data);
+                }
+            });
+        });
 
-    <script src="~/Scripts/bootstrap-waitingfor.js"></script>
-    @Scripts.Render("~/bundles/jqueryval")
+    </script>
+   
+    <script src="~/lib/jquery-validation/dist/jquery.validate.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.js"></script>
 }
+
 @*@section Styles {
         @Styles.Render("~/Content/fileinput/css")
     }*@

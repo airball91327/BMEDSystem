@@ -1,0 +1,107 @@
+﻿@model EDIS.Areas.FORMS.Models.Assign
+
+@{
+    ViewBag.Title = "NewSContent";
+}
+    <script src="~/js/FORMS/OutsideBmedFlow.js" asp-append-version="true"></script>
+<script>
+    function SetValues(data) {
+        var application = $('#Application').val();
+       
+        if (application != "患者自帶") {
+            var chcek1 = document.getElementById("content1").checked;
+            var chcek2 = document.getElementById("content2").checked;
+            var chcek3 = document.getElementById("content3").checked;
+
+            $('#item1').val(chcek1);
+            $('#item2').val(chcek2);
+            $('#item3').val(chcek3);
+        }
+
+        else {
+            var chcek4 = document.getElementById("content4").checked;
+            var chcek5 = document.getElementById("content5").checked;
+            var chcek6 = document.getElementById("content6").checked;
+            var chcek7 = document.getElementById("content7").checked;
+
+            $('#item4').val(chcek4);
+            $('#item5').val(chcek5);
+            $('#item6').val(chcek6);
+            $('#item7').val(chcek7);
+        }
+        $.Toast.hideToast();
+        alert("審核確認建立完成");
+    };
+
+</script>
+<form asp-action="Content" asp-controller="OutsideBmedFlows" asp-area="FORMS" data-ajax="true" data-ajax-method="POST"
+      id="ContentForm"
+      data-ajax-begin="$.Toast.showToast({
+          'title':'作業進行中，請稍待...',
+          'icon':'loading',
+          'duration':0
+          })"
+      data-ajax-complete="$.Toast.hideToast()"
+      data-ajax-success="SetValues()" data-ajax-failure="onFailed">
+
+    @Html.HiddenFor(model => model.Application)
+    <div class="form-horizontal">
+        <label class="control-label" style="margin-bottom:15px; color:red">
+            審核內容(審核內容檢查完成請按下確認鍵)
+            
+        </label>
+
+        @if (Model.Application != "患者自帶")
+        {
+            <div class="form-group" style="margin-left:108px">
+                <div class="col-md-10 text-left">
+                    
+                    @Html.CheckBox("content1")
+                    @Html.LabelFor(model => model.item1)
+                    <br />
+
+                    @Html.CheckBox("content2")
+                    @Html.LabelFor(model => model.item2)
+                    <br />
+
+                    @Html.CheckBox("content3")
+                    @Html.LabelFor(model => model.item3)
+                    <br />
+
+                </div>
+            </div>
+        }
+
+        else
+        {
+            <div class="form-group" style="margin-left:108px">
+                <div class="col-md-10 text-left">
+                    @Html.CheckBox("content4")
+                    @Html.LabelFor(model => model.item4)
+                    <br />
+
+                    @Html.CheckBox("content5")
+                    @Html.LabelFor(model => model.item5)
+                    <br />
+
+                    @Html.CheckBox("content6")
+                    @Html.LabelFor(model => model.item6)
+                    <br />
+
+                    @Html.CheckBox("content7")
+                    @Html.LabelFor(model => model.item7)
+                    <br />
+
+                </div>
+            </div>
+        }
+
+        <div class="form-group" style="margin-left:108px">
+            <div class="col-md-10" >
+                <input id="ContentbtnGO" type="submit" value="審核確定" class="btn btn-primary" />
+                <img id="imgLOADING" src="~/Images/opc-ajax-loader.gif" style="display: none" />
+            </div>
+        </div>
+
+    </div>
+</form>

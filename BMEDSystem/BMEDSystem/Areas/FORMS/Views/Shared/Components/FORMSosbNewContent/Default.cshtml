@@ -1,0 +1,135 @@
+﻿@model EDIS.Areas.FORMS.Models.Assign
+
+@{
+    ViewBag.Title = "NewContent";
+}
+    <div class="form-horizontal">
+        <label class="control-label" style="margin-bottom:5px">審核內容(打勾為已審核)</label>
+        @if (Model.Application != "患者自帶")
+        {
+            <div class="form-group" style="margin-left:24px">
+                <div class="col-md-10 text-left">
+                    @if (Model.item1 == true)
+                    {
+                        <ul style="padding:0px; list-style-type:none">
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                <label>@Model.Content</label>
+                            </li>
+
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item1)
+                            </li>
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item2)
+                            </li>
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item3)
+                            </li>
+                        </ul>
+                    }
+                    else
+                    {
+                        <ul style="padding:0px; list-style-type:none">
+                            <li>
+                                <label style = "padding-left:17px;">@Model.Content</label>
+                            </li>
+
+                            <li>
+
+                                @Html.LabelFor(model => model.item1, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item2, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item3, new { @style = "padding-left:17px;" })
+                            </li>
+                        </ul>
+                    }
+
+                    @Html.ValidationMessageFor(model => model.item1, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        else
+        {
+            <div class="form-group" style="margin-left:24px">
+                <span class="col">患者自帶之設備,工程師做安全性檢查後,始可使用(可檢查時段為8:00~1730,但CPAP呼吸器的檢查時間不受限):</span>
+                <div class="col-md-10 text-left"  style="margin-top:5px">
+                    <ul style="padding:0px;list-style-type:none">
+                        @if (Model.item4 == true)
+                        {
+
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item4)
+                            </li>
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item5)
+                            </li>
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item6)
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item7, new { @style = "padding-left:17px;" })
+                            </li>
+                        }
+                        else if (Model.item7 == true)
+                        {
+
+                            <li>
+
+                                @Html.LabelFor(model => model.item4, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item5, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item6, new { @style = "padding-left:17px;" })
+                            </li>
+
+                            <li>
+                                <i class="fa fa-check" aria-hidden="true"></i>
+                                @Html.LabelFor(model => model.item7)
+                            </li>
+                        }
+                        else
+                        {
+                            <li>
+
+                                @Html.LabelFor(model => model.item4, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item5, new { @style = "padding-left:17px;" })
+                            </li>
+                            <li>
+
+                                @Html.LabelFor(model => model.item6, new { @style = "padding-left:17px;" })
+                            </li>
+
+                            <li>
+
+                                @Html.LabelFor(model => model.item7, new { @style = "padding-left:17px;" })
+                            </li>
+                        }
+                    </ul>
+                    @Html.ValidationMessageFor(model => model.item4, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+        }
+
+    </div>
