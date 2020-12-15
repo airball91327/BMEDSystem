@@ -25,7 +25,7 @@ namespace EDIS.Areas.FORMS.Models
        
         [Display(Name = "到達時間")]
         public DateTime Rtt { get; set; }
-        [Display(Name = "狀態")]
+        [Display(Name = "文件狀態")]
         public string Status { get; set; }
         [Display(Name = "流程類別")]
         public string Kind { get; set; }
@@ -54,6 +54,9 @@ namespace EDIS.Areas.FORMS.Models
         
         [Display(Name = "廠牌")]
         public string Label { get; set; }
+
+        [Display(Name = "關卡人員")]
+        public string Cls { get; set; }
 
     }
 }

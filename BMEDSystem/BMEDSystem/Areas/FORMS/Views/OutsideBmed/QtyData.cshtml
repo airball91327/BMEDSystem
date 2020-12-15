@@ -1,0 +1,91 @@
+﻿@{
+    ViewBag.Title = "外部醫療儀器申請單";
+}
+
+<script src="~/js/FORMS/SignDataEdit.js" asp-append-version="true"></script>
+<script src="~/js/FORMS/QryData.js" asp-append-version="true"></script>
+<div class="row wrapper border-bottom white-bg page-heading">
+    <div class="col-lg-10">
+        <h2>查詢</h2>
+    </div>
+</div>
+
+<div>
+    <div class="card">
+
+
+        <div class="card-header">查詢條件</div>
+
+        <div class="card-body">
+            @*@using (Ajax.BeginForm("QryData", "OutsideBmed",
+                new AjaxOptions { HttpMethod = "Post", UpdateTargetId = "pnlDATALIST"}))
+                {*@
+            <div class="row">
+                <div class="col-4">
+                    <label id="Name" class="control-label col">品名</label>
+                    <div class="col-auto">
+                        @Html.TextBox("Name", null, new { @class = "form-control col-6", placeholder = "請輸入關鍵字" })
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label id="Model" class="control-label col">型號</label>
+                    <div class="col-auto">
+                        @Html.TextBox("Model", null, new { @class = "form-control col-6", placeholder = "請輸入關鍵字" })
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label id="Serial" class="control-label col">序號</label>
+                    <div class="col-auto">
+                        @Html.TextBox("Serial", null, new { @class = "form-control col-6", placeholder = "請輸入關鍵字" })
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+
+                <div class="col-4">
+                    <label id="Label" class="control-label col">廠牌</label>
+                    <div class="col-auto">
+                        @Html.TextBox("Label", null, new { @class = "form-control col-6", placeholder = "請輸入關鍵字" })
+                    </div>
+                </div>
+                <div class="col-4">
+                    <label id="UseUnit" class="control-label col">使用部門</label>
+                    <div class="col-auto">
+                        <div class="form-inline">
+                            @Html.TextBox("UseUnitName", null, new { @class = "form-control col-6", placeholder = "部門關鍵字" })
+                            <input id="btnQuid" type="button" value="查詢" class="btn btn-default" />
+                            @Html.DropDownList("UseUnit", null, "請選擇", new { @class = "form-control", @style = "width:auto;" })
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <label id="Sdate" class="control-label col">使用日期</label>
+                <div class="form-inline col-auto">
+                    <input id="Sdate" class="form-control" type="date" />
+                    <span>&nbsp;~&nbsp;</span>
+                    <label for="Edate" class="sr-only"></label>
+                    <input id="Edate" class="form-control" type="date" />
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <button id="btnQry" class="btn btn-white ml-4 mt-3" type="submit">查詢</button>
+            </div>
+
+
+        </div>
+
+    </div>
+
+</div>
+<div id="pnlDATALIST">
+    @*@Html.Action("QryDataList")*@
+    <form asp-controller="OutsideBmed" asp-action="QryDataList" asp-route-id="Model.DocId" />
+</div>
+
+
+    @*<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>*@
+   

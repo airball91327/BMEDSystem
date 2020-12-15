@@ -45,7 +45,7 @@
 
             <li class="@Html.IsSelected(area: null) @Html.IsSelected(area: "BMED") @Html.IsSelected(area: "Admin")">
                 @*<a href="#"><span class="nav-label">醫療儀器</span><span class="fa arrow"></span></a>*@
-                <ul class="nav collapse @Html.IsSelected(area: "BMED", cssClass: "in")">
+                <ul class="nav collapse @Html.IsSelected(area: "BMED", cssClass: "in") @Html.IsSelected(area: "FORMS", cssClass: "in")">
 
                     <li class="@Html.IsSelected(controller: "Repair", area: "BMED") @Html.IsSelected(controller: "Keep", area: "BMED")
                                @Html.IsSelected(controller: "Delivery", area: "BMED") @Html.IsSelected(controller: "BuyEvaluate", area: "BMED")">
@@ -58,9 +58,9 @@
                                 <a href="@Url.Action("Create", "Keep", new { Area = "BMED" })">保養單</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                              UserManager.IsInRole(User, "MedToDo"))
+                             UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                             UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                             UserManager.IsInRole(User, "MedToDo"))
                             {
                                 <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                     <a href="@Url.Action("Create", "Delivery", new { Area = "BMED" })">驗收單</a>
@@ -127,9 +127,9 @@
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })">設備保養排程年報</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
-                              UserManager.IsInRole(User, "DeviceMgr"))
+                             UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                             UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
+                             UserManager.IsInRole(User, "DeviceMgr"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })">月故障率統計表</a>
@@ -240,9 +240,20 @@
                             </li>
                         }
                     }
+                @*</ul>
+            </li>
+            <li class="@Html.IsSelected(area: null)  @Html.IsSelected(area: "FORMS") @Html.IsSelected(area: "Admin")">
+                <ul class="nav collapse @Html.IsSelected(area: "FORMS", cssClass: "in")">*@
+                    <li class="@Html.IsSelected(controller: "OutsideBmed", area: "FORMS")">
+                        <a href="#"><i class="fa fa-edit "></i><span class="nav-label">外部醫療儀器申請</span><span class="fa arrow"></span></a>
+                        <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "OutsideBmed", area: "FORMS", cssClass: "in") ">
+                            <li class="@Html.IsSelected(action: "Create", area: "FORMS")">
+                                <a href="@Url.Action("Create", "OutsideBmed", new { Area = "FORMS" })">申請單</a>
+                            </li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
-        
         </ul>
     </div>
 </nav>

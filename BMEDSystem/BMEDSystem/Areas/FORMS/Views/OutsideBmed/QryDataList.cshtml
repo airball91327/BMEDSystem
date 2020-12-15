@@ -1,4 +1,4 @@
-﻿@model IEnumerable<MedEue.Models.OutsideBmedListModel>
+﻿@model IEnumerable< EDIS.Areas.FORMS.Models.OutsideBmedListModel>
 <style>
     .btn {
         font-size: 12px;
@@ -11,6 +11,9 @@
          text-align:center;
     }
 </style>
+
+
+<script src="~/js/FORMS/inspinia.js" asp-append-version="true"></script>
 
 <div class="card">
 
@@ -125,11 +128,7 @@
                             @Html.ActionLink("預覽", "PreviewData", "OutsideBmed", new { @id = item.DocId }, new { @class = "btn btn-default", target = "blank" }) &nbsp;
                             @if (item.Status != "已結案")
                             {
-                                @Ajax.ActionLink("轉給自己", "TransToMe", "OutsideBmedFlows", new { docid = item.DocId }, new AjaxOptions
-                                {
-                               HttpMethod = "POST",
-                               OnSuccess = "OnSuccess"
-                           }, new { @class = "btn btn-default",onsuccess="OnSuccess" })
+                                @Html.ActionLink("轉給自己", "TransToMe", "OutsideBmedFlows", new { docid = item.DocId }, new{ @class = "btn btn-default", target = "blank" })
                             }
 
                         </td>
@@ -192,4 +191,3 @@
 
 
 
-<script src="~/Scripts/MedEue/inspinia.js"></script>

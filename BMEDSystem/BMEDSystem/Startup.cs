@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EDIS.Areas.BMED.Repositories;
+using EDIS.Areas.FORMS.Data;
 using EDIS.Extensions;
 using EDIS.Fliters;
 using EDIS.Models;
@@ -35,6 +36,9 @@ namespace EDIS
         {
             services.AddDbContext<ApplicationDbContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("EdisConnection")));//AzureConnection//EdisConnection
+            //new
+            services.AddDbContext<BMEDDBContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("EdisConnection")));//AzureConnection//EdisConnection
 
             services.AddScoped<IRepository<AppUserModel, int>, AppUserRepository>();
             services.AddScoped<IRepository<DepartmentModel, string>, DepartmentRepository>();
@@ -50,6 +54,7 @@ namespace EDIS
             //services.AddIdentity<ApplicationUser, IdentityRole>()
             services.AddIdentity<ApplicationUser, ApplicationRole>()
                 .AddEntityFrameworkStores<ApplicationDbContext>()
+                .AddEntityFrameworkStores<BMEDDBContext>() //new
                 .AddRoleStore<ApplicationRole>()
                 .AddUserStore<ApplicationUser>()
                 .AddDefaultTokenProviders()

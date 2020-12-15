@@ -1,4 +1,5 @@
 ﻿using System;
+//using EDIS.Areas.FORMS.Models;
 using EDIS.Models.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
@@ -67,10 +68,14 @@ namespace EDIS.Models
         public virtual DbSet<DocIdStore> DocIdStores { get; set; }
         public virtual DbSet<ExceptDevice> ExceptDevice { get; set; }
         //public virtual DbSet<ExternalUsers> ExternalUsers { get; set; }
-        public virtual DbSet<UsersInRolesModel> UsersInRoles { get; set; }
+        public virtual DbSet<UsersInRolesModel> UsersInRoles { get; set; }  
         //public virtual DbSet<Vendors> Vendors { get; set; }
 
-        public DbQuery<UnSignListVModel> UnSignListVModelQuery { get; set; }
+        public virtual DbQuery<UnSignListVModel> UnSignListVModelQuery { get; set; }
+
+       
+
+
 
         // Unable to generate entity type for table 'dbo.BuyEvaluate'. Please see the warning messages.
         // Unable to generate entity type for table 'dbo.BuyFlow'. Please see the warning messages.

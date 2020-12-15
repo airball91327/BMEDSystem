@@ -10,7 +10,14 @@
             fetchPageREP(1);
             return false;
         });
-        $("#BMEDrepSearchForm").submit();
+
+
+         $('#FORMSOutsideBmedForm').submit(function () {
+            fetchPageOSB(1);
+            return false;
+        });
+
+
         $('#homeNav > li > a').attr('data-toggle', 'tab');  //Set data-toggle to other tabs.
     });
     var onFailed = function (data) {
@@ -24,11 +31,13 @@
     <li><a href="#menu2">保養 <span class="badge" id="BMEDkeepCount">@Model.KeepCount</span></a></li>
     <li><a href="#menu3">驗收 <span class="badge" id="BMEDdelivCount">@Model.DeliveryCount</span></a></li>
     <li><a href="#menu4">採購評估 <span class="badge" id="BMEDbuyCount">@Model.BuyEvalateCount</span></a></li>
+
     @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr") ||
-       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
+     UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
     {
         <li><a href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
     }
+    <li><a href="#menu6">外部醫療儀器使用 <span class="badge" id="OutsideBmedCount">@Model.OutsideBmedCount</span></a></li>
 </ul>
 
 <div class="tab-content">
@@ -56,6 +65,11 @@
     <div id="menu5" class="tab-pane fade">
         <div>
             @await Component.InvokeAsync("RepResignIndex")
+        </div>
+    </div>
+    <div id="menu6" class="tab-pane fade">
+        <div>
+            @await Component.InvokeAsync("OutsideBemdIndex")
         </div>
     </div>
 
