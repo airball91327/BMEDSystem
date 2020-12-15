@@ -40,11 +40,11 @@ namespace EDIS.Areas.FORMS.Components.OutsideBmed
             _db.OutsideBmedFlows.Where(f => f.DocId == id)
                 .Join(_db.Instruments, f => f.DocId, a => a.DocId,
                 (f, a) => new
-                {
+                {   
                     DocId = f.DocId,
                     StepId = f.StepId,
                     UserId = f.UserId,
-                    UserName = a.UserName + " (" + a.UserId + ")",
+                    UserName = f.UserName,
                     Opinions = a.Description,
                     Status = f.Status,
                     Rtt = f.Rtt,
@@ -58,7 +58,7 @@ namespace EDIS.Areas.FORMS.Components.OutsideBmed
                         DocId = f.DocId,
                         StepId = f.StepId,
                         UserId = f.UserId,
-                        UserName = f.UserName,
+                        UserName = _db.AppUsers.Find(f.UserId).FullName,
                         Opinions = f.Opinions,
                         Status = f.Status,
                         Rtt = f.Rtt,

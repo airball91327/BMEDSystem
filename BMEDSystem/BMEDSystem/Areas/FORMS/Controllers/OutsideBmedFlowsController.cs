@@ -69,9 +69,6 @@ namespace EDIS.Areas.BMED.Controllers
                 assign.FlowUid = _context.AppUsers.Where(u => u.FullName == assign.ClsNow).Select(u => u.Id).FirstOrDefault();
             Instrument instrument = _db.Instruments.Find(assign.DocId);
 
-            
-
-
             if (ModelState.IsValid)
             {
                 OutsideBmedFlow of = _db.OutsideBmedFlows.Where(f => f.DocId == assign.DocId && f.Status == "?").FirstOrDefault();

@@ -191,7 +191,7 @@ namespace EDIS.Areas.FORMS.Controllers
                            DocType = "外部醫療儀器使用申請",
                            Cls = j.flow.Cls,
                            DocId = j.flow.DocId,
-                           UserName = j.flow.UserName,
+                           UserName = j.repdtl.UserName,
                            Topic = j.flow.Opinion,
                            ApplyDate = j.repdtl.ApplyDate,
                            Rtt = j.flow.Rtt,
