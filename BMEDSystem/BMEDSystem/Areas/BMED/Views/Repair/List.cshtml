@@ -254,7 +254,7 @@ else
                         {
                             @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
-                            if (item.FlowCls == "驗收人" && item.IsCharged == "N")
+                            if (item.FlowCls == "驗收人" && item.IsCharged == "N" && !item.DealState.Contains("報廢"))
                             {
                                 <a href="#" onclick="closeRepDoc(@item.DocId)">結案</a>
                                 @Html.Raw(" | ")

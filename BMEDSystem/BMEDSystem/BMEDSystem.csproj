@@ -52,7 +52,6 @@
     <Folder Include="Areas\BMED\Repositories\" />
     <Folder Include="Areas\BMED\Views\Repair\Components\Preview\" />
     <Folder Include="Extensions\" />
-    <Folder Include="Fliters\" />
     <Folder Include="Services\" />
     <Folder Include="wwwroot\Files\BMED\Asset\" />
     <Folder Include="wwwroot\Files\BMED\Budget\" />

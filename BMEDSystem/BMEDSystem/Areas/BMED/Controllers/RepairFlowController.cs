@@ -149,16 +149,6 @@ namespace EDIS.Areas.BMED.Controllers
                     rf.Rtp = ur.Id;
                     _context.Entry(rf).State = EntityState.Modified;
                     _context.Entry(rd).State = EntityState.Modified;
-
-                    //sync to oracleBatch
-                    var rep = _context.BMEDRepairs.Find(assign.DocId);
-                    if (rep.Loc == "總院" || rep.Loc == "K")
-                    {
-                        string smsg = SyncToOracleBatch(assign.DocId);
-                        //if (smsg == "1")
-                        //    throw new Exception("同步OracleBatch失敗!");
-                    }
-
                     // Save stock to ERP system.
                     if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
@@ -169,7 +159,16 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     _context.SaveChanges();
+                    //sync to oracleBatch
+                    var rep = _context.BMEDRepairs.Find(assign.DocId);
+                    if (rep.Loc == "總院" || rep.Loc == "K")
+                    {
+                        string smsg = SyncToOracleBatch(assign.DocId);
+                        //if (smsg == "1")
+                        //    throw new Exception("同步OracleBatch失敗!");
+                    }
 
+                   
                     //Send Mail
                     //To all users in this repair's flow.
                     Tmail mail = new Tmail();
@@ -661,7 +660,7 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var repair = _context.BMEDRepairs.Find(docId);
             ERPRepHead hd = new ERPRepHead();
-            hd.ZHANG_ID = "3";
+            hd.ZHANG_ID = "2";
             hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
@@ -743,7 +742,7 @@ namespace EDIS.Areas.BMED.Controllers
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
                             AMT = Convert.ToDecimal(stock.TotalCost),
-                            INV_CUS_NO = stock.VendorId == null ? null : ERPvendor.CUS_NO,
+                            INV_CUS_NO = stock.VendorId == null || stock.StockType == "0" ? null : ERPvendor.CUS_NO,
                             ISPAY = isPay,
                             TAX_ID = stock.TaxClass
                         });

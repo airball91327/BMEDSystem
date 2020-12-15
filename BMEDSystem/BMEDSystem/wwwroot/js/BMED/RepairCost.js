@@ -119,20 +119,37 @@ $(function () {
         }
     });
     $('input:radio[name="StockType"]').trigger('click');
-
+    $('input:radio[name="TaxClass"]').click(function () {
+        $("#Price").val('');
+        $("#TotalCost").val('');
+    });
     /* Auto calculate total price when input price or qty. */
     $('#Price').change(function () {
+        var s = $('input:radio[name="TaxClass"]:checked').val();
         var v1 = $(this).val();
         var v2 = $('#Qty').val();
         if (v1 !== null && v2 !== null) {
-            $('#TotalCost').val(v1 * v2);
+            if (s == "3") //三聯式發票
+            {
+                $('#TotalCost').val(Math.round(v1 * v2 * 1.05));
+            }
+            else {
+                $('#TotalCost').val(v1 * v2);
+            }
         }
     });
     $('#Qty').change(function () {
+        var s = $('input:radio[name="TaxClass"]:checked').val();
         var v1 = $(this).val();
         var v2 = $('#Price').val();
         if (v1 !== null && v2 !== null) {
-            $('#TotalCost').val(v1 * v2);
+            if (s == "3") //三聯式發票
+            {
+                $('#TotalCost').val(Math.round(v1 * v2 * 1.05));
+            }
+            else {
+                $('#TotalCost').val(v1 * v2);
+            }
         }
     });
 

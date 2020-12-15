@@ -91,3 +91,6 @@ ul.nav-second-level {
     color: #555555 !important;
     cursor: default;
 }
+select.form-control {
+    width: 200px;
+}
