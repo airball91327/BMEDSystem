@@ -325,35 +325,43 @@
                                         }
                                         else
                                         {
-                                            if (Model.item1 == true)
-                                            {
-                                                <td colspan="5"
-                                                    style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                             <td colspan="5"
+                                                style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+                                                <br />
+                                                @if (Model.item1 == true)
+                                                {
+                                                    <label>✓@Model.Content</label>
                                                     <br />
-                                                    <label>✓@Model.Content</label><br />
 
-                                                    <label>✓特殊水、電、氣的需求,請提供資料(須會工務部)</label><br />
+                                                    <label>✓特殊水、電、氣的需求,請提供資料(須會工務部)</label>
+                                                    <br />
 
-                                                    <label>✓為游離輻射設備(須會輻安室)</label><br />
+                                                    <label>✓為游離輻射設備(須會輻安室)</label>
+                                                    <br />
 
                                                     <label>✓儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</label>
-                                                </td>
-                                            }
-                                            else
-                                            {
-                                                <td colspan="5"
-                                                    style="border-right-style: solid; border-bottom-style: solid; border-right-width: 1px; border-bottom-width: 1px; border-right-color: #000000; border-bottom-color: #000000">
+
+                                                }
+                                                else
+                                                {
+
+                                                    <label>✕@Model.Content</label>
                                                     <br />
-                                                    <label>✕@Model.Content</label><br />
 
-                                                    <label>✕特殊水、電、氣的需求,請提供資料(須會工務部)</label><br />
+                                                    <label>✕特殊水、電、氣的需求,請提供資料(須會工務部)</label>
+                                                    <br />
 
-                                                    <label>✕為游離輻射設備(須會輻安室)</label><br />
+                                                    <label>✕為游離輻射設備(須會輻安室)</label>
+                                                    <br />
 
                                                     <label>✕儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</label>
 
-                                                </td>
-                                            }
+                                                }
+                                                <div style="text-align:right">
+                                                    <label>醫工簽名_________________</label>
+                                                    <label>單位簽名_________________</label>
+                                                </div>
+                                            </td>
                                         }
                                     </tr>
                                     @if (Model.Application == "患者自帶(審核內容:6)")

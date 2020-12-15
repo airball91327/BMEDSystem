@@ -30,7 +30,7 @@
             <tr>
                 <td>@Html.DisplayFor(modelItem => item.SeqNo)</td>
                 <td>@Html.DisplayFor(modelItem => item.Title)</td>
-                <td><a href='@Url.Content("~/Files/")@item.FileLink' target="_blank">下載</a></td>
+                <td><a href=@Url.Content("~/Files/BMED/" + @item.FileLink) target="_blank">下載</a></td>
             </tr>
         }
     </table>

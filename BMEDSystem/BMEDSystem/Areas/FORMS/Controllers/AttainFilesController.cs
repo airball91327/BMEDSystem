@@ -43,22 +43,7 @@ namespace EDIS.Areas.FORMS.Controllers
             return View(await _db.AttainFiles.ToListAsync());
         }
 
-        // GET: /FROMS/AttainFile/Create
-        public IActionResult Create(string id = null, string typ = null, string title = null, int? vendorId = null)
-        {
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            AttainFile a = new AttainFile();
-            a.DocType = typ;
-            a.DocId = id;
-            a.Title = title;
-            if (typ == "3" && vendorId != null)
-                a.Rtp = vendorId;
-            else
-                a.Rtp = ur.Id;
-            a.Rtt = DateTime.Now;
-            return View(a);
-        }
-
+        
         // POST: /AttainFiles/Create
         [HttpPost]
         public async Task<IActionResult> Create(AttainFile attainFile, IEnumerable<IFormFile> file)
@@ -165,18 +150,14 @@ namespace EDIS.Areas.FORMS.Controllers
                     //HttpPostedFileBase file = Request.Files[0];
                     //文件扩展名
                     //string extension = Path.GetExtension(file.FileName);
-                    string s = "/Files/OutsideBmed";
-#if DEBUG
-                    s = "Files";
-#endif
+                    string s = "/Files/BMED";
+//#if DEBUG
+//                    s = "Files";
+//#endif
                     switch (attainFile.DocType)
                     {
-                        case "3":
+                        case "6":
                             s += "/OutsideBmed/";
-                            break;
-                       
-                        default:
-                            s += "/Sign/";
                             break;
                     }
                     var i = _db.AttainFiles
@@ -184,24 +165,24 @@ namespace EDIS.Areas.FORMS.Controllers
                         .Where(a => a.DocId == attainFile.DocId).ToList();
                     attainFile.SeqNo = i.Count == 0 ? 1 : i.Select(a => a.SeqNo).Max() + 1;
 
-                    string path = Path.Combine(@"C:\" + s + attainFile.DocId + "_"
+                    //string WebRootPath = _hostingEnvironment.WebRootPath;
+                    string path = Path.Combine(@"D:\" + s + attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName));
+
                     // Upload files.
                     using (var stream = new FileStream(path, FileMode.Create))
                     {
                         await Request.Form.Files[0].CopyToAsync(stream);
                     }
+
+                    // Save file details to AttainFiles table.
                     string filelink = attainFile.DocId + "_"
                     + attainFile.SeqNo.ToString() + Path.GetExtension(attainFile.Files[0].FileName);
 
                     switch (attainFile.DocType)
                     {
-                        case "3":
+                        case "6":
                             attainFile.FileLink = "OutsideBmed/" + filelink;
-                            break;
-                        
-                        default:
-                            attainFile.FileLink = "Sign/" + filelink;
                             break;
                     }
                     attainFile.Rtt = DateTime.Now;
@@ -258,7 +239,8 @@ namespace EDIS.Areas.FORMS.Controllers
                 try
                 {
                     string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string filePath = Path.Combine(@"C:\" + "Files/");
+                    string filePath = Path.Combine(@"D:\" + "/Files/BMED/");
+
                     FileInfo ff = new FileInfo(Path.Combine(filePath, attainfile.FileLink));
                     ff.Delete();
                     _db.AttainFiles.Remove(attainfile);
