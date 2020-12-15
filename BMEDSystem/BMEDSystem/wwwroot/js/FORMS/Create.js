@@ -85,7 +85,7 @@ $('#modalFILES').on('hidden.bs.modal', function () {
     $.ajax({
         url: '../AttainFiles/List',
         type: "POST",
-        data: { docid: docid, typ: "3" },
+        data: { docid: docid, typ: "6" },
         success: function (data) {
             $("#pnlFILES").html(data);
         }

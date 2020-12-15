@@ -68,7 +68,7 @@ else
                                     </td>
 
                                     <td>
-                                        @if (item.Cls == "醫工部工程師" && item.Status == "待簽核")
+                                        @if (item.Cls == "醫工工程師" && item.Status == "待簽核")
                                         {
                                             @Html.ActionLink("編輯", "OutsideBmedEdit", "OutsideBmed", new { @id = item.DocId, kind = item.Kind }, new { target = "blank" })
                                             @Html.Raw(" | ")
