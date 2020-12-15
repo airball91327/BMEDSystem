@@ -170,17 +170,24 @@ namespace EDIS.Areas.FORMS.Controllers
                 /* 與登入者相關且流程不在該登入者身上的文件 */
                 case "流程中":
                     rps.Where(r => r.signflow.Status == "1")
+                       .Join(_db.OutsideBmedFlows.Where(f => f.Status == "?" && f.UserId != ur.Id),
+                       r => r.signflow.DocId, f => f.DocId,
+                       (r, f) => new
+                       {
+                           repair = r,
+                           flow = f
+                       })
                        .ToList()
                        .ForEach(j => rv.Add(new OutsideBmedListModel
                        {
                            DocType = "外部醫療儀器使用申請",
-                           Cls = j.signflow.Cls,
-                           DocId = j.signdata.DocId,
-                           UserName = j.signdata.UserName,
-                           Topic = j.signdata.Description,
-                           ApplyDate = j.signdata.ApplyDate,
-                           Rtt = j.signflow.Rtt,
-                           Status = GetStatus(j.signflow.Status),
+                           Cls = j.repair.signflow.Cls,
+                           DocId = j.repair.signdata.DocId,
+                           UserName = j.repair.signdata.UserName,
+                           Topic = j.repair.signdata.Description,
+                           ApplyDate = j.repair.signdata.ApplyDate,
+                           Rtt = j.repair.signflow.Rtt,
+                           Status = GetStatus(j.repair.signflow.Status),
                            Kind = ""
                        }));
                     break;
