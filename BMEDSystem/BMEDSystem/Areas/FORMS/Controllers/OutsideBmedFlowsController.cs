@@ -142,7 +142,7 @@ namespace EDIS.Areas.BMED.Controllers
                     flow.DocId = assign.DocId;
                     flow.StepId = of.StepId + 1;
                     flow.UserId = assign.FlowUid.Value;
-                    flow.UserName = _db.AppUsers.Find(assign.FlowUid.Value).FullName;
+                    flow.UserName = _db.AppUsers.Find(assign.FlowUid.Value).UserName;
                     flow.Status = "?";
                     flow.Cls = assign.FlowCls;
                     flow.Rtt = DateTime.Now;
@@ -316,7 +316,7 @@ namespace EDIS.Areas.BMED.Controllers
                     flow.DocId = assign.DocId;
                     flow.StepId = of.StepId + 1;
                     flow.UserId = assign.FlowUid.Value;
-                    flow.UserName = _context.AppUsers.Find(assign.FlowUid.Value).FullName;
+                    flow.UserName = _context.AppUsers.Find(flow.UserId).UserName;
                     flow.Status = "?";
                     flow.Cls = assign.FlowCls;
                     flow.Rtt = DateTime.Now;
