@@ -82,8 +82,8 @@ namespace EDIS.Areas.BMED.Controllers
                     assetfile.Fid = 1;
                 else
                     assetfile.Fid = Convert.ToInt32(i + 1);
-                string WebRootPath = _hostingEnvironment.WebRootPath;
-                string path = Path.Combine(WebRootPath + s, assetfile.AssetNo + "_"
+                //string WebRootPath = _hostingEnvironment.WebRootPath;
+                string path = Path.Combine(@"D:\"+ s, assetfile.AssetNo + "_"
                     + assetfile.SeqNo.ToString() + "_" + assetfile.Fid.ToString() + Path.GetExtension(Request.Form.Files[0].FileName));
                 string filelink = assetfile.AssetNo + "_" + assetfile.SeqNo.ToString() + "_"
                     + assetfile.Fid.ToString() + Path.GetExtension(Request.Form.Files[0].FileName);
@@ -160,8 +160,8 @@ namespace EDIS.Areas.BMED.Controllers
 
                     foreach (AssetFileModel a in fs)
                     {
-                        string WebRootPath = _hostingEnvironment.WebRootPath;
-                        string filePath = Path.Combine(WebRootPath + "/Files/BMED/");
+                        //string WebRootPath = _hostingEnvironment.WebRootPath;
+                        string filePath = Path.Combine(@"D:\"+ "/Files/BMED/");
                         fid++;
                         FileInfo inf = new FileInfo(filePath + a.FileLink);
                         af = new AssetFileModel();
@@ -209,8 +209,8 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 try
                 {
-                    string WebRootPath = _hostingEnvironment.WebRootPath;
-                    string filePath = Path.Combine(WebRootPath + "/Files/BMED/");
+                    //string WebRootPath = _hostingEnvironment.WebRootPath;
+                    string filePath = Path.Combine(@"D:\" + "/Files/BMED/");
                     FileInfo ff = new FileInfo(Path.Combine(filePath, assetfile.FileLink));
                     ff.Delete();
                     _context.AssetFiles.Remove(assetfile);

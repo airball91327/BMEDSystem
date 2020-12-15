@@ -670,7 +670,11 @@ namespace EDIS.Areas.BMED.Controllers
                 asset.DelivEmp = "";
                 asset.DelivDpt = "";
             }
-            listItem2.Add(new SelectListItem { Text = asset.DelivEmp, Value = asset.DelivUid.Value.ToString() });
+            else
+            {
+                listItem2.Add(new SelectListItem { Text = asset.DelivEmp, Value = asset.DelivUid.Value.ToString() });
+            }
+            
             List<AppUserModel> ul;
             string gid = "CCH";
             _context.Departments.ToList()

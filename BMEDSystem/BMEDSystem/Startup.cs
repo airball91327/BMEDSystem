@@ -96,6 +96,7 @@ namespace EDIS
                 app.UseExceptionHandler("/Home/Error");
             }
             app.UseVirtualDirectory("Files", @"D:\Files");
+            app.UseVirtualDirectory("Files/BMED", @"D:\Files\BMED");
             app.UseStaticFiles();
             //app.UseStaticFiles(new StaticFileOptions
             //{
