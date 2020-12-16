@@ -77,21 +77,26 @@ namespace EDIS.Areas.FORMS.Controllers
             
             if (!string.IsNullOrEmpty(keyname))   
             {
+                
                 //關鍵字
                 _context.AppUsers.Where(c => c.FullName.Contains(keyname))
+                    .OrderBy(c => c.UserName)
+                    .ThenBy( t => t.FullName)
                     .ToList()
                     .ForEach(ul => list.Add(
                                 new SelectListItem { Text = "(" + ul.UserName + ")" + ul.FullName, Value = ul.Id.ToString() }
                             ));
                 //代號
                 _context.AppUsers.Where(c => c.UserName.Contains(keyname))
+                    .OrderBy(c => c.UserName)
+                    .ThenBy(t => t.FullName)
                     .ToList()
                     .ForEach(ul => list.Add(
                                 new SelectListItem { Text = "(" + ul.UserName + ")" + ul.FullName, Value = ul.Id.ToString() }
                             ));
             }
             
-            return Json(list);
+            return Json(list.OrderBy(c => c.Text));
         }
        
         public JsonResult GetToClsByKeyname(string keyname,string docid,string tle)

@@ -525,21 +525,21 @@ namespace EDIS.Areas.BMED.Controllers
                     li.Value = u2.Id.ToString();
                     list.Add(li);
                     break;
-                case "評估工程師":
-                    list = new List<SelectListItem>();
-                    s = roleManager.GetUsersInRole("MedEngineer").ToList();
-                    foreach (string l in s)
-                    {
-                        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
-                        if (u != null)
-                        {
-                            li = new SelectListItem();
-                            li.Text = "(" + u.UserName + ")" + u.FullName;
-                            li.Value = u.Id.ToString();
-                            list.Add(li);
-                        }
-                    }
-                    break;
+                //case "評估工程師":
+                //    list = new List<SelectListItem>();
+                //    s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                //    foreach (string l in s)
+                //    {
+                //        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                //        if (u != null)
+                //        {
+                //            li = new SelectListItem();
+                //            li.Text = "(" + u.UserName + ")" + u.FullName;
+                //            li.Value = u.Id.ToString();
+                //            list.Add(li);
+                //        }
+                //    }
+                //    break;
                 case "設備主管":
                     list = new List<SelectListItem>();
                     s = roleManager.GetUsersInRole("MedMgr").ToList();
@@ -638,6 +638,24 @@ namespace EDIS.Areas.BMED.Controllers
                             list.Add(li);
                         }
                     }
+                    break;
+
+                case "賀康主管":
+                    //s = roleManager.GetUsersInRole("Manager").ToList();
+                    c = _context.AppUsers.Find(r.UserId).DptId;
+                    list = new List<SelectListItem>();
+                    
+                        u = _context.AppUsers.Where(ur => ur.UserName == "344005").FirstOrDefault();
+                        if (u != null)
+                        {
+                            
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                           
+                        }
+                    
                     break;
                 default:
                     list = new List<SelectListItem>();

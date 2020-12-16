@@ -35,10 +35,18 @@ $(function () {
         $('option', select).remove();
         if ($(this).val() === "設備工程師") {
             $('#SelectVendor').removeProp("disabled");
+            $('#FirstUserId').show();
+            $('#FidenUserId').hide();
+        }
+        else if ($(this).val() === "評估工程師") {
+            $('#FirstUserId').hide();
+            $('#FidenUserId').show();
         }
         else {
             $('#SelectVendor').val('');
             $('#SelectVendor').prop("disabled", true);
+            $('#FirstUserId').show();
+            $('#FidenUserId').hide();
         }
         $.ajax({
             url: '../../BuyFlow/GetNextEmp',
@@ -121,5 +129,33 @@ $(function () {
             }
 
         }
+    });
+
+    $('#UserIdQryBtn').click(function () {
+        var UserNameStr = $("#UserIdQry").val();
+        var ul = $(this).data('request-url');
+        $.ajax({
+            url: ul,
+            type: "GET",
+            data: { keyname: UserNameStr },
+            success: function (data) {
+                //console.log(data);
+                var select = $('#UserId');
+                $('option', select).remove();
+                if (data.length == 0) {
+                    $("#UserIdNoErrorMsg").html("查無資料!");
+                }
+                else if (data.length == 1) {
+                    select.addItems(data);
+                    $('#UserId').trigger("change");
+                    $("#UserIdNoErrorMsg").html("");
+                }
+                else {
+                    select.append($('<option selected="selected" disabled="disabled"></option>').text("請選擇").val(""));
+                    select.addItems(data);
+                    $("#UserIdNoErrorMsg").html("");
+                }
+            }
+        });
     });
 });
