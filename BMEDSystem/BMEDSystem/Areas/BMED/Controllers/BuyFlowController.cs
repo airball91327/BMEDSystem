@@ -641,21 +641,37 @@ namespace EDIS.Areas.BMED.Controllers
                     break;
 
                 case "賀康主管":
-                    //s = roleManager.GetUsersInRole("Manager").ToList();
-                    c = _context.AppUsers.Find(r.UserId).DptId;
+                    s = roleManager.GetUsersInRole("MedAssetMgr").ToList();
                     list = new List<SelectListItem>();
-                    
-                        u = _context.AppUsers.Where(ur => ur.UserName == "344005").FirstOrDefault();
-                        if (u != null)
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                        
+                        if (u != null  && u.Status == "Y")
                         {
-                            
-                                li = new SelectListItem();
-                                li.Text = "(" + u.UserName + ")" + u.FullName;
-                                li.Value = u.Id.ToString();
-                                list.Add(li);
-                           
+                            DepartmentModel o = _context.Departments.Find(u.DptId);
+                            DepartmentModel e = _context.Departments.Where( n => n.Name_C == r.Place).FirstOrDefault();
+                            if (e.Loc == "C" || e.Loc == "P" || e.Loc == "K") { 
+                                if (o.Loc == "C" || o.Loc == "P" || o.Loc == "K")
+                                {
+                                    li = new SelectListItem();
+                                    li.Text = "(" + u.UserName + ")" + u.FullName;
+                                    li.Value = u.Id.ToString();
+                                    list.Add(li);
+                                }
+                            }
+                            else
+                            {
+                                if (o.Loc != "C" || o.Loc != "P" || o.Loc != "K")
+                                {
+                                    li = new SelectListItem();
+                                    li.Text = "(" + u.UserName + ")" + u.FullName;
+                                    li.Value = u.Id.ToString();
+                                    list.Add(li);
+                                }
+                            }
                         }
-                    
+                    }
                     break;
                 default:
                     list = new List<SelectListItem>();

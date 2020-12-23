@@ -198,12 +198,18 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyTicketNo))     //發票號碼
             {
                 qtyTicketNo = qtyTicketNo.ToUpper();
-                var resultDocIds = _context.BMEDRepairCosts.Include(rc => rc.TicketDtl)
-                                                           .Where(rc => rc.TicketDtl.TicketDtlNo == qtyTicketNo)
-                                                           .Select(rc => rc.DocId).Distinct();
-                rps = (from r in rps
-                       where resultDocIds.Any(val => r.DocId.Contains(val))
-                       select r);
+                //var resultDocIds = _context.BMEDRepairCosts.Include(rc => rc.TicketDtl)
+                //                                           .Where(rc => rc.TicketDtl.TicketDtlNo == qtyTicketNo)
+                //                                           .Select(rc => rc.DocId).Distinct();
+               rps = rps.Join(_context.BMEDRepairCosts
+                   .Where(rc => rc.TicketDtl.TicketDtlNo == qtyTicketNo),
+                    rp => rp.DocId , rc => rc.DocId,(re,rd) => re)
+                                       /*.Select(rc => rc.DocId).Distinct()*/;
+
+                //rps = (from r in rps
+                //       where resultDocIds.Any(val => r.DocId.Contains(val))
+                //       select r);
+                
             }
             if (!string.IsNullOrEmpty(qtyVendor))   //廠商關鍵字
             {
@@ -224,6 +230,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
 
+          
             /* If no search result. */
             if (rps.Count() == 0)
             {

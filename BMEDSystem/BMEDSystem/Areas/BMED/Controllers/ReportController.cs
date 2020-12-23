@@ -626,56 +626,108 @@ namespace EDIS.Areas.BMED.Controllers
             //依照院區區分設備
             var bmedAssets = GetAssetsByLoc(urLocation);
             //
-            List<AssetModel> assets = bmedAssets.Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
-                    .Where(a => a.DisposeKind == "正常").ToList();
+            var test = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
+                     .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
+                     (r, d) => new { repair = r, d.EndDate }).ToList();
+
+            
+            var assets = bmedAssets
+             .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+             .Where(a => a.DisposeKind == "正常")
+             .GroupJoin(test, d => d.AssetNo, b => b.repair.AssetNo,
+             (assetD, repairA) => new { assetD = assetD, repairA = repairA })
+             .ToList()
+             .GroupJoin(_context.Departments, d => d.assetD.AccDpt, b => b.DptId,
+             (assetM, depart) => new { assetM = assetM, depart = depart })
+             .SelectMany(x => x.depart.DefaultIfEmpty(), (o, g) =>
+                      new { _assetM = o.assetM, _depart = g })
+             .ToList();
+
+           
+
+
+         //var t = assets
+         //   .GroupJoin(test, d => d._assetM.AssetNo, b => b.repair.AssetNo,
+         //   (assetD, repairA) => new { assetD = assetD, repairA = repairA })
+         //    .SelectMany(x => x.repairA.DefaultIfEmpty(), (o, g) =>
+         //             new { _assetD = o.assetD, _repairA = g })
+         //   .ToList();
+               //.ForEach(r =>
+               //     {
+               //         if (r.assetD.EndDate.Value.CompareTo(v.Edate.Value) > 0)
+               //         {
+               //             faildays += v.Edate.Value.Subtract(r.assetD.repair.ApplyDate).TotalDays;
+               //         }
+               //         else
+               //         {
+               //             dd = r.assetD.EndDate.Value.Subtract(r.assetD.repair.ApplyDate).TotalDays;
+               //             if (dd > 0)
+               //             {
+               //                 if (dd <= 1d)
+               //                     faildays += 1d;
+               //                 else
+               //                     faildays += dd;
+               //             }
+               //         }
+               //         cnt++;
+               //});
+            
+
+
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
+                assets = assets.Where(a => a._assetM.assetD.AccDpt == v.AccDpt).ToList();
             }
             if (!string.IsNullOrEmpty(v.AssetNo))
             {
-                assets = assets.Where(a => a.AssetNo == v.AssetNo)
+                assets = assets.Where(a => a._assetM.assetD.AssetNo == v.AssetNo)
                     .ToList();
             }
 
-            foreach (AssetModel asset in assets)
+            foreach (var asset in assets)
             {
+                
                 pr = new ProperRate();
-                pr.AssetNo = asset.AssetNo;
-                pr.AssetName = asset.Cname;
-                pr.Brand = asset.Brand;
-                pr.Type = asset.Type;
-                pr.AccDpt = asset.AccDpt;
-                var dpt = _context.Departments.Find(asset.AccDpt);
-                pr.AccDptNam = dpt == null ? "" : dpt.Name_C;
+                pr.AssetNo = asset._assetM.assetD.AssetNo;
+                pr.AssetName = asset._assetM.assetD.Cname;
+                pr.Brand = asset._assetM.assetD.Brand;
+                pr.Type = asset._assetM.assetD.Type;
+                pr.AccDpt = asset._assetM.assetD.AccDpt;
+                //var dpt = _context.Departments.Find(asset.AccDpt);
+                pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
                 faildays = 0;
                 dd = 0;
                 cnt = 0;
-                _context.BMEDRepairs.Where(r => r.AssetNo == asset.AssetNo)
-                    .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
-                    .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
-                    (r, d) => new { repair = r, d.EndDate })
-                    .ToList()
-                    .ForEach(r =>
+                var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
+                var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
+                //_context.BMEDRepairs.Where(r => r.AssetNo == asset._assetM.assetD.AssetNo)
+                //    .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
+                //    .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
+                //    (r, d) => new { repair = r, d.EndDate })
+                //    .ToList()
+                //    .ForEach(r =>
+                //    {
+                if (de != null) { 
+                    if (de.Value.CompareTo(v.Edate.Value) > 0)
                     {
-                        if (r.EndDate.Value.CompareTo(v.Edate.Value) > 0)
+                        faildays += v.Edate.Value.Subtract(ra).TotalDays;
+                    }
+                    else
+                    {
+                        dd = de.Value.Subtract(ra).TotalDays;
+                        if (dd > 0)
                         {
-                            faildays += v.Edate.Value.Subtract(r.repair.ApplyDate).TotalDays;
+                            if (dd <= 1d)
+                                faildays += 1d;
+                            else
+                                faildays += dd;
                         }
-                        else
-                        {
-                            dd = r.EndDate.Value.Subtract(r.repair.ApplyDate).TotalDays;
-                            if (dd > 0)
-                            {
-                                if (dd <= 1d)
-                                    faildays += 1d;
-                                else
-                                    faildays += dd;
-                            }
-                        }
-                        cnt++;
-                    });
+                    }
+                    cnt++;
+                }
+                //    });
+
                 pr.RepairCnts = cnt;
                 pr.RepairDays = faildays;
                 pr.AssetProperRate = decimal.Round(100m -
@@ -2405,6 +2457,31 @@ namespace EDIS.Areas.BMED.Controllers
             int rcnt = 0;
             int kcnt = 0;
             decimal tolcost = 0m;
+            var ss = new[] { "?", "2" };
+
+            var sr = _context.BMEDRepairs
+                    .Where(r => r.Loc == urLocation)
+                    .Where(r => r.ApplyDate >= v.Sdate)
+                    .Where(r => r.ApplyDate <= v.Edate)
+                    .Join(  _context.BMEDRepairFlows
+                            .Where(f => ss.Contains(f.Status))
+                            , r => r.DocId
+                            , f => f.DocId
+                            , (r, f) => r
+                            )
+                    .Join(_context.BMEDAssets
+                          .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                          .Join(_context.Departments, c => c.AccDpt, d => d.DptId, (bd, cd) => bd)
+                          , rd => rd.AssetNo, r => r.AssetNo,
+                          (rd, r) => rd)
+                    .GroupBy(g => g.AccDpt)
+                    //.Select(g => new { Country = g.Key, CustCount = g.Count() })
+                    .ToDictionary(o => o.Key, o => o.Count())
+                    .ToList();
+           
+            
+
+            var btls = _context.BMEDRepairDtls.Where(d => d.EndDate != null);
 
             foreach (DepartmentModel p in _context.Departments.ToList())
             {
@@ -2414,21 +2491,24 @@ namespace EDIS.Areas.BMED.Controllers
                 rcnt = 0;
                 kcnt = 0;
                 tolcost = 0m;
-                var ss = new[] { "?", "2" };
+                //var ss = new[] { "?", "2" };
                 List<RepairModel> rs = _context.BMEDRepairs.Where(r => r.Loc == urLocation)
                     .Where(r => r.ApplyDate >= v.Sdate)
                     .Where(r => r.ApplyDate <= v.Edate)
                     .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
                     (r, f) => r).Join(_context.BMEDAssets
                           .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
-                          .Where(r => r.AccDpt == p.DptId), rd => rd.AssetNo, r => r.AssetNo,
+                          .Where(r => r.AccDpt == p.DptId)
+                          , rd => rd.AssetNo, r => r.AssetNo,
                           (rd, r) => rd).ToList();
                 //
                 rcnt = rs.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
                           rd => rd.DocId, r => r.DocId,
                           (rd, r) => rd).ToList().Count();
+                
                 m.RpEndAmt = rcnt;
                 m.RepairAmt = rs.Count();
+               // m.RepairAmt = sr[p.DptId];
                 if (rcnt > 0)
                 {
                     m.RepFinishedRate =
