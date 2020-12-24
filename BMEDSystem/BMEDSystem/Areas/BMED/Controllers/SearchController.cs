@@ -333,7 +333,29 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             client.Dispose();
-
+            string eno = "";
+            RepairModel repair;
+            KeepModel keep;
+            AppUserModel ur;
+            rv.ForEach(v =>
+            {
+                if (v.RD_EMPNO != null)
+                {
+                    eno = v.RD_EMPNO.Value.ToString();
+                    ur = _context.AppUsers.Where(u => u.UserName == eno).FirstOrDefault();
+                    v.RD_EMPNAM = ur == null ? "" : ur.FullName;
+                }
+                if (v.DOC_TYP == "請修")
+                {
+                    repair = _context.BMEDRepairs.Find(v.DOCID);
+                    v.APPLYDPT = repair != null ? _context.Departments.Find(repair.DptId).Name_C : "";
+                }
+                else
+                {
+                    keep = _context.BMEDKeeps.Find(v.DOCID);
+                    v.APPLYDPT = keep != null ? _context.Departments.Find(keep.DptId).Name_C : "";
+                }
+            });
             return View("MedTransRdQList", rv);
         }
         /// <summary>
