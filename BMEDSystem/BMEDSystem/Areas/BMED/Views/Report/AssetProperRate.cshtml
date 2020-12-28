@@ -1,68 +1,101 @@
-﻿@model IEnumerable<EDIS.Models.ProperRate>
+﻿@model X.PagedList.IPagedList<EDIS.Models.ProperRate>
+
 @using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Identity
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
 @{
-    Layout = null;
+    //Layout = null;
     var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
 }
-<h4>設備妥善率統計表</h4>
-<p>
-    <a class="btn btn-default" href="@Url.Action("ExcelAssetProperRate", qry)">匯出Excel</a>
-</p>
 
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetNo)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetName)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Brand)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Type)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AccDptNam)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.RepairDays)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.RepairCnts)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.AssetProperRate)
-        </th>
-    </tr>
-    @foreach (var item in Model)
+    @*<script>
+        $(document).ready(function () {
+            $(".pagination a").click(function () {
+                BMEDRepAsSubmit();
+            });
+        });
+    </script>*@
+
+
+
+<h4>設備妥善率統計表</h4> 
+
+    <p>
+        <a class="btn btn-default" href="@Url.Action("ExcelAssetProperRate", qry)">匯出Excel</a>
+    </p>
+    @if (Model.Count() <= 0)
     {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssetNo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssetName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Brand)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Type)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AccDptNam)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RepairDays)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RepairCnts)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssetProperRate)
-            </td>
-        </tr>
+        <p class="text-danger">無任何資料!</p>
     }
-</table>
+    else
+    {
+        <table class="table">
+            <tr>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Brand)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().Type)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptNam)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().RepairDays)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().RepairCnts)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.FirstOrDefault().AssetProperRate)
+                </th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AssetNo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AssetName)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Brand)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.Type)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AccDptNam)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RepairDays)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.RepairCnts)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AssetProperRate)
+                    </td>
+                </tr>
+            }
+        </table>
+    }
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page}), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
