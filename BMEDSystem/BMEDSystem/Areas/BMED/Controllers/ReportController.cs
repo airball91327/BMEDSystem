@@ -2126,8 +2126,18 @@ namespace EDIS.Areas.BMED.Controllers
             TimeSpan ts;
             ts = endDate - startDate;
             totalMins = Convert.ToInt32(ts.TotalMinutes);
+
             // Get assets by user's location.
             assets = GetAssetsByLoc(urLocation);
+            //var ass = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
+            //                                    (a, d) => new
+            //                                    {
+            //                                        asset = a,
+            //                                        dept = d
+            //                                    })
+            //                                    .Where(r => r.dept.Loc == "C" )
+            //                                    .Select(r => r.asset);
+
             if (!string.IsNullOrEmpty(v.AccDpt))    // Get AccDpt assets.
             {
                 assets = assets.Where(a => a.AccDpt == v.AccDpt).ToList();
@@ -2144,36 +2154,101 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 assets = assets.Where(a => a.AssetClass == v.AssetClass3).ToList();
             }
+            //var data = assets.Join(_context.Departments.ToList(), a => a.AccDpt, d => d.DptId,
+            //    (a, d) => new { a, dpt = d.Name_C }).ToList();
+
             var data = assets.Join(_context.Departments.ToList(), a => a.AccDpt, d => d.DptId,
-                (a, d) => new { a, dpt = d.Name_C }).ToList();
-            foreach (var item in data)
-            {
-                int repairMins = 0;
-                MonthFailRateVModel m = new MonthFailRateVModel();
-                var repairDocs = _context.BMEDRepairs.Where(r => r.AssetNo == item.a.AssetNo)
-                                           .Join(_context.BMEDRepairDtls, r => r.DocId, rd => rd.DocId,
-                                           (r, rd) => new {
+              (a, d) => new { a, dpt = d });
+
+            //設備歸屬單位
+            //var data = assets.Join(_context.Departments.ToList(), a => a.AccDpt, d => d.DptId,
+            //   (a, d) => new { a, dpt = d }).ToList();
+
+            //單位去抓
+            var datas = data.GroupBy(rep => rep.dpt.DptId)
+                            .ToDictionary(o => o.Key, o => o.Count());
+
+
+            var repairDs = repairs.Join(
+                                        data, rp => rp.AssetNo,
+                                        d => d.a.AssetNo,
+                                        (rp, d) => new { repairD =  rp ,
+                                                         asset = d.a, 
+                                                         accdpt = d.dpt
+                                                       }
+                                       ).ToList();
+
+            var repairDos = repairDs.Join(_context.BMEDRepairDtls
+                                           , r => r.repairD.DocId, rd => rd.DocId,
+                                           (r, rd) => new
+                                           {
                                                repair = r,
                                                repairDtl = rd
-                                           }).Where(r => r.repairDtl.EndDate != null).ToList();
-                if (repairDocs.Count() > 0)
-                {
-                    foreach(var r in repairDocs)
-                    {
-                        TimeSpan ts2 = r.repairDtl.EndDate.Value.AddDays(1) - r.repair.ApplyDate;
-                        repairMins += Convert.ToInt32(ts2.TotalMinutes);
-                    }
+                                           })
+                                    .Where(r => r.repairDtl.EndDate != null).ToList();
+
+            var repairDocs = repairDos.GroupBy(rep => rep.repair.accdpt.DptId)
+                                      .ToDictionary(o => o.Key, o => o.Count());
+
+            //var repairDocMins = repairDs.Join(_context.BMEDRepairDtls, r => r.DocId, rd => rd.DocId,
+            //                               (r, rd) => new {
+            //                                   repair = r,
+            //                                   repairDtl = rd
+            //                               }).Where(r => r.repairDtl.EndDate != null)
+            //                               .GroupBy(rep => rep.repair.AssetNo)
+            //                               .ToDictionary(o => o.Key, o => o.Select(x => x.repairDtl.EndDate.Value - x.repair.ApplyDate));
+            //                               //repairDtl.EndDate.Value.AddDays(1) - o.repair.ApplyDate););
+
+
+
+            foreach (var item in _context.Departments.ToList())
+            {
+                PlantAmt = datas.ContainsKey(item.DptId) == false ? 0 : datas[item.DptId];
+                RepairAmt = repairDocs.ContainsKey(item.DptId) == false ? 0 : repairDocs[item.DptId];
+
+                //Have PlantAmt Count
+                if (PlantAmt > 0) { 
+                    MonthFailRateVModel m = new MonthFailRateVModel();
+                    //var repairDocss = _context.BMEDRepairs.Where(r => r.AssetNo == item.a.AssetNo)
+                    //                           .Join(_context.BMEDRepairDtls, r => r.DocId, rd => rd.DocId,
+                    //                           (r, rd) => new
+                    //                           {
+                    //                               repair = r,
+                    //                               repairDtl = rd
+                    //                           }).Where(r => r.repairDtl.EndDate != null).ToList();
+                    //if (repairDocss.Count() > 0)
+                    //{
+                    //    foreach (var r in repairDocss)
+                    //    {
+                    //        TimeSpan ts2 = r.repairDtl.EndDate.Value.AddDays(1) - r.repair.ApplyDate;
+                    //        repairMins += Convert.ToInt32(ts2.TotalMinutes);
+                    //    }
+                    //}
+
+                   
+                    //if (repairD > 0)
+                    //{
+                    //   var ts2 = repairDocMins.ContainsKey(item.a.AssetNo) == false ? null : repairDocMins[item.a.AssetNo];
+                    //   repairMins += Convert.ToInt32(ts2.Select(t => t.TotalMinutes).FirstOrDefault().ToString());//TotalMinutes
+                    //}
+                    //
+                    m.RepairAmt = RepairAmt;
+                    m.PlantAmt = PlantAmt;
+                    decimal num1 = decimal.Round(RepairAmt , 4);
+                    decimal num2 = decimal.Round(PlantAmt  , 4);
+
+                    m.FailRate = decimal.Round(num1 / num2, 4).ToString("P");
+                    
+                    //m.AssetNo = item.a.AssetNo;
+                    //m.Cname = item.a.Cname;
+                    m.CustId = item.DptId;
+                    //var dpt = _context.Departments.Find(m.CustId);
+                    m.CustNam = item.Name_C;
+                    //m.RepairMins = repairMins;
+                    //m.TotalMins = totalMins;
+                    //m.FailRate = decimal.Round(m.RepairMins / m.TotalMins, 4).ToString("P");
+                    mv.Add(m);
                 }
-                //
-                //m.AssetNo = item.a.AssetNo;
-                //m.Cname = item.a.Cname;
-                m.CustId = item.a.AccDpt;
-                //var dpt = _context.Departments.Find(m.CustId);
-                m.CustNam = item.dpt;
-                //m.RepairMins = repairMins;
-                //m.TotalMins = totalMins;
-                //m.FailRate = decimal.Round(m.RepairMins / m.TotalMins, 4).ToString("P");
-                mv.Add(m);
             }
 
             return mv;

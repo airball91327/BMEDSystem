@@ -4387,7 +4387,6 @@ C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\bin\Debu
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\bin\Debug\netcoreapp2.1\EDIS.pdb
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\bin\Debug\netcoreapp2.1\EDIS.Views.dll
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\bin\Debug\netcoreapp2.1\EDIS.Views.pdb
-C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csprojAssemblyReference.cache
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.RazorAssemblyInfo.cache
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.RazorAssemblyInfo.cs
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\UserSecretsAssemblyInfo.cs
