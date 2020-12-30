@@ -2368,25 +2368,29 @@ namespace EDIS.Areas.BMED.Controllers
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
             mv = _context.BMEDRepairDtls
-           .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation).Where(d => d.ApplyDate >= v.Sdate)
-           .Where(d => d.ApplyDate <= v.Edate), rd => rd.DocId, k => k.DocId,
-           (rd, k) => new
-           {
-               rd.DocId,
-               k.AccDpt,
-               k.ApplyDate,
-               k.AssetNo,
-               rd.Cost,
-               rd.EndDate,
-               rd.FailFactor,
-               rd.DealDes,
-               rd.DealState,
-               k.TroubleDes,
-               rd.InOut,
-               k.AssetName,
-               rd.Hour,
-               k.PlantClass
-           })
+           .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation)
+                   .Where(d => d.ApplyDate >= v.Sdate)
+                   .Where(d => d.ApplyDate <= v.Edate), 
+                   rd => rd.DocId, 
+                   k => k.DocId,
+                   (rd, k) => new
+                   {
+                       rd.DocId,
+                       k.AccDpt,
+                       k.ApplyDate,
+                       k.AssetNo,
+                       rd.Cost,
+                       rd.EndDate,
+                       rd.FailFactor,
+                       rd.DealDes,
+                       rd.DealState,
+                       k.TroubleDes,
+                       rd.InOut,
+                       k.AssetName,
+                       rd.Hour,
+                       k.PlantClass,
+                       k.EngId
+                    })
            //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
            //(k, at) => new
            //{

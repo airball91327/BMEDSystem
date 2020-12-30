@@ -4684,3 +4684,4 @@ C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debu
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.dll
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\EDIS.pdb
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csproj.CopyComplete
+C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csprojAssemblyReference.cache
