@@ -643,7 +643,7 @@ namespace EDIS.Areas.BMED.Controllers
             ERPRepHead hd = new ERPRepHead();
             hd.ZHANG_ID = "2";
             hd.ADD = 0;
-            hd.BIL_NO = docId;
+            hd.BIL_NO = "K" + docId;
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
             //Get SAL_NO
