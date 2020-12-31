@@ -42,9 +42,11 @@ namespace EDIS.Areas.BMED.Controllers
             userManager = customUserManager;
             roleManager = customRoleManager;
         }
-        // GET: /BMED/Reports
+        // GET: /BMED/Report
         public IActionResult Index(string rpname)
         {
+            if (rpname == "保養完成率統計表")
+                return RedirectToAction("FinishRateKeepIndex", "Report", new { rpname = rpname });
             //if (rpname == "儀器設備保養清單")
             //    return RedirectToAction("AssetKeepList");
             ReportQryVModel pv = new ReportQryVModel();
@@ -65,6 +67,123 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["ACCDPT"] = new SelectList(listItem, "Value", "Text");
 
             return View(pv);
+        }
+
+        // GET: /BMED/Report/FinishRateKeepIndex
+        public IActionResult FinishRateKeepIndex(string rpname)
+        {
+            ReportQryVModel pv = new ReportQryVModel();
+            pv.ReportClass = rpname;
+            return View(pv);
+        }
+
+        // POST: /BMED/Report/FinishRateKeepIndex
+        [HttpPost]
+        public IActionResult FinishRateKeepIndex(ReportQryVModel v)
+        {
+            var result = GetFinishRateKeep(v);
+
+            return View("FinishRateKeep", result);
+        }
+
+        private List<FinishRateKeep> GetFinishRateKeep(ReportQryVModel v)
+        {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            //
+            int? keepYm = v.KeepYm;
+            var qryFlowEng = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2").Select(kf => kf.DocId)
+                                                   .Join(_context.BMEDKeepFlows, id => id, kf => kf.DocId,
+                                                   (id, kf) => kf)
+                                                   .Where(kf => kf.Cls.Contains("工程師"))
+                                                   .OrderByDescending(kf => kf.DocId).ThenByDescending(kf => kf.StepId)
+                                                   .GroupBy(kf => kf.DocId).Select(group => group.FirstOrDefault());
+            var qryAsset = _context.BMEDAssets.Join(_context.BMEDAssetKeeps, a => a.AssetNo, ak => ak.AssetNo,
+                                              (a, ak) => new
+                                              {
+                                                  asset = a,
+                                                  assetkeep = ak
+                                              });
+            if (keepYm != null)
+            {
+                qryAsset = qryAsset.Where(d => d.assetkeep.KeepYm == keepYm);
+            }
+            var data = _context.BMEDKeeps.Where(k => k.Loc == urLocation)
+                                         .Join(_context.BMEDKeepDtls, k => k.DocId, kdtl => kdtl.DocId,
+                                         (k, kdtl) => new 
+                                         {
+                                             keep = k,
+                                             dtl = kdtl
+                                         })
+                                         .Join(qryFlowEng, k => k.keep.DocId, f => f.DocId,
+                                         (k, f) => new
+                                         {
+                                             keep = k.keep,
+                                             dtl = k.dtl,
+                                             engflow = f
+                                         })
+                                         .Join(qryAsset, k => k.keep.AssetNo, a => a.asset.AssetNo,
+                                         (k, a) => new
+                                         {
+                                             keep = k.keep,
+                                             dtl = k.dtl,
+                                             engflow = k.engflow,
+                                             asset = a.asset,
+                                             assetkeep = a.assetkeep
+                                         })
+                                         .Join(_context.AppUsers, k => k.engflow.UserId, u => u.Id,
+                                         (k, u) => new
+                                         {
+                                             keep = k.keep,
+                                             dtl = k.dtl,
+                                             engflow = k.engflow,
+                                             asset = k.asset,
+                                             assetkeep = k.assetkeep,
+                                             eng = u
+                                         });
+            var engIdList = data.Select(d => d.engflow.UserId).Distinct().ToList();
+            var dataToList = data.ToList();
+            List<FinishRateKeep> result = new List<FinishRateKeep>();
+            FinishRateKeep frk;
+            foreach (var engid in engIdList)
+            {
+                var engData = dataToList.Where(d => d.eng.Id == engid).ToList();
+                frk = new FinishRateKeep();
+                frk.EngId = engid.ToString();
+                frk.EngUserName = engData.FirstOrDefault().eng.UserName;
+                frk.EngFullName = engData.FirstOrDefault().eng.FullName;
+                frk.KeepYm = engData.FirstOrDefault().assetkeep.KeepYm;
+                //自行
+                frk.KeepCount0 = engData.Where(d => d.dtl.InOut == "0").Count();
+                frk.KeepEndCount0 = engData.Where(d => d.dtl.InOut == "0" && d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRate0 = frk.KeepCount0 == 0 ? "N/A" : ((decimal)frk.KeepEndCount0 / frk.KeepCount0).ToString("P");
+                //委外
+                frk.KeepCount1 = engData.Where(d => d.dtl.InOut == "1").Count();
+                frk.KeepEndCount1 = engData.Where(d => d.dtl.InOut == "1" && d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRate1 = frk.KeepCount1 == 0 ? "N/A" : ((decimal)frk.KeepEndCount1 / frk.KeepCount1).ToString("P");
+                //租賃
+                frk.KeepCount2 = engData.Where(d => d.dtl.InOut == "2").Count();
+                frk.KeepEndCount2 = engData.Where(d => d.dtl.InOut == "2" && d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRate2 = frk.KeepCount2 == 0 ? "N/A" : ((decimal)frk.KeepEndCount2 / frk.KeepCount2).ToString("P");
+                //保固
+                frk.KeepCount3 = engData.Where(d => d.dtl.InOut == "3").Count();
+                frk.KeepEndCount3 = engData.Where(d => d.dtl.InOut == "3" && d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRate3 = frk.KeepCount3 == 0 ? "N/A" : ((decimal)frk.KeepEndCount3 / frk.KeepCount3).ToString("P");
+                //總數
+                frk.KeepCount = engData.Count();
+                frk.KeepEndCount = engData.Where(d => d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRate = frk.KeepCount == 0 ? "N/A" : ((decimal)frk.KeepEndCount / frk.KeepCount).ToString("P");
+                //高風險
+                frk.KeepCountRisk = engData.Where(d => d.asset.HighRisk == "Y").Count();
+                frk.KeepEndCountRisk = engData.Where(d => d.asset.HighRisk == "Y" && d.dtl.EndDate.HasValue == true).Count();
+                frk.KeepEndRateRisk = frk.KeepCountRisk == 0 ? "N/A" : ((decimal)frk.KeepEndCountRisk / frk.KeepCountRisk).ToString("P");
+                result.Add(frk);
+            }
+
+            result.OrderBy(r => r.EngUserName);
+            return result;
         }
 
         private List<AssetKpScheVModel> AssetKpSche(ReportQryVModel v)
