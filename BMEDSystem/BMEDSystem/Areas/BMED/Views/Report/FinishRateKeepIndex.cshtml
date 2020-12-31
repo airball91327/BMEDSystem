@@ -6,6 +6,11 @@
 <script src="~/js/BMED/Report.js" asp-append-version="true"></script>
 
 <script>
+    $(function () {
+        $('#BtnQry').click(function () {
+            fetchPage(1);
+        });
+    });
     // Use ajax to fetch page.
     var fetchPage = function (page) {
         var pagedPartialUrl = '@Url.Action("FinishRateKeepIndex", "Report", new { Area = "BMED" })';
@@ -80,7 +85,7 @@
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="submit" value="查詢" class="btn btn-default"/>
+                <input type="button" value="查詢" class="btn btn-default" id="BtnQry"/>
             </div>
         </div>
     </div>

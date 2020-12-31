@@ -79,11 +79,12 @@ namespace EDIS.Areas.BMED.Controllers
 
         // POST: /BMED/Report/FinishRateKeepIndex
         [HttpPost]
-        public IActionResult FinishRateKeepIndex(ReportQryVModel v)
+        public IActionResult FinishRateKeepIndex(ReportQryVModel v, int page = 1)
         {
             var result = GetFinishRateKeep(v);
 
-            return View("FinishRateKeep", result);
+            TempData["qry"] = JsonConvert.SerializeObject(v);
+            return View("FinishRateKeep", result.ToPagedList(page, pageSize));
         }
 
         private List<FinishRateKeep> GetFinishRateKeep(ReportQryVModel v)
@@ -184,6 +185,80 @@ namespace EDIS.Areas.BMED.Controllers
 
             result.OrderBy(r => r.EngUserName);
             return result;
+        }
+
+        public IActionResult ExcelFinishRateKeep(ReportQryVModel v)
+        {
+            var result = GetFinishRateKeep(v);
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var sheet1 = excel.Workbook.Worksheets.Add("保養完成率統計表");
+            // Sheet1
+            // Title
+            sheet1.Cells[1, 1].Value = "負責工程師";
+            sheet1.Cells[1, 2].Value = "員工姓名";
+            sheet1.Cells[1, 3].Value = "保養起始年月";
+            sheet1.Cells[1, 4].Value = "應保養(自行)";
+            sheet1.Cells[1, 5].Value = "已保養(自行)";
+            sheet1.Cells[1, 6].Value = "完成率(自行)";
+            sheet1.Cells[1, 7].Value = "應保養(委外)";
+            sheet1.Cells[1, 8].Value = "已保養(委外)";
+            sheet1.Cells[1, 9].Value = "完成率(委外)"; 
+            sheet1.Cells[1, 10].Value = "應保養(租賃)";
+            sheet1.Cells[1, 11].Value = "已保養(租賃)";
+            sheet1.Cells[1, 12].Value = "完成率(租賃)";
+            sheet1.Cells[1, 13].Value = "應保養(保固)";
+            sheet1.Cells[1, 14].Value = "已保養(保固)";
+            sheet1.Cells[1, 15].Value = "完成率(保固)";
+            sheet1.Cells[1, 16].Value = "應保養";
+            sheet1.Cells[1, 17].Value = "已保養";
+            sheet1.Cells[1, 18].Value = "完成率";
+            sheet1.Cells[1, 19].Value = "應保養(高風險)";
+            sheet1.Cells[1, 20].Value = "已保養(高風險)";
+            sheet1.Cells[1, 21].Value = "完成率(高風險)";
+            //Data
+            int startPos = 2;
+            foreach (var item in result)
+            {
+                sheet1.Cells[startPos, 1].Value = item.EngUserName;
+                sheet1.Cells[startPos, 2].Value = item.EngFullName;
+                sheet1.Cells[startPos, 3].Value = item.KeepYm;
+                sheet1.Cells[startPos, 4].Value = item.KeepCount0;
+                sheet1.Cells[startPos, 5].Value = item.KeepEndCount0;
+                sheet1.Cells[startPos, 6].Value = item.KeepEndRate0;
+                sheet1.Cells[startPos, 7].Value = item.KeepCount1;
+                sheet1.Cells[startPos, 8].Value = item.KeepEndCount1;
+                sheet1.Cells[startPos, 9].Value = item.KeepEndRate1;
+                sheet1.Cells[startPos, 10].Value = item.KeepCount2;
+                sheet1.Cells[startPos, 11].Value = item.KeepEndCount2;
+                sheet1.Cells[startPos, 12].Value = item.KeepEndRate2;
+                sheet1.Cells[startPos, 13].Value = item.KeepCount3;
+                sheet1.Cells[startPos, 14].Value = item.KeepEndCount3;
+                sheet1.Cells[startPos, 15].Value = item.KeepEndRate3;
+                sheet1.Cells[startPos, 16].Value = item.KeepCount;
+                sheet1.Cells[startPos, 17].Value = item.KeepEndCount;
+                sheet1.Cells[startPos, 18].Value = item.KeepEndRate;
+                sheet1.Cells[startPos, 19].Value = item.KeepCountRisk;
+                sheet1.Cells[startPos, 20].Value = item.KeepEndCountRisk;
+                sheet1.Cells[startPos, 21].Value = item.KeepEndRateRisk;
+                startPos++;
+            }
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            var fileName = "FinishRateKeep_" + DateTime.Now.ToString("yyyyMMdd") + ".xlsx";
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: fileName
+            );
         }
 
         private List<AssetKpScheVModel> AssetKpSche(ReportQryVModel v)
