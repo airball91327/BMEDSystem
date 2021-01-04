@@ -41,6 +41,10 @@ namespace EDIS.Models
         public string StockName { get; set; }
         [Display(Name = "工程師")]
         public string EngId { get; set; }
+        [Display(Name = "廠商名稱")]
+        public string VendorName { get; set; }
+        [Display(Name = "廠商統編")]
+        public string VendorUniteNo { get; set; }
     }
     //
     public class UserHour
@@ -469,6 +473,8 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "關卡人員")]
+        public string ClsNam { get; set; }
         [Display(Name = "總工時")]
         public decimal Hour { get; set; }
         [Display(Name = "設備類別")]
@@ -949,8 +955,14 @@ namespace EDIS.Models
         public Nullable<DateTime> CloseDate { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "廠商代號")]
+        public string VendorId { get; set; }
         public string AssetClass { get; set; }
-
+        [Display(Name = "廠商名稱")]
+        public string VendorName { get; set; }
+        [Display(Name = "廠商統編")]
+        public string VendorUniteNo { get; set; }
+       
         private readonly ApplicationDbContext db;
         public StokCostVModel(ApplicationDbContext context)
         {

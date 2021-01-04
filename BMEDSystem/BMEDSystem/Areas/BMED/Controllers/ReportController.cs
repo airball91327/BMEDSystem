@@ -1267,22 +1267,22 @@ namespace EDIS.Areas.BMED.Controllers
                 asset.AccDptName = _context.Departments.Find(asset.AccDpt).Name_C;
             }
             sheet1.Cells[1, 1].Value = "儀器基本資料";
-            sheet1.Cells[2, 1].Value = "財產編號";
+            sheet1.Cells[1, 2].Value = "財產編號";
             sheet1.Cells[2, 2].Value = asset.AssetNo;
-            sheet1.Cells[3, 1].Value = "成本中心";
-            sheet1.Cells[3, 2].Value = asset.AccDptName;
-            sheet1.Cells[4, 1].Value = "廠牌";
-            sheet1.Cells[4, 2].Value = asset.Brand;
-            sheet1.Cells[5, 1].Value = "型號";
-            sheet1.Cells[5, 2].Value = asset.Type;
-            sheet1.Cells[6, 1].Value = "中文名稱";
-            sheet1.Cells[6, 2].Value = asset.Cname;
-            sheet1.Cells[7, 1].Value = "取得金額";
-            sheet1.Cells[7, 2].Value = asset.Cost;
-            sheet1.Cells[8, 1].Value = "取得日期";
-            sheet1.Cells[8, 2].Value = asset.BuyDate == null ? "" : asset.BuyDate.Value.ToString("yyyy/MM/dd"); ;
-            sheet1.Cells[9, 1].Value = "耐用年限";
-            sheet1.Cells[9, 2].Value = asset.UseLife == null ? "" : asset.UseLife.Value.ToString();
+            sheet1.Cells[1, 3].Value = "成本中心";
+            sheet1.Cells[2, 3].Value = asset.AccDptName;
+            sheet1.Cells[1, 4].Value = "廠牌";
+            sheet1.Cells[2, 4].Value = asset.Brand;
+            sheet1.Cells[1, 5].Value = "型號";
+            sheet1.Cells[2, 5].Value = asset.Type;
+            sheet1.Cells[1, 6].Value = "中文名稱";
+            sheet1.Cells[2, 6].Value = asset.Cname;
+            sheet1.Cells[1, 7].Value = "取得金額";
+            sheet1.Cells[2, 7].Value = asset.Cost;
+            sheet1.Cells[1, 8].Value = "取得日期";
+            sheet1.Cells[2, 8].Value = asset.BuyDate == null ? "" : asset.BuyDate.Value.ToString("yyyy/MM/dd"); ;
+            sheet1.Cells[1, 9].Value = "耐用年限";
+            sheet1.Cells[2, 9].Value = asset.UseLife == null ? "" : asset.UseLife.Value.ToString();
             //sheet2
             var sheet2 = excel.Workbook.Worksheets.Add("維修保養履歷");
             List<RpKpHistoryVModel> sv = new List<RpKpHistoryVModel>();
@@ -1383,28 +1383,43 @@ namespace EDIS.Areas.BMED.Controllers
             if (v.Edate != null)
                 sv = sv.Where(s => s.ApplyDate <= v.Edate).ToList();
             //Title
+            //sheet2.Cells[1, 1].Value = "表單類別";
+            //sheet2.Cells[1, 2].Value = "表單編號";
+            //sheet2.Cells[1, 3].Value = "送單日期";
+            //sheet2.Cells[1, 4].Value = "完工日期";
+            //sheet2.Cells[1, 5].Value = "工程師";
+            //sheet2.Cells[1, 6].Value = "工時";
+            //sheet2.Cells[1, 7].Value = "費用";
+            //sheet2.Cells[1, 8].Value = "故障原因";
+            //sheet2.Cells[1, 9].Value = "處理情形";
+            //
+
             sheet2.Cells[1, 1].Value = "表單類別";
             sheet2.Cells[1, 2].Value = "表單編號";
-            sheet2.Cells[1, 3].Value = "送單日期";
-            sheet2.Cells[1, 4].Value = "完工日期";
-            sheet2.Cells[1, 5].Value = "工程師";
-            sheet2.Cells[1, 6].Value = "工時";
-            sheet2.Cells[1, 7].Value = "費用";
-            sheet2.Cells[1, 8].Value = "故障原因";
-            sheet2.Cells[1, 9].Value = "處理情形";
+            sheet2.Cells[1, 3].Value = "財產編號";
+            sheet2.Cells[1, 4].Value = "設備名稱";
+            sheet2.Cells[1, 5].Value = "送單日期";
+            sheet2.Cells[1, 6].Value = "完工日期";
+            sheet2.Cells[1, 7].Value = "工程師";
+            sheet2.Cells[1, 8].Value = "維修時數";
+            sheet2.Cells[1, 9].Value = "維修金額";
+            sheet2.Cells[1, 10].Value = "故障狀態";
+            sheet2.Cells[1, 11].Value = "處理情形";
             //Data
             int startPos = 2;
             foreach(var item in sv)
             {
                 sheet2.Cells[startPos, 1].Value = item.DocType;
                 sheet2.Cells[startPos, 2].Value = item.DocId;
-                sheet2.Cells[startPos, 3].Value = item.ApplyDate;
-                sheet2.Cells[startPos, 4].Value = item.EndDate;
-                sheet2.Cells[startPos, 5].Value = item.EngName;
-                sheet2.Cells[startPos, 6].Value = item.Hours;
-                sheet2.Cells[startPos, 7].Value = item.Cost;
-                sheet2.Cells[startPos, 8].Value = item.TroubleDes;
-                sheet2.Cells[startPos, 9].Value = item.DealDes;
+                sheet2.Cells[startPos, 3].Value = item.AssetNo;
+                sheet2.Cells[startPos, 4].Value = item.AssetName;
+                sheet2.Cells[startPos, 5].Value = item.ApplyDate;
+                sheet2.Cells[startPos, 6].Value = item.EndDate;
+                sheet2.Cells[startPos, 7].Value = item.EngName;
+                sheet2.Cells[startPos, 8].Value = item.Hours;
+                sheet2.Cells[startPos, 9].Value = item.Cost;
+                sheet2.Cells[startPos, 10].Value = item.TroubleDes;
+                sheet2.Cells[startPos, 11].Value = item.DealDes;
                 startPos++;
             }
             //sheet3
@@ -1466,19 +1481,19 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var sheet3 = excel.Workbook.Worksheets.Add("總計");
             sheet3.Cells[1, 1].Value = "總計";
-            sheet3.Cells[2, 1].Value = "維修時數";
+            sheet3.Cells[1, 2].Value = "維修時數";
             sheet3.Cells[2, 2].Value = ay.RepairHour;
-            sheet3.Cells[3, 1].Value = "保養時數";
-            sheet3.Cells[3, 2].Value = ay.KeepHour;
-            sheet3.Cells[4, 1].Value = "維修金額";
-            sheet3.Cells[4, 2].Value = ay.RepCost;
-            sheet3.Cells[5, 1].Value = "保養金額";
-            sheet3.Cells[5, 2].Value = ay.KeepCost;
-            sheet3.Cells[6, 1].Value = "妥善率";
-            sheet3.Cells[6, 2].Value = ay.ProperRate;
-            sheet3.Cells[7, 1].Value = "維修比";
-            sheet3.Cells[7, 2].Value = ay.RepRatio;
-            sheet3.Cells[8, 1].Value = "備註：維修比 = 維修總金額/取得金額。";
+            sheet3.Cells[1, 3].Value = "保養時數";
+            sheet3.Cells[2, 3].Value = ay.KeepHour;
+            sheet3.Cells[1, 4].Value = "維修金額";
+            sheet3.Cells[2, 4].Value = ay.RepCost;
+            sheet3.Cells[1, 5].Value = "保養金額";
+            sheet3.Cells[2, 5].Value = ay.KeepCost;
+            sheet3.Cells[1, 6].Value = "妥善率";
+            sheet3.Cells[2, 6].Value = ay.ProperRate;
+            sheet3.Cells[1, 7].Value = "維修比";
+            sheet3.Cells[2, 7].Value = ay.RepRatio;
+            sheet3.Cells[3, 1].Value = "備註：維修比 = 維修總金額/取得金額。";
 
             // Generate the Excel, convert it into byte array and send it back to the controller.
             byte[] fileContents;
@@ -1510,96 +1525,118 @@ namespace EDIS.Areas.BMED.Controllers
             //依照院區區分設備
             List<AssetModel> bmedAssets = GetAssetsByLoc(urLocation);
             //
-            sv = bmedAssets.Where(a => a.AssetNo == v.AssetNo)
-                .Join(_context.BMEDRepairs, a => a.AssetNo, r => r.AssetNo,
-                (a, r) => new
-                {
-                    DocType = "請修",
-                    DocId = r.DocId,
-                    AssetNo = a.AssetNo,
-                    AssetName = a.Cname,
-                    ApplyDate = r.ApplyDate,
-                    TroubleDes = r.TroubleDes
-                }).Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
-                    (r, f) => r).Join(_context.BMEDRepairDtls, r => r.DocId, d => d.DocId,
-                (r, d) => new
-                {
-                    DocType = "請修",
-                    DocId = r.DocId,
-                    AssetNo = r.AssetNo,
-                    AssetName = r.AssetName,
-                    ApplyDate = r.ApplyDate,
-                    TroubleDes = r.TroubleDes,
-                    DealDes = d.DealDes,
-                    EndDate = d.EndDate,
-                    Hours = d.Hour,
-                    Cost = d.Cost
-                }).Join(_context.BMEDRepairEmps.Join(_context.AppUsers, r => r.UserId, a => a.Id,
-                (r, a) => new
-                {
-                    DocId = r.DocId,
-                    UserName = a.FullName
-                }), d => d.DocId, e => e.DocId,
-                (d, e) => new RpKpHistoryVModel
-                {
-                    DocType = "請修",
-                    DocId = d.DocId,
-                    AssetNo = d.AssetNo,
-                    AssetName = d.AssetName,
-                    ApplyDate = d.ApplyDate,
-                    TroubleDes = d.TroubleDes,
-                    DealDes = d.DealDes,
-                    EndDate = d.EndDate,
-                    Hours = d.Hours,
-                    Cost = d.Cost,
-                    EngName = e.UserName
-                }).ToList();
-            //
-            sv2 = bmedAssets.Where(a => a.AssetNo == v.AssetNo)
-                .Join(_context.BMEDKeeps, a => a.AssetNo, r => r.AssetNo,
-                (a, r) => new
-                {
-                    DocType = "保養",
-                    DocId = r.DocId,
-                    AssetNo = a.AssetNo,
-                    AssetName = a.Cname,
-                    ApplyDate = r.SentDate,
-                    TroubleDes = ""
-                }).Join(_context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
-                    (r, f) => r).Join(_context.BMEDKeepDtls, r => r.DocId, d => d.DocId,
-                (r, d) => new
-                {
-                    DocType = r.DocType,
-                    DocId = r.DocId,
-                    AssetNo = r.AssetNo,
-                    AssetName = r.AssetName,
-                    ApplyDate = r.ApplyDate,
-                    TroubleDes = r.TroubleDes,
-                    DealDes = d.Result,
-                    EndDate = d.EndDate,
-                    Hours = d.Hours,
-                    Cost = d.Cost
-                }).Join(_context.BMEDKeepEmps.Join(_context.AppUsers, r => r.UserId, a => a.Id,
-                (r, a) => new
-                {
-                    DocId = r.DocId,
-                    UserName = a.FullName
-                }), d => d.DocId, e => e.DocId,
-                (d, e) => new RpKpHistoryVModel
-                {
-                    DocType = d.DocType,
-                    DocId = d.DocId,
-                    AssetNo = d.AssetNo,
-                    AssetName = d.AssetName,
-                    ApplyDate = d.ApplyDate.Value,
-                    TroubleDes = d.TroubleDes,
-                    DealDes = Convert.ToString(d.DealDes),
-                    EndDate = d.EndDate,
-                    Hours = d.Hours,
-                    Cost = d.Cost,
-                    EngName = e.UserName
-                }).ToList();
+
+            //維修工程師
+            var repairE = _context.BMEDRepairEmps
+                        .Join(_context.AppUsers, r => r.UserId, a => a.Id,
+                        (r, a) => new
+                        {
+                            DocId = r.DocId,
+                            UserName = a.FullName
+                        })
+                        .ToList();
+
+            //財編申請單
+            var bmedA = _context.BMEDRepairs.Where(a => a.AssetNo == v.AssetNo).ToList();
+
+            sv = bmedA
+                //.Join(  _context.BMEDRepairFlows.Where(f => ss.Contains(f.Status))
+                //        , r => r.DocId
+                //        , f => f.DocId,
+                //        (r, f) => r)
+                .Join(  _context.BMEDRepairDtls, 
+                        r => r.DocId, 
+                        d => d.DocId,
+                        (r, d) => new
+                        {
+                          DocType = "請修",
+                          DocId = r.DocId,
+                          AssetNo = r.AssetNo,
+                          AssetName = r.AssetName,
+                          ApplyDate = r.ApplyDate,
+                          TroubleDes = r.TroubleDes,
+                          DealDes = d.DealDes,
+                          EndDate = d.EndDate,
+                          Hours = d.Hour,
+                          Cost = d.Cost
+                        }
+                     )
+                .AsQueryable()
+                .Join(  repairE,
+                        d => d.DocId, e => e.DocId,
+                        (d, e) => new RpKpHistoryVModel
+                        {
+                            DocType = "請修",
+                            DocId = d.DocId,
+                            AssetNo = d.AssetNo,
+                            AssetName = d.AssetName,
+                            ApplyDate = d.ApplyDate,
+                            TroubleDes = d.TroubleDes,
+                            DealDes = d.DealDes,
+                            EndDate = d.EndDate,
+                            Hours = d.Hours,
+                            Cost = d.Cost,
+                            EngName = e.UserName
+                        }).ToList();
+
+            //保養工程師
+            var keepE = _context.BMEDKeepEmps
+                        .Join(  _context.AppUsers, 
+                                r => r.UserId, 
+                                a => a.Id,
+                                (r, a) => new
+                                {
+                                    DocId = r.DocId,
+                                    UserName = a.FullName
+                                }
+                             )
+                        .ToList();
+
+            sv2 = _context.BMEDKeeps.Where(a => a.AssetNo == v.AssetNo)
+                .Join(  _context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), 
+                        r => r.DocId, 
+                        f => f.DocId,
+                        (r, f) => r)
+                .AsQueryable()
+                .Join(  _context.BMEDKeepDtls, 
+                        r => r.DocId, 
+                        d => d.DocId,
+                        (r, d) => new
+                        {
+                            DocType = "保養",
+                            DocId = r.DocId,
+                            AssetNo = r.AssetNo,
+                            AssetName = r.AssetName,
+                            ApplyDate = r.SentDate,
+                            TroubleDes = "",
+                            DealDes = d.Result,
+                            EndDate = d.EndDate,
+                            Hours = d.Hours,
+                            Cost = d.Cost
+                        }
+                     )
+                .AsQueryable()
+                .Join(  keepE, 
+                        d => d.DocId, 
+                        e => e.DocId,
+                        (d, e) => new RpKpHistoryVModel
+                        {
+                            DocType = d.DocType,
+                            DocId = d.DocId,
+                            AssetNo = d.AssetNo,
+                            AssetName = d.AssetName,
+                            ApplyDate = d.ApplyDate.Value,
+                            TroubleDes = d.TroubleDes,
+                            DealDes = Convert.ToString(d.DealDes),
+                            EndDate = d.EndDate,
+                            Hours = d.Hours,
+                            Cost = d.Cost,
+                            EngName = e.UserName
+                        })
+                .ToList();
+
             sv.AddRange(sv2);
+
             if (v.Sdate != null)
                 sv = sv.Where(s => s.ApplyDate >= v.Sdate).ToList();
             if (v.Edate != null)
@@ -2309,6 +2346,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("請修日期");
             dt.Columns.Add("完工日期");
             dt.Columns.Add("財產編號");
+            dt.Columns.Add("設備名稱");
             dt.Columns.Add("成本中心");
             dt.Columns.Add("故障描述");
             dt.Columns.Add("故障原因");
@@ -2317,6 +2355,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("維修方式");
             dt.Columns.Add("維修費用");
             dt.Columns.Add("工程師");
+            dt.Columns.Add("目前關卡人員");
             dt.Columns.Add("總工時");
             List<MonthRepairVModel> mv = MonthRepair(v);
             mv.ForEach(m =>
@@ -2325,16 +2364,18 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[0] = m.DocId;
                 dw[1] = m.ApplyDate;
                 dw[2] = m.EndDate;
-                dw[3] = m.AssetNo + m.AssetNam;
-                dw[4] = m.AccDpt + m.AccDptNam;
-                dw[5] = m.TroubleDes;
-                dw[6] = m.FailFactor;
-                dw[7] = m.DealState;
-                dw[8] = m.DealDes;
-                dw[9] = m.InOut;
-                dw[10] = m.Cost;
-                dw[11] = m.EngNam;
-                dw[12] = m.Hour;
+                dw[3] = m.AssetNo;
+                dw[4] = m.AssetNam;
+                dw[5] = m.AccDpt + m.AccDptNam;
+                dw[6] = m.TroubleDes;
+                dw[7] = m.FailFactor;
+                dw[8] = m.DealState;
+                dw[9] = m.DealDes;
+                dw[10] = m.InOut;
+                dw[11] = m.Cost;
+                dw[12] = m.EngNam;
+                dw[13] = m.ClsNam;
+                dw[14] = m.Hour;
                 dt.Rows.Add(dw);
             });
             //
@@ -2388,8 +2429,7 @@ namespace EDIS.Areas.BMED.Controllers
                        rd.InOut,
                        k.AssetName,
                        rd.Hour,
-                       k.PlantClass,
-                       k.EngId
+                       k.PlantClass
                     })
            //.Join(_context.BMEDAssets, k => k.AssetNo, at => at.AssetNo,
            //(k, at) => new
@@ -2459,6 +2499,41 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.Hour,
                k.k.PlantClass
            })
+            .GroupJoin(_context.BMEDRepairFlows.Where( f => f.Status == "?")
+            , k => k.DocId, kf => kf.DocId,
+            (k, kf) => new { k, kf })
+            .SelectMany(oi => oi.kf.DefaultIfEmpty(),
+            (k, kf) => new
+            {
+               repairV = k,kf
+            })
+            .GroupJoin(_context.AppUsers, k => k.kf.UserId, u => u.Id,
+            (k, u) => new { k, u })
+            .SelectMany(ui => ui.u.DefaultIfEmpty(),
+            (k, u) => new
+            {
+                k.k.repairV.k.DocId,
+                k.k.repairV.k.AccDpt,
+                k.k.repairV.k.Name_C,
+                k.k.repairV.k.ApplyDate,
+                k.k.repairV.k.AssetNo,
+                //k.k.Cname,
+                k.k.repairV.k.Cost,
+                k.k.repairV.k.EndDate,
+                k.k.repairV.k.TroubleDes,
+                k.k.repairV.k.FailFactor,
+                k.k.repairV.k.DealDes,
+                k.k.repairV.k.DealState,
+                k.k.repairV.k.InOut,
+                //k.k.Type,
+                //k.k.AssetClass,
+                k.k.repairV.k.UserId,
+                u.FullName,
+                k.k.repairV.k.AssetName,
+                k.k.repairV.k.Hour,
+                k.k.repairV.k.PlantClass,
+                //kf.UserId
+            })
             .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
             (k, u) => new { k, u })
             .SelectMany(ui => ui.u.DefaultIfEmpty(),
@@ -2479,11 +2554,62 @@ namespace EDIS.Areas.BMED.Controllers
                TroubleDes = k.k.TroubleDes,
                Type = "",
                EngNam = u.FullName,
+               ClsNam = k.k.FullName,
                AssetClass = "",
                Hour = k.k.Hour,
                PlantClass = k.k.PlantClass
            })
             //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+            .GroupJoin(_context.BMEDFailFactors, m => m.FailFactor.ToString(), f => f.Id.ToString(),
+            (m, f) => new { m, f })
+            .SelectMany(fa => fa.f.DefaultIfEmpty(),
+            (m, f) => new
+            {
+                m.m.DocId,
+                m.m.AccDpt,
+                m.m.AccDptNam,
+                m.m.ApplyDate,
+                m.m.AssetNo,
+                m.m.AssetNam,
+                m.m.Cost,
+                m.m.EndDate,
+                f.Title,
+                m.m.DealDes,
+                m.m.DealState,
+                m.m.InOut,
+                m.m.TroubleDes,
+                m.m.Type,
+                m.m.EngNam,
+                m.m.ClsNam,
+                m.m.AssetClass,
+                m.m.Hour,
+                m.m.PlantClass
+            })
+            .GroupJoin(_context.BMEDDealStatuses, m => m.DealState, d => d.Id.ToString(),
+            (m, d) => new { m, d })
+            .SelectMany(ds => ds.d.DefaultIfEmpty(),
+            (m, d) => new MonthRepairVModel
+            {
+                DocId = m.m.DocId,
+                AccDpt = m.m.AccDpt,
+                AccDptNam = m.m.AccDptNam,
+                ApplyDate = m.m.ApplyDate,
+                AssetNo = m.m.AssetNo,
+                AssetNam = m.m.AssetNam,
+                Cost = m.m.Cost,
+                EndDate = m.m.EndDate,
+                FailFactor = m.m.Title,
+                DealDes = m.m.DealDes,
+                DealState = d.Title,
+                InOut = m.m.InOut,
+                TroubleDes = m.m.TroubleDes,
+                Type = m.m.Type,
+                EngNam = m.m.EngNam,
+                ClsNam = m.m.ClsNam,
+                AssetClass = m.m.AssetClass,
+                Hour = m.m.Hour,
+                PlantClass = m.m.PlantClass
+            })
             .ToList();
 
             if (!string.IsNullOrEmpty(v.AccDpt))
@@ -2819,7 +2945,7 @@ namespace EDIS.Areas.BMED.Controllers
                                 , d => d.rd.DocId
                                 , c => c.DocId
                                 , (d, c) => new { repM = d, repCost = c })
-                              .SelectMany(s => s.repCost.Select(c => c.TotalCost).DefaultIfEmpty(0).DefaultIfEmpty(),
+                              .SelectMany(s => s.repCost.Select(c => c.TotalCost).DefaultIfEmpty(0),
                               (r, c) => new { repM = r.repM, repCost = c })
                               .GroupBy(g => g.repM.r.AccDpt)
                               .ToDictionary(o => o.Key, o => o.Select(c => c.repCost).Sum());
@@ -3424,7 +3550,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("表單編號");
             dt.Columns.Add("請修日期");
             dt.Columns.Add("單位名稱");
-            dt.Columns.Add("設備財編");
+            //dt.Columns.Add("設備財編");
             dt.Columns.Add("設備名稱");
             dt.Columns.Add("設備型號");
             dt.Columns.Add("故障描述");
@@ -3439,14 +3565,14 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[0] = m.DocId;
                 dw[1] = m.ApplyDate.ToString("yyyy/MM/dd");
                 dw[2] = m.CustNam;
-                dw[3] = m.AssetNo;
-                dw[4] = m.AssetNam;
-                dw[5] = m.Type;
-                dw[6] = m.TroubleDes;
-                dw[7] = m.FailFactor;
-                dw[8] = m.DealDes;
-                dw[9] = m.EndDate.ToString("yyyy/MM/dd");
-                dw[10] = m.EngNam;
+                //dw[3] = m.AssetNo;
+                dw[3] = m.AssetNam;
+                dw[4] = m.Type;
+                dw[5] = m.TroubleDes;
+                dw[6] = m.FailFactor;
+                dw[7] = m.DealDes;
+                dw[8] = m.EndDate.ToString("yyyy/MM/dd");
+                dw[9] = m.EngNam;
                 dt.Rows.Add(dw);
             });
             //
@@ -3486,7 +3612,78 @@ namespace EDIS.Areas.BMED.Controllers
             TempData["qry"] = JsonConvert.SerializeObject(v);
 
             List<RepairDtlModel> rdtl = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate)
-                .Where(d => d.EndDate <= v.Edate).ToList();
+                .Where(d => d.EndDate <= v.Edate)
+                .ToList();
+
+            var rdtlF = rdtl.GroupJoin( _context.BMEDFailFactors,
+                                        d => d.FailFactor,
+                                        f => f.Id,
+                                        (d, f) => new { repairD = d, failF = f }
+                                      )
+                            .SelectMany( f => f.failF.DefaultIfEmpty(),
+                                         (d, f) => new {_repairD = d.repairD , _failF = f })
+                            .GroupBy( x => x._repairD.FailFactor)
+                            .ToDictionary( x => x.Key , x => x.Select(xf => xf._failF));
+
+            //
+            var repairU = _context.BMEDRepairs.Where(i => i.Loc == urLocation).ToList();
+
+            var repairD = repairU
+                            .Join( rdtl ,
+                                   d => d.DocId,
+                                   rd => rd.DocId,
+                                   (d,rd) => new { repairs = d , rdrlR = rd }
+                            )
+                            .GroupBy( x => x.repairs.DocId)
+                            .ToDictionary(x => x.Key, x => x.Select(xo => xo.repairs));
+
+            //
+            var departO = _context.BMEDRepairs
+                                    .GroupBy(rp => rp.AccDpt)
+                                    .Select(g => g.First())
+                                    .ToList();
+
+            var repairO = _context.Departments
+                            .Join( departO,
+                                   d => d.DptId,
+                                   rd => rd.AccDpt,
+                                   (d, rd) => new { depart = d, repairs = rd }
+                            )
+                            
+                            .GroupBy(x => x.repairs.DocId)
+                            .ToDictionary(x => x.Key, x => x.Select( xo => xo.depart));
+
+            //
+            var departA = _context.BMEDRepairs
+                                    .GroupBy(rp => rp.AssetNo)
+                                    .Select(g => g.First())
+                                    .ToList();
+
+            var repairA = _context.BMEDAssets
+                            .Join( departA,
+                                   d => d.AssetNo,
+                                   rd => rd.AssetNo,
+                                   (d, rd) => new { asset = d, repairs = rd }
+                                  )
+                            .GroupBy(x => x.repairs.DocId)
+                            .ToDictionary(x => x.Key, x => x.Select(xo => xo.asset));
+
+            //
+            var departP = rdtl.GroupBy(rp => rp.DocId)
+                              .Select(g => g.First())
+                              .ToList();
+
+            var repairP = _context.BMEDRepairEmps
+                            .Join(departP,
+                                   d => d.DocId,
+                                   rd => rd.DocId,
+                                   (d, rd) => new { repairE = d, repairs = rd }
+                                  )
+                            .GroupBy(x => x.repairs.DocId)
+                            .ToDictionary(x => x.Key, x => x.Select(xo => xo.repairE));
+
+
+
 
             foreach (RepairDtlModel rd in rdtl)
             {
@@ -3495,32 +3692,58 @@ namespace EDIS.Areas.BMED.Controllers
                 m.DealDes = rd.DealDes;
                 m.EndDate = rd.EndDate.Value;
                 m.Cost = rd.Cost;
-                m.FailFactor = Convert.ToString(rd.FailFactor);
-                r = _context.BMEDRepairs.Where(i => i.Loc == urLocation).Where(i => i.DocId == rd.DocId).ToList().FirstOrDefault();
-                if (r != null)
+                m.FailFactor = rdtlF.ContainsKey(rd.FailFactor) == false ? null : rdtlF[rd.FailFactor].FirstOrDefault().Title;//Convert.ToString(rd.FailFactor);
+                //r = _context.BMEDRepairs
+                //    .Where(i => i.Loc == urLocation)
+                //    .Where(i => i.DocId == rd.DocId)
+                //    .ToList()
+                //    .FirstOrDefault();
+                //if (r != null)
+                //{
+                //    m.TroubleDes = r.TroubleDes;
+                //    m.CustId = r.AccDpt;
+                //    o = _context.Departments.Where(c => c.DptId == r.AccDpt).ToList().FirstOrDefault();
+                //    if (o != null)
+                //        m.CustNam = o.Name_C;
+
+                //    m.ApplyDate = r.ApplyDate;
+                //    m.AssetNo = r.AssetNo;
+                //    a = _context.BMEDAssets.Where(s => s.AssetNo == r.AssetNo)
+                //            .Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).FirstOrDefault();
+                //    if (a != null)
+                //    {
+                //        m.AssetNam = a.Cname;
+                //        m.Type = a.Type;
+                //    }
+                //}
+
+                if (repairD.ContainsKey(rd.DocId) != false)
                 {
-                    m.TroubleDes = r.TroubleDes;
-                    m.CustId = r.AccDpt;
-                    o = _context.Departments.Where(c => c.DptId == r.AccDpt).ToList().FirstOrDefault();
+                    m.TroubleDes = repairD[rd.DocId].FirstOrDefault().TroubleDes;
+                    m.CustId = repairD[rd.DocId].FirstOrDefault().AccDpt;
+                    o = repairO.ContainsKey(rd.DocId) == false ? null : repairO[rd.DocId].FirstOrDefault();
                     if (o != null)
                         m.CustNam = o.Name_C;
-                    m.ApplyDate = r.ApplyDate;
-                    m.AssetNo = r.AssetNo;
-                    a = _context.BMEDAssets.Where(s => s.AssetNo == r.AssetNo)
-                            .Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).FirstOrDefault();
+
+                    m.ApplyDate = repairD[rd.DocId].FirstOrDefault().ApplyDate;
+                    m.AssetNo = repairD[rd.DocId].FirstOrDefault().AssetNo;
+                    a = repairA.ContainsKey(rd.DocId) == false ? null : repairA[rd.DocId].FirstOrDefault();
                     if (a != null)
                     {
                         m.AssetNam = a.Cname;
                         m.Type = a.Type;
                     }
                 }
-                p = _context.BMEDRepairEmps.Where(e => e.DocId == rd.DocId).ToList().FirstOrDefault();
+                //p = _context.BMEDRepairEmps.Where(e => e.DocId == rd.DocId).ToList().FirstOrDefault();
+
+                p = repairP.ContainsKey(rd.DocId) == false ? null : repairP[rd.DocId].FirstOrDefault();
+
                 if (p != null)
                 {
                     AppUserModel u = _context.AppUsers.Find(p.UserId);
                     m.EngNam = u.FullName;
                 }
-                if (r != null)
+                if (repairD.ContainsKey(rd.DocId) != false)
                 {
                     mv2.Add(m);
                 }
@@ -3849,6 +4072,7 @@ namespace EDIS.Areas.BMED.Controllers
                     dt.Columns.Add(s);
                 });
             List<StokCostVModel> uv = StokCost(v);
+            uv = uv.Where(sv => sv.TotalPrice > 0 ).ToList();
             uv.ForEach(m =>
             {
                 dw = dt.NewRow();
@@ -3905,9 +4129,33 @@ namespace EDIS.Areas.BMED.Controllers
             List<StokCostVModel> sv = new List<StokCostVModel>();
             List<StokCostVModel> sv2 = new List<StokCostVModel>();
 
-            sv = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate
-                && d.EndDate <= v.Edate)
-            .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
+
+            var repairD = _context.BMEDRepairDtls.ToList();
+                            //.Where(d => d.EndDate >= v.Sdate && d.EndDate <= v.Edate);
+            if (v.Sdate != null)
+            {
+                repairD = repairD.Where(d => d.EndDate >= v.Sdate).ToList();
+            }
+
+            if (v.Edate != null)
+            {
+                repairD = repairD.Where(d => d.EndDate <= v.Edate).ToList();
+            }
+
+            var repair = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
+            //var costs = _context.BMEDRepairCosts.ToList();
+            //if (!string.IsNullOrEmpty(v.VendorName))
+            //{
+            //    costs = costs.Where(c => c.VendorName == v.VendorName).ToList();
+            //}
+
+            //if (!string.IsNullOrEmpty(v.VendorUniteNo))
+            //{
+            //    costs = costs.Where(c => c.VendorName == v.VendorUniteNo).ToList();
+            //}
+
+            sv = repairD
+            .Join(repair, rd => rd.DocId, k => k.DocId,
             (rd, k) => new
             {
                 rd.DocId,
@@ -3960,11 +4208,40 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.DealDes,
                //k.k.Type,
                //k.k.AssetClass,
-               PartNo = rc.PartNo != null ? rc.PartNo : "",
-               PartNam = rc.PartName != null ? rc.PartName : "",
-               Qty = rc.Qty != null ? rc.Qty : 0,
-               Price = rc.Price != null ? rc.Price : 0,
-               TotalCost = rc.TotalCost != null ? rc.TotalCost : 0
+               PartNo = rc != null ? (rc.PartNo != null ? rc.PartNo : ""):"",
+               PartNam = rc != null ? (rc.PartName != null ? rc.PartName : ""): "",
+               Qty = rc != null ? rc.Qty : 0,
+               Price = rc != null ? rc.Price : 0,
+               TotalCost = rc != null ? rc.TotalCost : 0,
+               VendorId = rc != null ? (rc.VendorId != null ? rc.VendorId : null) : null
+           })
+             .GroupJoin(_context.BMEDVendors, k => k.VendorId, vr => vr.VendorId,
+            (k, vr) => new { k, vr })
+            .SelectMany(oi => oi.vr.DefaultIfEmpty(),
+           (k, vr) => new
+           {
+               k.k.DocId,
+               k.k.AccDpt,
+               k.k.ApplyDate,
+               k.k.AssetNo,
+               k.k.AssetName,
+               k.k.PlantClass,
+               //k.k.Cname,
+               k.k.Cost,
+               k.k.EndDate,
+               k.k.CloseDate,
+               k.k.FailFactor,
+               k.k.TroubleDes,
+               k.k.DealDes,
+               //k.k.Type,
+               //k.k.AssetClass,
+               PartNo = k.k.PartNo,
+               PartNam =k.k.PartNam,
+               Qty = k.k.Qty,
+               Price = k.k.Price,
+               TotalCost = k.k.TotalCost,
+               VendorName = vr == null ? "" : vr.VendorName,
+               UniteNo = vr == null ? "" : vr.UniteNo
            })
              .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
             (k, c) => new
@@ -3989,7 +4266,9 @@ namespace EDIS.Areas.BMED.Controllers
                 k.Qty,
                 k.Price,
                 k.TotalCost,
-                c.Name_C
+                c.Name_C,
+                k.VendorName,
+                k.UniteNo
             })
              .Join(_context.BMEDRepairEmps, k => k.DocId, ke => ke.DocId,
             (k, ke) => new
@@ -4015,7 +4294,9 @@ namespace EDIS.Areas.BMED.Controllers
                 k.Price,
                 k.TotalCost,
                 k.Name_C,
-                ke.UserId
+                ke.UserId,
+                k.VendorName,
+                k.UniteNo
             })
             .Join(_context.AppUsers, k => k.UserId, u => u.Id,
             (k, u) => new StokCostVModel
@@ -4039,18 +4320,46 @@ namespace EDIS.Areas.BMED.Controllers
                 Price = k.Price,
                 TotalPrice = k.TotalCost,
                 EngNam = u.FullName,
-                AssetClass = ""
+                AssetClass = "",
+                VendorName = k.VendorName,
+                VendorUniteNo = k.UniteNo
             }).ToList();
             //
+            var svs = sv.GroupJoin( _context.BMEDRepairCosts,
+                                s => s.DocId,
+                                r => r.DocId,
+                                (s , r) => new { costV = s , repsirC = r})
+                        .SelectMany( x => x.repsirC.DefaultIfEmpty()
+                                     ,(s , r) => new { _costV = s , _repsirC = r })
+                        .GroupBy( x => x._costV.costV.DocId)
+                        .ToDictionary( x => x.Key , x => x.Select(xr => xr._repsirC.TotalCost))
+                        ;
             foreach (StokCostVModel s in sv)
             {
-                if (s.StokNo != "")
-                    s.Cost = _context.BMEDRepairCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
+                if (s.StokNo != "") 
+                    s.Cost = svs[s.DocId].Sum(r => r);
+                    //s.Cost = _context.BMEDRepairCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
+            
             }
             //保養
-            sv2 = _context.BMEDKeepDtls.Where(d => d.EndDate >= v.Sdate
-               && d.EndDate <= v.Edate)
-           .Join(_context.BMEDKeeps.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
+
+            var keeps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
+            //var costK = _context.BMEDKeepCosts.ToList();
+            var KeepD = _context.BMEDKeepDtls.ToList();
+            //.Where(d => d.EndDate >= v.Sdate && d.EndDate <= v.Edate);
+            if (v.Sdate != null)
+            {
+                KeepD = KeepD.Where(d => d.EndDate >= v.Sdate).ToList();
+            }
+
+            if (v.Edate != null)
+            {
+                KeepD = KeepD.Where(d => d.EndDate <= v.Edate).ToList();
+            }
+
+
+            sv2 = KeepD
+           .Join(keeps, rd => rd.DocId, k => k.DocId,
            (rd, k) => new
            {
                rd.DocId,
@@ -4099,11 +4408,38 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.Cycle,
                k.k.Type,
                k.k.AssetClass,
-               PartNo = rc.PartNo != null ? rc.PartNo : "",
-               PartNam = rc.PartName != null ? rc.PartName : "",
-               Qty = rc.Qty != null ? rc.Qty : 0,
-               Price = rc.Price != null ? rc.Price : 0,
-               TotalCost = rc.TotalCost != null ? rc.TotalCost : 0
+               PartNo = rc != null ? (rc.PartNo != null ? rc.PartNo : "") : "",
+               PartNam = rc != null ? (rc.PartName != null ? rc.PartName : "") : "",
+               Qty = rc != null ? rc.Qty : 0,
+               Price = rc != null ? rc.Price : 0,
+               TotalCost = rc != null ? rc.TotalCost : 0,
+               VendorId = rc != null ? (rc.VendorId != null ? rc.VendorId : null) : null,
+           })
+              .GroupJoin(_context.BMEDVendors, k => k.VendorId, vr => vr.VendorId,
+            (k, vr) => new { k, vr })
+            .SelectMany(oi => oi.vr.DefaultIfEmpty(),
+           (k, vr) => new
+           {
+               k.k.DocId,
+               k.k.AccDpt,
+               k.k.SentDate,
+               k.k.AssetNo,
+               k.k.AssetName,
+               k.k.Cname,
+               k.k.Cost,
+               k.k.EndDate,
+               k.k.CloseDate,
+               k.k.Result,
+               k.k.Cycle,
+               k.k.Type,
+               k.k.AssetClass,
+               PartNo = k.k.PartNo,
+               PartNam = k.k.PartNam,
+               Qty = k.k.Qty,
+               Price = k.k.Price,
+               TotalCost = k.k.TotalCost,
+               VendorName = vr == null ? "" : vr.VendorName,
+               UniteNo = vr == null ? "" : vr.UniteNo
            })
             .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
            (k, c) => new
@@ -4127,7 +4463,9 @@ namespace EDIS.Areas.BMED.Controllers
                k.TotalCost,
                k.AssetClass,
                //c.GroupId,
-               c.Name_C
+               c.Name_C,
+               k.VendorName,
+               k.UniteNo
            })
             .GroupJoin(_context.BMEDKeepEmps, k => k.DocId, ke => ke.DocId,
            (k, ke) => new { k, ke })
@@ -4153,7 +4491,9 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.TotalCost,
                k.k.Name_C,
                k.k.AssetClass,
-               UserId = ke.UserId != null ? ke.UserId : 0
+               k.k.VendorName,
+               k.k.UniteNo,
+               UserId = ke != null ? ke.UserId : 0
            })
            .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
            (k, u) => new { k, u })
@@ -4177,9 +4517,20 @@ namespace EDIS.Areas.BMED.Controllers
                Price = k.k.Price,
                TotalPrice = k.k.TotalCost,
                EngNam = u.Id != 0 ? u.FullName : "",
-               AssetClass = ""
+               AssetClass = "",
+               VendorName = k.k.VendorName,
+               VendorUniteNo = k.k.UniteNo
            }).ToList();
             //
+            var sv2sum = sv2.GroupJoin(_context.BMEDKeepCosts,
+                                s => s.DocId,
+                                r => r.DocId,
+                                (s, r) => new { costV = s, repsirC = r })
+                        .SelectMany(x => x.repsirC.DefaultIfEmpty()
+                                     , (s, r) => new { _costV = s, _repsirC = r })
+                        .GroupBy(x => x._costV.costV.DocId)
+                        .ToDictionary(x => x.Key, x => x.Select(xr => xr._repsirC.TotalCost));
+
             foreach (StokCostVModel s in sv2)
             {
                 switch (s.DealDes)
@@ -4203,7 +4554,8 @@ namespace EDIS.Areas.BMED.Controllers
                 s.TroubleDes = _context.BMEDKeeps.Find(s.DocId).Cycle.ToString();
                 s.FailFactor = "";
                 if (s.StokNo != "")
-                    s.Cost = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
+                    s.Cost = sv2sum[s.DocId].Sum(r => r);
+                // s.Cost = _context.BMEDKeepCosts.Where(r => r.DocId == s.DocId).Sum(r => r.TotalCost);
             }
             sv.AddRange(sv2);
             //sv = sv.Where(s => s.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1)).ToList();
@@ -4232,8 +4584,40 @@ namespace EDIS.Areas.BMED.Controllers
                     TotalPrice = k.s.TotalPrice,
                     EngNam = k.s.EngNam,
                     AssetClass = k.s.AssetClass,
-                    Brand = u == null ? "" : u.Brand
-                }).ToList();
+                    Brand = u == null ? "" : u.Brand,
+                    VendorName = k.s.VendorName,
+                    VendorUniteNo = k.s.VendorUniteNo
+                })
+                .GroupJoin(_context.BMEDFailFactors, s => s.FailFactor, f => f.Id.ToString(),
+                (s, f) => new { s, f })
+                .SelectMany(k => k.f.DefaultIfEmpty(),
+                (k, ft) => new StokCostVModel
+                {
+                    DocTyp = k.s.DocTyp,
+                    DocId = k.s.DocId,
+                    AccDpt = k.s.AccDpt,
+                    AccDptNam = k.s.AccDptNam,
+                    AssetNo = k.s.AssetNo,
+                    AssetNam = k.s.AssetNam,
+                    Type = k.s.Type,
+                    ApplyDate = k.s.ApplyDate,
+                    EndDate = k.s.EndDate,
+                    CloseDate = k.s.CloseDate,
+                    DealDes = k.s.DealDes,
+                    FailFactor = ft != null ? ft.Title : "其他",
+                    TroubleDes = k.s.TroubleDes,
+                    StokNo = k.s.StokNo,
+                    StokNam = k.s.StokNam,
+                    Qty = k.s.Qty,
+                    Price = k.s.Price,
+                    TotalPrice = k.s.TotalPrice,
+                    EngNam = k.s.EngNam,
+                    AssetClass = k.s.AssetClass,
+                    Brand = k.s.Brand,
+                    VendorName = k.s.VendorName,
+                    VendorUniteNo = k.s.VendorUniteNo
+                })
+                .ToList();
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
@@ -4243,6 +4627,15 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 sv = sv.Where(vv => !string.IsNullOrEmpty(vv.StokNam)).ToList();
                 sv = sv.Where(vv => vv.StokNam.Contains(v.StockName)).ToList();
+            }
+            if (!string.IsNullOrEmpty(v.VendorName))
+            {
+                sv = sv.Where(c => c.VendorName == v.VendorName).ToList();
+            }
+
+            if (!string.IsNullOrEmpty(v.VendorUniteNo))
+            {
+                sv = sv.Where(c => c.VendorUniteNo == v.VendorUniteNo).ToList();
             }
             //
             return sv;
