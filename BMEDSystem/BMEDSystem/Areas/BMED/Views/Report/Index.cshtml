@@ -138,6 +138,20 @@
             </div>
         </div>
 
+        @if (Model.ReportClass == "月維修清單" || Model.ReportClass == "月保養清單")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.DateType, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <select asp-for="DateType" class="form-control">
+                        <option value="申請日">申請日</option>
+                        <option value="完工日">完工日</option>
+                    </select>
+                    @Html.ValidationMessageFor(model => model.DateType, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
         <div class="form-group">
             @Html.LabelFor(model => model.Sdate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
@@ -179,7 +193,7 @@
         }
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageRATE(1)"/>
+                <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageRATE(1)" />
             </div>
         </div>
     </div>

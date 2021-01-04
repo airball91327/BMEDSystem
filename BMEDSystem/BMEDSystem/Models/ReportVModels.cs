@@ -43,6 +43,8 @@ namespace EDIS.Models
         public string EngId { get; set; }
         [Display(Name = "保養起始年月")]
         public int? KeepYm { get; set; }
+        [Display(Name = "日期查詢")]
+        public string DateType { get; set; }
     }
     //
     public class UserHour
@@ -475,6 +477,12 @@ namespace EDIS.Models
         public decimal Hour { get; set; }
         [Display(Name = "設備類別")]
         public string PlantClass { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "放置地點")] //放置地點
+        public string PlaceLoc { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthRepairVModel(ApplicationDbContext context)
@@ -613,6 +621,14 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "保養結果")]
+        public string Result { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "保養工時")]
+        public decimal? Hours { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthKeepVModel(ApplicationDbContext context)
