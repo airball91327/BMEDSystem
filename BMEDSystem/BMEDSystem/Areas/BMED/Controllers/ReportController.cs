@@ -2524,8 +2524,8 @@ namespace EDIS.Areas.BMED.Controllers
                 dw = dt.NewRow();
                 dw[0] = "請修";
                 dw[1] = m.DocId;
-                dw[2] = m.ApplyDate;
-                dw[3] = m.EndDate;
+                dw[2] = m.ApplyDate.ToString("yyyy/MM/dd");
+                dw[3] = m.EndDate != null ? m.EndDate.Value.ToString("yyyy/MM/dd") : "";
                 dw[4] = m.AssetNo;
                 dw[5] = m.AssetNam;
                 dw[6] = m.AccDpt;
@@ -2818,8 +2818,8 @@ namespace EDIS.Areas.BMED.Controllers
                 dw = dt.NewRow();
                 dw[0] = "保養";
                 dw[1] = m.DocId;
-                dw[2] = m.SentDate;
-                dw[3] = m.EndDate;
+                dw[2] = m.SentDate.ToString("yyyy/MM/dd");
+                dw[3] = m.EndDate != null ? m.EndDate.Value.ToString("yyyy/MM/dd") : "";
                 dw[4] = m.AssetNo;
                 dw[5] = m.AssetNam;
                 dw[6] = m.AccDpt;
