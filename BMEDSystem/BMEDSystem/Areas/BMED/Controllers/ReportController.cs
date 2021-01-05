@@ -2499,36 +2499,48 @@ namespace EDIS.Areas.BMED.Controllers
         {
             DataTable dt = new DataTable();
             DataRow dw;
+            dt.Columns.Add("類別");
             dt.Columns.Add("表單編號");
             dt.Columns.Add("請修日期");
             dt.Columns.Add("完工日期");
             dt.Columns.Add("財產編號");
+            dt.Columns.Add("設備名稱");
             dt.Columns.Add("成本中心");
-            dt.Columns.Add("故障描述");
-            dt.Columns.Add("故障原因");
-            dt.Columns.Add("處理狀況");
-            dt.Columns.Add("處理描述");
-            dt.Columns.Add("維修方式");
-            dt.Columns.Add("維修費用");
+            dt.Columns.Add("部門名稱");
+            dt.Columns.Add("故障狀態");
+            dt.Columns.Add("處理情形");
+            dt.Columns.Add("內/外修");
             dt.Columns.Add("工程師");
-            dt.Columns.Add("總工時");
+            dt.Columns.Add("維修時數");
+            dt.Columns.Add("維修費用");
+            dt.Columns.Add("基數");
+            dt.Columns.Add("數量");
+            dt.Columns.Add("關帳年月");
+            dt.Columns.Add("處理狀態");
+            dt.Columns.Add("放置地點");
             List<MonthRepairVModel> mv = MonthRepair(v);
             mv.ForEach(m =>
             {
                 dw = dt.NewRow();
-                dw[0] = m.DocId;
-                dw[1] = m.ApplyDate;
-                dw[2] = m.EndDate;
-                dw[3] = m.AssetNo + m.AssetNam;
-                dw[4] = m.AccDpt + m.AccDptNam;
-                dw[5] = m.TroubleDes;
-                dw[6] = m.FailFactor;
-                dw[7] = m.DealState;
-                dw[8] = m.DealDes;
-                dw[9] = m.InOut;
-                dw[10] = m.Cost;
+                dw[0] = "請修";
+                dw[1] = m.DocId;
+                dw[2] = m.ApplyDate;
+                dw[3] = m.EndDate;
+                dw[4] = m.AssetNo;
+                dw[5] = m.AssetNam;
+                dw[6] = m.AccDpt;
+                dw[7] = m.AccDptNam;
+                dw[8] = m.TroubleDes;
+                dw[9] = m.DealDes;
+                dw[10] = m.InOut;
                 dw[11] = m.EngNam;
                 dw[12] = m.Hour;
+                dw[13] = m.Cost;
+                dw[14] = m.Shares;
+                dw[15] = m.Amt;
+                dw[16] = m.ShutDateYm;
+                dw[17] = m.DealState;
+                dw[18] = m.PlaceLoc;
                 dt.Rows.Add(dw);
             });
             //
@@ -2603,7 +2615,8 @@ namespace EDIS.Areas.BMED.Controllers
                rd.Hour,
                k.PlantClass,
                rd.ShutDate,
-               k.PlaceLoc
+               k.PlaceLoc,
+               k.Amt
            })
            .Join(_context.Departments, k => k.AccDpt, c => c.DptId,
            (k, c) => new
@@ -2624,7 +2637,8 @@ namespace EDIS.Areas.BMED.Controllers
                k.Hour,
                k.PlantClass,
                k.ShutDate,
-               k.PlaceLoc
+               k.PlaceLoc,
+               k.Amt
            })
            .GroupJoin(_context.BMEDRepairEmps, k => k.DocId, ke => ke.DocId,
             (k, ke) => new { k, ke })
@@ -2648,7 +2662,8 @@ namespace EDIS.Areas.BMED.Controllers
                k.k.Hour,
                k.k.PlantClass,
                k.k.ShutDate,
-               k.k.PlaceLoc
+               k.k.PlaceLoc,
+               k.k.Amt
            })
            .GroupJoin(_context.BMEDDealStatuses, k => k.DealState, d => d.Id,
             (k, d) => new { k, d })
@@ -2673,7 +2688,8 @@ namespace EDIS.Areas.BMED.Controllers
                 k.k.PlantClass,
                 k.k.ShutDate,
                 DealTitle = d.Title,
-                k.k.PlaceLoc
+                k.k.PlaceLoc,
+                k.k.Amt
             })
             .GroupJoin(_context.BMEDFailFactors, k => k.FailFactor, f => f.Id,
             (k, f) => new { k, f })
@@ -2699,7 +2715,8 @@ namespace EDIS.Areas.BMED.Controllers
                 k.k.ShutDate,
                 k.k.DealTitle,
                 FailTitle = f.Title,
-                k.k.PlaceLoc
+                k.k.PlaceLoc,
+                k.k.Amt
             })
             .GroupJoin(assets, k => k.AssetNo, a => a.asset.AssetNo,
             (k, a) => new { k, a })
@@ -2727,7 +2744,8 @@ namespace EDIS.Areas.BMED.Controllers
                 k.k.FailTitle,
                 a.asset,
                 a.assetkeep,
-                k.k.PlaceLoc
+                k.k.PlaceLoc,
+                k.k.Amt
             })
             .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
             (k, u) => new { k, u })
@@ -2756,7 +2774,8 @@ namespace EDIS.Areas.BMED.Controllers
                PlantClass = k.k.PlantClass,
                Shares = k.k.asset != null ? k.k.asset.Shares : 0,
                ShutDateYm = k.k.ShutDate != null ? (k.k.ShutDate.Value.Year - 1911).ToString() + k.k.ShutDate.Value.Month.ToString("mm") : "",
-               PlaceLoc = k.k.PlaceLoc
+               PlaceLoc = k.k.PlaceLoc,
+               Amt = k.k.Amt
             })
             //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .ToList();
@@ -2791,6 +2810,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("保養費用");
             dt.Columns.Add("基數");
             dt.Columns.Add("關帳年月");
+            dt.Columns.Add("存放地點");
 
             List<MonthKeepVModel> mv = MonthKeep(v);
             mv.ForEach(m =>
@@ -2813,6 +2833,7 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[14] = m.Cost;
                 dw[15] = m.Shares;
                 dw[16] = m.ShutDateYm;
+                dw[17] = m.LeaveSite;
                 dt.Rows.Add(dw);
             });
             //
@@ -2994,6 +3015,7 @@ namespace EDIS.Areas.BMED.Controllers
                 ShutDateYm = k.k.ShutDate != null ? (k.k.ShutDate.Year - 1911).ToString() + k.k.ShutDate.Month.ToString("mm") : "",
                 AssetClass = "",
                 EngNam = u.FullName + "(" + u.UserName + ")",
+                LeaveSite = k.k.asset != null ? k.k.asset.LeaveSite : "",
             })
             //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .ToList()

@@ -483,6 +483,8 @@ namespace EDIS.Models
         public string ShutDateYm { get; set; }
         [Display(Name = "放置地點")] //放置地點
         public string PlaceLoc { get; set; }
+        [Display(Name = "數量")]
+        public int Amt { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthRepairVModel(ApplicationDbContext context)
@@ -629,6 +631,8 @@ namespace EDIS.Models
         public string ShutDateYm { get; set; }
         [Display(Name = "保養工時")]
         public decimal? Hours { get; set; }
+        [Display(Name = "存放地點")]
+        public string LeaveSite { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthKeepVModel(ApplicationDbContext context)
