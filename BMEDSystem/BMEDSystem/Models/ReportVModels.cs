@@ -50,13 +50,15 @@ namespace EDIS.Models
     public class UserHour
     {
         public int Uid { get; set; }
-        public decimal Hour { get; set; }
-        public DateTime ApplyDate { get; set; }
+        public decimal? Hour { get; set; }
+        public DateTime? ApplyDate { get; set; }
         public DateTime EndDate { get; set; }
         [Display(Name = "設備類別")]
         public string AssetClass { get; set; }
         public string InOut { get; set; }
         public string AccDpt { get; set; }
+        public string AssetNo { get; set; }
+        
     }
 
     public class Cust
@@ -746,18 +748,36 @@ namespace EDIS.Models
     {
         [Display(Name = "工程師代號")]
         public int UserId { get; set; }
+
+        [Display(Name = "工程師代碼")]
+        public string FullName { get; set; }
+
         [Display(Name = "工程師姓名")]
         public string UserNam { get; set; }
         [Display(Name = "工時")]
-        public decimal Hours { get; set; }
+        public decimal? Hours { get; set; }
+        [Display(Name = "工時(維修)")]
+        public decimal? HoursR { get; set; }
+        [Display(Name = "工時(保養)")]
+        public decimal? HoursK { get; set; }
         [Display(Name = "件數")]
         public int Cases { get; set; }
+        [Display(Name = "維修件數")]
+        public int RCases { get; set; }
+        [Display(Name = "保養件數")]
+        public int KCases { get; set; }
         [Display(Name = "轉撥計價費用")]
         public decimal Costs { get; set; }
-        [Display(Name = "超過五天件數")]
+        [Display(Name = "超過五天件數(維修)")]
         public int OverFive { get; set; }
+        [Display(Name = "超過五天件數(保養)")]
+        public int OverFiveKeep { get; set; }
+        [Display(Name = "超過五天件數(高風險)")]
+        public int OverFiveHigh { get; set; }
         [Display(Name = "五日完修率")]
         public decimal OverFiveRate { get; set; }
+        [Display(Name = "五日完修率(高風險)")]
+        public decimal OverFiveRateHigh { get; set; }
         [Display(Name = "自修率")]
         public decimal SelfRate { get; set; }
         [Display(Name = "三個月維修總件數")]
@@ -834,8 +854,8 @@ namespace EDIS.Models
                 dv.UserNam = db.AppUsers.Find(g.Key).FullName;
                 dv.Cases = g.Count();
                 dv.Hours = g.Sum(s => s.Hour);
-                case1 = g.Where(g1 => g1.EndDate.Subtract(g1.ApplyDate).Days < 5).Count();
-                case5 = g.Where(g1 => g1.EndDate.Subtract(g1.ApplyDate).Days >= 5).Count();
+                case1 = g.Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days < 5).Count();
+                case5 = g.Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days >= 5).Count();
                 dv.OverFive = case5;
                 if (case1 + case5 > 0)
                 {
