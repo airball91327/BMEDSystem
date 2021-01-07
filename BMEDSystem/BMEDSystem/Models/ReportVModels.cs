@@ -483,6 +483,14 @@ namespace EDIS.Models
         public decimal Hour { get; set; }
         [Display(Name = "設備類別")]
         public string PlantClass { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "放置地點")] //放置地點
+        public string PlaceLoc { get; set; }
+        [Display(Name = "數量")]
+        public int Amt { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthRepairVModel(ApplicationDbContext context)
@@ -621,6 +629,16 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "保養結果")]
+        public string Result { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "保養工時")]
+        public decimal? Hours { get; set; }
+        [Display(Name = "存放地點")]
+        public string LeaveSite { get; set; }
 
 
         private readonly ApplicationDbContext db;
@@ -2687,66 +2705,6 @@ namespace EDIS.Models
     }
     //列管報廢清單
     public class ScrapAsset
-    {
-        [Display(Name = "表單編號")]
-        public string DocId { get; set; }
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
-        [Display(Name = "送單日期")]
-        public DateTime ApplyDate { get; set; }
-        [Display(Name = "申請部門")]
-        public string DptId { get; set; }
-        [Display(Name = "申請部門名稱")]
-        public string DptName { get; set; }
-        [Display(Name = "成本中心")]
-        public string AccDpt { get; set; }
-        [Display(Name = "成本中心名稱")]
-        public string AccDptName { get; set; }
-        [Display(Name = "申請人")]
-        public string UserName { get; set; }
-        [Display(Name = "申請人姓名")]
-        public string UserFullName { get; set; }
-        [Display(Name = "數量")]
-        public int? Amt { get; set; }
-        [Display(Name = "財產類別")]
-        public string AssetType { get; set; }
-        [Display(Name = "財產編號")]
-        public string AssetNo { get; set; }
-        [Display(Name = "財產名稱")]
-        public string AssetName { get; set; }
-        [Display(Name = "故障情形")]
-        public string TroubleDes { get; set; }
-        [Display(Name = "處理狀況")]
-        public string DealState { get; set; }
-        [Display(Name = "處理描述")]
-        public string DealDes { get; set; }
-        [DataType(DataType.Date)]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
-        [Display(Name = "完工日期")]
-        public DateTime? EndDate { get; set; }
-        [Display(Name = "工程師")]
-        public string EngName { get; set; }
-        [Display(Name = "維修工時")]
-        public decimal? Hour { get; set; }
-        [Display(Name = "維修別")]
-        public string RepType { get; set; }
-        [Display(Name = "完帳日/結案日")]
-        public DateTime? CloseDate { get; set; }
-        [Display(Name = "關帳日")]
-        public DateTime? CloseTicketDate { get; set; }
-        [Display(Name = "使用單位")]
-        public string FlowDptUser { get; set; }
-        [Display(Name = "使用單位同意時間")]
-        public DateTime? FlowDptAcceptTime { get; set; }
-        [Display(Name = "醫工主管")]
-        public string MedMgr { get; set; }
-        [Display(Name = "醫工主管同意時間")]
-        public DateTime? MedMgrAcceptTime { get; set; }
-
-    }
-
-    //分攤費用清單
-    public class ReKeShCosCheckVModel
     {
         [Display(Name = "表單編號")]
         public string DocId { get; set; }
