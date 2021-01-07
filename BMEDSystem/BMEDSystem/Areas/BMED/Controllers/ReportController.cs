@@ -550,7 +550,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     return PartialView("MonthKeep", MonthKeep(v).ToPagedList(page, pageSize));
                 case "維修保養統計表":
-                    return PartialView("RepairKeep", RepairKeep(v,page));
+                    return PartialView("RepairKeep", RepairKeep(v).ToPagedList(page, pageSize));
                 case "維修金額統計表":
                     return PartialView("RepairCost", RepairCost(v,page));
                 case "保養金額統計表":
@@ -671,7 +671,7 @@ namespace EDIS.Areas.BMED.Controllers
                             Value = new { success = false, error = "請輸入時間區間!" }
                         };
                     }
-                    else if (string.IsNullOrEmpty(v.Location) )
+                    else if (string.IsNullOrEmpty(v.Location))
                     {
                         return new JsonResult(v)
                         {
@@ -679,10 +679,10 @@ namespace EDIS.Areas.BMED.Controllers
                         };
                     }
                     return PartialView("ReKeShCosCheck", ReKeShCosCheck(v));
-                    //case "滿意度調查統計表":
-                    //    return PartialView("QuestionAnalysis", QuestAnaly(v));
-                    //case "儀器設備保養清單":
-                    //    return PartialView("AssetKeepList", AssetKeepList(v));
+                //case "滿意度調查統計表":
+                //    return PartialView("QuestionAnalysis", QuestAnaly(v));
+                //case "儀器設備保養清單":
+                //    return PartialView("AssetKeepList", AssetKeepList(v));
             }
 
             return View();
@@ -2939,6 +2939,7 @@ namespace EDIS.Areas.BMED.Controllers
                k.AssetNo,
                Cost = k.Cost,
                EndDate = k.EndDate,
+               
                k.FailFactor,
                k.TroubleDes,
                k.DealDes,
@@ -3057,6 +3058,42 @@ namespace EDIS.Areas.BMED.Controllers
                 a.assetkeep,
                 k.k.PlaceLoc,
                 k.k.Amt
+            })
+            .GroupJoin(_context.BMEDRepairFlows.Where(f => f.Status == "?")
+            , k => k.DocId, kf => kf.DocId,
+            (k, kf) => new { k, kf })
+            .SelectMany(oi => oi.kf.DefaultIfEmpty(),
+            (k, kf) => new
+            {
+                repairV = k,
+                kf
+            })
+            .GroupJoin(_context.AppUsers, k => k.kf.UserId, u => u.Id,
+            (k, u) => new { k, u })
+            .SelectMany(ui => ui.u.DefaultIfEmpty(),
+            (k, u) => new
+            {
+                k.k.repairV.k.DocId,
+                k.k.repairV.k.AccDpt,
+                k.k.repairV.k.Name_C,
+                k.k.repairV.k.ApplyDate,
+                k.k.repairV.k.AssetNo,
+                //k.k.Cname,
+                k.k.repairV.k.Cost,
+                k.k.repairV.k.EndDate,
+                k.k.repairV.k.TroubleDes,
+                k.k.repairV.k.FailFactor,
+                k.k.repairV.k.DealDes,
+                k.k.repairV.k.DealState,
+                k.k.repairV.k.InOut,
+                //k.k.Type,
+                //k.k.AssetClass,
+                k.k.repairV.k.UserId,
+                u.FullName,
+                k.k.repairV.k.AssetName,
+                k.k.repairV.k.Hour,
+                k.k.repairV.k.PlantClass,
+                //kf.UserId
             })
             .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
             (k, u) => new { k, u })
@@ -5504,13 +5541,16 @@ namespace EDIS.Areas.BMED.Controllers
                 var command = conn.CreateCommand();
                 command.CommandText = query;
                 var reader = command.ExecuteReader();
-                while ( reader.Read() )
+                
+                while (reader.Read())
                 {
-                    var title = reader.GetString(0);
+                    var title = reader;
                     // Do whatever you want with title 
                 }
+                // Call Close when done reading.
+                reader.Close();
             }
-            catch(Exception e)
+            catch (Exception e)
             {
                 throw new Exception(e.Message.ToString());
             }
