@@ -3071,11 +3071,9 @@ namespace EDIS.Areas.BMED.Controllers
                AssetNam = k.k.AssetName,
                Cost = k.k.Cost,
                EndDate = k.k.EndDate,
-               //FailFactor = Convert.ToString(k.k.FailFactor),
-               FailFactor = k.k.FailTitle,
+               FailFactor = Convert.ToString(k.k.FailFactor),
                DealDes = k.k.DealDes,
-               DealState = k.k.DealTitle,
-               //DealState = Convert.ToString(k.k.DealState),
+               DealState = Convert.ToString(k.k.DealState),
                InOut = k.k.InOut,
                TroubleDes = k.k.TroubleDes,
                Type = "",
@@ -3083,12 +3081,8 @@ namespace EDIS.Areas.BMED.Controllers
                ClsNam = k.k.FullName,
                AssetClass = "",
                Hour = k.k.Hour,
-               PlantClass = k.k.PlantClass,
-               Shares = k.k.asset != null ? k.k.asset.Shares : 0,
-               ShutDateYm = k.k.ShutDate != null ? (k.k.ShutDate.Value.Year - 1911).ToString() + k.k.ShutDate.Value.Month.ToString("mm") : "",
-               PlaceLoc = k.k.PlaceLoc,
-               Amt = k.k.Amt
-            })
+               PlantClass = k.k.PlantClass
+           })
             //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .GroupJoin(_context.BMEDFailFactors, m => m.FailFactor.ToString(), f => f.Id.ToString(),
             (m, f) => new { m, f })
@@ -3415,7 +3409,7 @@ namespace EDIS.Areas.BMED.Controllers
             return PartialView();
         }
 
-        public IPagedList<RepairKeepVModel> RepairKeep(ReportQryVModel v,int page = 1)
+        public List<RepairKeepVModel> RepairKeep(ReportQryVModel v)
         {
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
@@ -3606,14 +3600,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 mv = mv.Where(vv => vv.CustId == v.AccDpt).ToList();
             }
-            //
-            var pageCount = mv.ToPagedList(page, pageSize).PageCount;
-            pageCount = pageCount == 0 ? 1 : pageCount; // If no page.
-            if (mv.ToPagedList(page, pageSize).Count <= 0)  //If the page has no items.
-                return mv.ToPagedList(pageCount, pageSize);
-            return mv.ToPagedList(page, pageSize);
-
-            //return mv;
+            return mv;
         }
         public IPagedList<RepairKeepVModel> RepairCost(ReportQryVModel v, int page = 1)
         {
