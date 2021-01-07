@@ -131,9 +131,9 @@
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })">設備保養排程年報</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                            UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                            UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
-                            UserManager.IsInRole(User, "DeviceMgr"))
+                          UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                          UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
+                          UserManager.IsInRole(User, "DeviceMgr"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })">月故障率統計表</a>
@@ -160,15 +160,15 @@
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件統計表" })">維修保養零件統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
-                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件(廠牌)統計表" })">維修保養零件(廠牌)統計表</a>
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "廠商支出統計表" })">廠商支出統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "儀器設備保養清單" })">儀器設備保養清單</a>
                                 </li>
                                 @*2020-12-03
-                            <li class="@Html.IsSelected(controller: "Report", action: "EffectRatio", area: "BMED")">
-                                <a href="@Url.Action("EffectRatio", "Report", new { Area = "BMED" })">成效指標</a>
-                            </li>*@
+            <li class="@Html.IsSelected(controller: "Report", action: "EffectRatio", area: "BMED")">
+                <a href="@Url.Action("EffectRatio", "Report", new { Area = "BMED" })">成效指標</a>
+            </li>*@
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "設備妥善率統計表" })">設備妥善率統計表</a>
                                 </li>
@@ -179,8 +179,12 @@
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "保養金額統計表" })">保養金額統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "分攤費用清單" })">分攤費用清單</a>
+                                </li>
+                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "列管報廢清單" })">列管報廢清單</a>
                                 </li>
+
                             }
 
                         </ul>

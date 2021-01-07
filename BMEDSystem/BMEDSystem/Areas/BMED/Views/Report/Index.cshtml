@@ -191,11 +191,21 @@
                 </div>
             </div>
         }
-        <div class="form-group">
-            <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageRATE(1)" />
+        @if (Model.ReportClass == "分攤費用清單")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    @Html.DropDownListFor(model => model.Location, ViewData["Location"] as SelectList, new { @class = "form-control combobox" })
+                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                </div>
             </div>
-        </div>
+         }
+         <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+               <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageRATE(1)" />
+            </div>
+         </div>
     </div>
 
 
