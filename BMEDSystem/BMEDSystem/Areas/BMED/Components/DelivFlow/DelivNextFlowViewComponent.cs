@@ -47,6 +47,8 @@ namespace EDIS.Areas.BMED.Components.DelivFlow
                 //listItem.Add(new SelectListItem { Text = "使用單位", Value = "使用單位" });
                 listItem.Add(new SelectListItem { Text = "設備經辦", Value = "設備經辦" });
                 //listItem.Add(new SelectListItem { Text = "採購主管", Value = "採購主管" });
+                listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
+                listItem.Add(new SelectListItem { Text = "資訊工程師", Value = "資訊工程師" });
                 if (rf.Cls == "設備主管")
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 ViewData["Item"] = new SelectList(listItem, "Value", "Text", "");
@@ -66,6 +68,7 @@ namespace EDIS.Areas.BMED.Components.DelivFlow
                 //        rf.FlowHint = db.Groups.Find(gid).FlowHint4;
                 //    }
                 //}
+                rf.FlowHint = "採購人員驗收起案+廠商維護+廠商帳號-->設備經辦 -->得標廠商(新增儀器+上傳資料)-->設備工程師-->(聯網系統設備需經過資訊工程師)-->設備主管確認保固保養資料結案";
                 rf.SelOpin = "同意";
             }
 

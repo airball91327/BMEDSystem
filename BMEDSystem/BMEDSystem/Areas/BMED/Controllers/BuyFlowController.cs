@@ -525,6 +525,24 @@ namespace EDIS.Areas.BMED.Controllers
                     li.Value = u2.Id.ToString();
                     list.Add(li);
                     break;
+                case "資訊工程師":
+                    list = new List<SelectListItem>();
+                    s = roleManager.GetUsersInRole("IT_Engineer").ToList();
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                        if (u != null)
+                        {
+                            if (u.Status == "Y")
+                            {
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
+                        }
+                    }
+                    break;
                 //case "評估工程師":
                 //    list = new List<SelectListItem>();
                 //    s = roleManager.GetUsersInRole("MedEngineer").ToList();
