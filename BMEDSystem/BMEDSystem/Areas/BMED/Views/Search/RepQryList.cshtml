@@ -71,6 +71,19 @@ else
                     @Html.ActionLink("預覽", "Views", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                     @Html.Raw(" |")
                     @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
+                    @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))))
+                    {
+                        <a asp-action="RecoveryDoc" asp-controller="Repair" asp-area="BMED" asp-route-DocId ="@item.DocId" data-ajax="true"  class="btn btn-danger btn-sm"
+                           data-ajax-update="#pnlREPLIST" data-ajax-method="POST" id="recovery"
+                              
+                              data-ajax-failure="RecoveryFailed"
+                              data-ajax-success="RecoverySuccess()"
+                           >
+                          恢復流程
+                        </a>        
+                        @*<input type="button" value="恢復流程" class="btn btn-danger btn-sm" onclick="recovery(item.DocId)" />*@
+                        @*@Html.ActionLink("恢復流程", "RecoveryDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { @class="btn btn-danger btn-sm",id ="recovery" })*@
+                    }
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.RepType)
@@ -160,3 +173,19 @@ else
     @Html.PagedListPager(Model,
     page => Url.Action("GetRepQryList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
 </div>
+
+<script>
+    function RecoverySuccess() {
+        
+        alert("流程已恢復");
+
+       var strArray = window.location.href.split("/");
+       var strArray2 = strArray[strArray.length - 1].split("#");
+       var page = strArray2[strArray2.length - 1];
+       fetchPage(page);
+    }
+    var RecoveryFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>

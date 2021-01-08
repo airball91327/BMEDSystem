@@ -5541,12 +5541,20 @@ namespace EDIS.Areas.BMED.Controllers
                 var command = conn.CreateCommand();
                 command.CommandText = query;
                 var reader = command.ExecuteReader();
+
+                DataTable dt = new DataTable();
                 
+
                 while (reader.Read())
                 {
+                    dt.Load(reader);
+                    int numRows = dt.Rows.Count;
+
                     var title = reader;
-                    // Do whatever you want with title 
+                    
+
                 }
+
                 // Call Close when done reading.
                 reader.Close();
             }

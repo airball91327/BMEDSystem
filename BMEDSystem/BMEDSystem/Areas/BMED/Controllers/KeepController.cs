@@ -1315,5 +1315,45 @@ namespace EDIS.Areas.BMED.Controllers
             _context.Dispose();
             base.Dispose(disposing);
         }
+
+        public ActionResult RecoveryDoc(string DocId)
+        {
+            if (!String.IsNullOrEmpty(DocId))
+            {
+
+                var flow = _context.BMEDKeepFlows.Where(f => f.DocId == DocId && f.Status == "2")
+                    .LastOrDefault();
+
+                if (flow == null)
+                {
+                    string msg = "";
+                    foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                    {
+                        msg += error.ErrorMessage + Environment.NewLine;
+                    }
+                    throw new Exception(msg);
+                }
+
+                flow.Status = "?";
+
+                _context.Entry(flow).State = EntityState.Modified; ;
+                _context.SaveChanges();
+
+                return new JsonResult(flow)
+                {
+                    Value = new { success = true, error = "" }
+                };
+            }
+            else
+            {
+                string msg = "";
+                foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                {
+                    msg += error.ErrorMessage + Environment.NewLine;
+                }
+                throw new Exception(msg);
+            }
+
+        }
     }
 }

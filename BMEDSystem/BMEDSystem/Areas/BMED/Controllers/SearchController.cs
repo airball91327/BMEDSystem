@@ -518,43 +518,56 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = j.flow,
                         repdtl = j.repdtl,
                         dpt = d
-                    }).Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
                     (j, d) => new
                     {
                         repair = j.repair,
                         flow = j.flow,
                         repdtl = j.repdtl,
                         dpt = d
-                    }).ToList()
-                      .ForEach(j => rv.Add(new RepairSearchListVModel
+                    })
+                    .Join(_context.AppUsers,
+                            j => j.flow.UserId,
+                            u => u.Id,
+                            (j, u) => new { rf = j, ur = u }
+                            )
+                     .Join(_context.BMEDDealStatuses,
+                            j => j.rf.repdtl.DealState,
+                            f => f.Id,
+                            (j, f) => new { flow = j, statuse = f }
+                            )
+                    .ToList()
+                    .ForEach(j => rv.Add(new RepairSearchListVModel
                     {
                         DocType = "請修",
-                        RepType = j.repair.RepType,
-                        DocId = j.repair.DocId,
-                        ApplyDate = j.repair.ApplyDate,
-                        PlaceLoc = j.repair.PlaceLoc,
-                        ApplyDpt = j.repair.DptId,
-                        AccDpt = j.repair.AccDpt,
-                        AccDptName = j.dpt.Name_C,
-                        TroubleDes = j.repair.TroubleDes,
-                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
-                        DealDes = j.repdtl.DealDes,
-                        Cost = j.repdtl.Cost,
-                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
-                        Flg = j.flow.Status,
-                        FlowUid = j.flow.UserId,
-                        FlowCls = j.flow.Cls,
-                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
-                        EndDate = j.repdtl.EndDate,
-                        CloseDate = j.repdtl.CloseDate,
-                        IsCharged = j.repdtl.IsCharged,
-                        IsPurchase = j.repair.IsPurchased,
-                        repdata = j.repair
+                        RepType = j.flow.rf.repair.RepType,
+                        DocId = j.flow.rf.repair.DocId,
+                        ApplyDate = j.flow.rf.repair.ApplyDate,
+                        PlaceLoc = j.flow.rf.repair.PlaceLoc,
+                        ApplyDpt = j.flow.rf.repair.DptId,
+                        AccDpt = j.flow.rf.repair.AccDpt,
+                        AccDptName = j.flow.rf.dpt.Name_C,
+                        TroubleDes = j.flow.rf.repair.TroubleDes,
+                        DealState = j.statuse.Title,
+                        DealDes = j.flow.rf.repdtl.DealDes,
+                        Cost = j.flow.rf.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Flg = j.flow.rf.flow.Status,
+                        FlowUid = j.flow.rf.flow.UserId,
+                        FlowCls = j.flow.rf.flow.Cls,
+                        FlowUidName = j.flow.ur.FullName,
+                        EndDate = j.flow.rf.repdtl.EndDate,
+                        CloseDate = j.flow.rf.repdtl.CloseDate,
+                        IsCharged = j.flow.rf.repdtl.IsCharged,
+                        IsPurchase = j.flow.rf.repair.IsPurchased,
+                        repdata = j.flow.rf.repair
                     }));
                         break;
                     case "已結案":
                         var repairFlows2 = rps.Join(_context.BMEDRepairFlows.Where(f => f.Status == "2"), r => r.DocId, f => f.DocId,
                             (r, f) => new { repair = r, flow = f });
+
                         repairFlows2.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
                     (m, d) => new
                     {
@@ -569,40 +582,105 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = j.flow,
                         repdtl = j.repdtl,
                         dpt = d
-                    }).ToList()
+                    })
+                    .Join(_context.AppUsers,
+                            j => j.flow.UserId,
+                            u => u.Id,
+                            (j, u) => new { rf = j, ur = u }
+                            )
+                     .Join(_context.BMEDDealStatuses,
+                            j => j.rf.repdtl.DealState,
+                            f => f.Id,
+                            (j, f) => new { flow = j, statuse = f }
+                            )
+                    .ToList()
                     .ForEach(j => rv.Add(new RepairSearchListVModel
                     {
                         DocType = "請修",
-                        RepType = j.repair.RepType,
-                        DocId = j.repair.DocId,
-                        ApplyDate = j.repair.ApplyDate,
-                        PlaceLoc = j.repair.PlaceLoc,
-                        ApplyDpt = j.repair.DptId,
-                        AccDpt = j.repair.AccDpt,
-                        AccDptName = j.dpt.Name_C,
-                        TroubleDes = j.repair.TroubleDes,
-                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
-                        DealDes = j.repdtl.DealDes,
-                        Cost = j.repdtl.Cost,
-                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
-                        Flg = j.flow.Status,
-                        FlowUid = j.flow.UserId,
-                        FlowCls = j.flow.Cls,
-                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
-                        EndDate = j.repdtl.EndDate,
-                        CloseDate = j.repdtl.CloseDate,
-                        IsCharged = j.repdtl.IsCharged,
-                        IsPurchase = j.repair.IsPurchased,
-                        repdata = j.repair
+                        RepType = j.flow.rf.repair.RepType,
+                        DocId = j.flow.rf.repair.DocId,
+                        ApplyDate = j.flow.rf.repair.ApplyDate,
+                        PlaceLoc = j.flow.rf.repair.PlaceLoc,
+                        ApplyDpt = j.flow.rf.repair.DptId,
+                        AccDpt = j.flow.rf.repair.AccDpt,
+                        AccDptName = j.flow.rf.dpt.Name_C,
+                        TroubleDes = j.flow.rf.repair.TroubleDes,
+                        DealState = j.statuse.Title,
+                        DealDes = j.flow.rf.repdtl.DealDes,
+                        Cost = j.flow.rf.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Flg = j.flow.rf.flow.Status,
+                        FlowUid = j.flow.rf.flow.UserId,
+                        FlowCls = j.flow.rf.flow.Cls,
+                        FlowUidName = j.flow.ur.FullName,
+                        EndDate = j.flow.rf.repdtl.EndDate,
+                        CloseDate = j.flow.rf.repdtl.CloseDate,
+                        IsCharged = j.flow.rf.repdtl.IsCharged,
+                        IsPurchase = j.flow.rf.repair.IsPurchased,
+                        repdata = j.flow.rf.repair
                     }));
                         break;
                 }
             }
-            //else
-            //{
-            //    repairFlows = repairFlows.GroupBy(f => f.DocId).Where(group => group.Last().Status != "3")
-            //                                                   .Select(group => group.Last());
-            //}
+            else
+            {
+                var ss = new[] { "?", "2" };
+
+                var repairFlows3 = rps.Join(_context.BMEDRepairFlows.Where( f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+
+                repairFlows3.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    })
+                     .Join(_context.AppUsers,
+                            j => j.flow.UserId,
+                            u => u.Id,
+                            (j, u) => new { rf = j, ur = u }
+                            )
+                    .Join(_context.BMEDDealStatuses,
+                            j => j.rf.repdtl.DealState,
+                            f => f.Id,
+                            (j, f) => new { flow = j, statuse = f }
+                            )
+                    .ToList()
+                    .ForEach(j => rv.Add(new RepairSearchListVModel
+                    {
+                        DocType = "請修",
+                        RepType = j.flow.rf.repair.RepType,
+                        DocId = j.flow.rf.repair.DocId,
+                        ApplyDate = j.flow.rf.repair.ApplyDate,
+                        PlaceLoc = j.flow.rf.repair.PlaceLoc,
+                        ApplyDpt = j.flow.rf.repair.DptId,
+                        AccDpt = j.flow.rf.repair.AccDpt,
+                        AccDptName = j.flow.rf.dpt.Name_C,
+                        TroubleDes = j.flow.rf.repair.TroubleDes,
+                        DealState = j.statuse.Title,
+                        DealDes = j.flow.rf.repdtl.DealDes,
+                        Cost = j.flow.rf.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Flg = j.flow.rf.flow.Status,
+                        FlowUid = j.flow.rf.flow.UserId,
+                        FlowCls = j.flow.rf.flow.Cls,
+                        FlowUidName = j.flow.ur.FullName,
+                        EndDate = j.flow.rf.repdtl.EndDate,
+                        CloseDate = j.flow.rf.repdtl.CloseDate,
+                        IsCharged = j.flow.rf.repdtl.IsCharged,
+                        IsPurchase = j.flow.rf.repair.IsPurchased,
+                        repdata = j.flow.rf.repair
+                    }));
+            }
             if (!string.IsNullOrEmpty(qtyDealStatus))   //處理狀態
             {
                 rv = rv.Where(r => r.DealState == qtyDealStatus).ToList();
