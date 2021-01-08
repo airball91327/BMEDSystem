@@ -112,7 +112,7 @@ namespace EDIS.Models
         [Display(Name = "維修費用")]
         public decimal RepCost { get; set; }
         [Display(Name = "妥善率")]
-        public decimal ProperRate { get; set; }
+        public decimal? ProperRate { get; set; }
         [Display(Name = "維修比")]
         public decimal RepRatio { get; set; }
     }

@@ -575,16 +575,16 @@ namespace EDIS.Areas.BMED.Controllers
                         };
                     }
                     ViewData["Ano"] = v.AssetNo;
-                    if (v.Edate == null)
-                    {
-                        if (v.Sdate == null)
-                        {
-                            v.Sdate = DateTime.Now.AddYears(-1);
-                        }
-                        v.Edate = DateTime.Now.AddHours(23)
-                        .AddMinutes(59)
-                        .AddSeconds(59);
-                    }
+                    //if (v.Edate == null)
+                    //{
+                    //    if (v.Sdate == null)
+                    //    {
+                    //        v.Sdate = DateTime.Now.AddYears(-1);
+                    //    }
+                    //    v.Edate = DateTime.Now.AddHours(23)
+                    //    .AddMinutes(59)
+                    //    .AddSeconds(59);
+                    //}
 
                     List<RpKpHistoryVModel> rk = RpKpHistory(v);
                     AssetAnalysis ay = new AssetAnalysis();
@@ -635,8 +635,25 @@ namespace EDIS.Areas.BMED.Controllers
                                 }
                             }
                         });
-                    ay.ProperRate = decimal.Round(100m -
+
+                    if (v.Sdate == null && v.Edate == null)
+                    {
+                        ay.ProperRate = null;
+                    }
+                    else if (v.Sdate != null && v.Edate == null)
+                    {
+                        v.Edate = DateTime.Now.AddHours(23)
+                        .AddMinutes(59)
+                        .AddSeconds(59);
+                        ay.ProperRate = decimal.Round(100m -
                         Convert.ToDecimal(faildays / v.Edate.Value.Subtract(v.Sdate.Value).TotalDays) * 100m, 2);
+
+                    }
+                    else {
+                        ay.ProperRate = decimal.Round(100m -
+                        Convert.ToDecimal(faildays / v.Edate.Value.Subtract(v.Sdate.Value).TotalDays) * 100m, 2);
+                    }
+                    
                     //decimal.Round(Convert.ToDecimal(faildays / v.Edate.Value.Subtract(v.Sdate.Value).TotalDays)*100m, 2);
                     ViewData["Analysis"] = ay;
                     return PartialView("RpKpHistory", rk);
@@ -662,7 +679,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "零件帳務清單":
                     return PartialView("StokCost", StokCost(v));
                 case "列管報廢清單":
-                    return PartialView("ScrapAsset", ScrapAsset(v));
+                    return PartialView("ScrapAsset", ScrapAsset(v).ToPagedList(page, pageSize));
                 case "分攤費用清單":
                     if (v.Edate == null && v.Sdate == null)
                     {
@@ -920,7 +937,19 @@ namespace EDIS.Areas.BMED.Controllers
             DepartmentModel dpt;
             AppUserModel usr;
             RepairFlowModel rf;
-            foreach(var item in result)
+            //
+            var flow = _context.BMEDRepairFlows
+                .Join(result ,
+                      r => r.DocId,
+                      t => t.repair.DocId,
+                      (r,t) => new { rf = r , rt = t}
+                      )
+                .OrderBy(r => r.rf.StepId)
+                //.Where(r => r.DocId == item.repair.DocId).OrderBy(r => r.StepId)
+                .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"))
+                ;
+            
+            foreach (var item in result)
             {
                 ScrapAsset s = new ScrapAsset();
                 s.DocId = item.repair.DocId;
@@ -1757,10 +1786,10 @@ namespace EDIS.Areas.BMED.Controllers
             var bmedA = _context.BMEDRepairs.Where(a => a.AssetNo == v.AssetNo).ToList();
 
             sv = bmedA
-                //.Join(  _context.BMEDRepairFlows.Where(f => ss.Contains(f.Status))
-                //        , r => r.DocId
-                //        , f => f.DocId,
-                //        (r, f) => r)
+                .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status))
+                        , r => r.DocId
+                        , f => f.DocId,
+                        (r, f) => r)
                 .Join(  _context.BMEDRepairDtls, 
                         r => r.DocId, 
                         d => d.DocId,
@@ -1778,7 +1807,6 @@ namespace EDIS.Areas.BMED.Controllers
                           Cost = d.Cost
                         }
                      )
-                .AsQueryable()
                 .Join(  repairE,
                         d => d.DocId, e => e.DocId,
                         (d, e) => new RpKpHistoryVModel
@@ -1814,7 +1842,6 @@ namespace EDIS.Areas.BMED.Controllers
                         r => r.DocId, 
                         f => f.DocId,
                         (r, f) => r)
-                .AsQueryable()
                 .Join(  _context.BMEDKeepDtls, 
                         r => r.DocId, 
                         d => d.DocId,
@@ -1832,7 +1859,6 @@ namespace EDIS.Areas.BMED.Controllers
                             Cost = d.Cost
                         }
                      )
-                .AsQueryable()
                 .Join(  keepE, 
                         d => d.DocId, 
                         e => e.DocId,
