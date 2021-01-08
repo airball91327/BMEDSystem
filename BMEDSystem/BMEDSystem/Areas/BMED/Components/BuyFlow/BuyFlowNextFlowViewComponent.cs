@@ -48,6 +48,7 @@ namespace EDIS.Areas.BMED.Components.BuyFlow
                 listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
                 listItem.Add(new SelectListItem { Text = "設備經辦", Value = "設備經辦" });
                 //listItem.Add(new SelectListItem { Text = "採購主管", Value = "採購主管" });
+                listItem.Add(new SelectListItem { Text = "資訊工程師", Value = "資訊工程師" });
                 if (rf.Cls == "設備經辦")
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
             }
@@ -77,6 +78,7 @@ namespace EDIS.Areas.BMED.Components.BuyFlow
                     listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
+                listItem.Add(new SelectListItem { Text = "資訊工程師", Value = "資訊工程師" });
             }
             ViewData["Item"] = new SelectList(listItem, "Value", "Text", "");
             //

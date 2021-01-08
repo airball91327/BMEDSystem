@@ -542,12 +542,12 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(o => {
                     delivdpt.Add(new SelectListItem
                     {
-                        Text = o.Name_C,
+                        Text = o.Name_C + "(" + o.DptId + ")",
                         Value = o.DptId
                     });
                     accdpt.Add(new SelectListItem
                     {
-                        Text = o.Name_C,
+                        Text = o.Name_C + "(" + o.DptId + ")",
                         Value = o.DptId
                     });
                 });
@@ -681,12 +681,12 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(d => {
                     delivdpt.Add(new SelectListItem
                     {
-                        Text = d.Name_C,
+                        Text = d.Name_C + "(" + d.DptId + ")",
                         Value = d.DptId
                     });
                     accdpt.Add(new SelectListItem
                     {
-                        Text = d.Name_C,
+                        Text = d.Name_C + "(" + d.DptId + ")",
                         Value = d.DptId
                     });
                 });
