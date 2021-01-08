@@ -577,10 +577,10 @@ namespace EDIS.Areas.BMED.Controllers
                     ViewData["Ano"] = v.AssetNo;
                     //if (v.Edate == null)
                     //{
-                    //    if (v.Sdate == null)
-                    //    {
-                    //        v.Sdate = DateTime.Now.AddYears(-1);
-                    //    }
+                    //    //if (v.Sdate == null)
+                    //    //{
+                    //    //    v.Sdate = DateTime.Now.AddYears(-1);
+                    //    //}
                     //    v.Edate = DateTime.Now.AddHours(23)
                     //    .AddMinutes(59)
                     //    .AddSeconds(59);
@@ -619,24 +619,33 @@ namespace EDIS.Areas.BMED.Controllers
                             {
                                 faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
                             }
-                            else if (r.EndDate.Value.CompareTo(v.Edate.Value) > 0)
-                            {
-                                faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
-                            }
-                            else
-                            {
-                                d = r.EndDate.Value.Subtract(r.ApplyDate).TotalDays;
-                                if (d > 0)
+                            else if (v.Edate != null)
+                            { 
+                                if(r.EndDate.Value.CompareTo(v.Edate.Value) > 0)
+                                       faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
+                                else
                                 {
-                                    if (d <= 1d)
-                                        faildays += 1d;
-                                    else
-                                        faildays += d;
+
+                                    d = r.EndDate.Value.Subtract(r.ApplyDate).TotalDays;
+                                    if (d > 0)
+                                    {
+                                        if (d <= 1d)
+                                            faildays += 1d;
+                                        else
+                                            faildays += d;
+                                    }
+
                                 }
                             }
+                            
+                            
                         });
 
                     if (v.Sdate == null && v.Edate == null)
+                    {
+                        ay.ProperRate = null;
+                    }
+                    else if (v.Sdate == null && v.Edate != null)
                     {
                         ay.ProperRate = null;
                     }
@@ -907,22 +916,28 @@ namespace EDIS.Areas.BMED.Controllers
             var bmedAssets = GetAssetsByLoc(urLocation);
             // 報廢案件
             var repairDtl = _context.BMEDRepairDtls.Where(rd => rd.DealState == 4)
-                                                   .Where(rd => rd.CloseDate != null).ToList();
-            var repair = _context.BMEDRepairs.ToList();
+                                                   .Where(rd => rd.CloseDate != null);
+            //var repair = _context.BMEDRepairs.ToList();
+            //非報廢設備
+            var asstes = _context.BMEDAssets.Where(a => a.DisposeKind != "報廢");
             // 列管財產
-            repair = repair.Where(r => r.AssetNo.Length > 6 || r.AssetNo == "99999").ToList();
+            var repair = _context.BMEDRepairs.Where(r => r.AssetNo.Length > 6 || r.AssetNo == "99999")
+                                 .Join(asstes,
+                                        r => r.AssetNo,
+                                        a => a.AssetNo,
+                                        (r,a) => r);
             // Query Conditions.
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                repair = repair.Where(r => r.AccDpt == v.AccDpt).ToList();
+                repair = repair.Where(r => r.AccDpt == v.AccDpt);
             }
             if (!string.IsNullOrEmpty(v.AssetNo))
             {
-                repair = repair.Where(r => r.AssetNo == v.AssetNo).ToList();
+                repair = repair.Where(r => r.AssetNo == v.AssetNo);
             }
             if (v.Sdate != null || v.Edate != null)
             {
-                repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate && rd.CloseDate <= v.Edate).ToList();
+                repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate && rd.CloseDate <= v.Edate);
             }
             //
             var result = repairDtl.Join(repair, rd => rd.DocId, r => r.DocId,
@@ -930,8 +945,7 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         dtl = rd,
                                         repair = r
-                                    })
-                                    .ToList();
+                                    });
             //
             List<ScrapAsset> sa = new List<ScrapAsset>();
             DepartmentModel dpt;
@@ -945,10 +959,45 @@ namespace EDIS.Areas.BMED.Controllers
                       (r,t) => new { rf = r , rt = t}
                       )
                 .OrderBy(r => r.rf.StepId)
-                //.Where(r => r.DocId == item.repair.DocId).OrderBy(r => r.StepId)
-                .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"))
-                ;
-            
+                .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"));
+
+            var flowuf = flow.Join(_context.AppUsers,
+                             r => r.rf.Rtp,
+                             u => u.Id,
+                             (r, u) => new { rR = r, ur = u }
+                 )
+                 .GroupBy(x => x.rR.rf.DocId)
+                 .ToDictionary(x => x.Key,
+                               x => (x.Select(u => u.ur.UserName).LastOrDefault() + x.Select(u => u.ur.FullName).LastOrDefault()));
+
+            var flowRtt = flow.GroupBy(x => x.rf.DocId)
+                 .ToDictionary(x => x.Key,
+                               x => x.Select(r => r.rf.Rtt));
+
+            //
+            var flowMgr = _context.BMEDRepairFlows
+                .Join(result,
+                      r => r.DocId,
+                      t => t.repair.DocId,
+                      (r, t) => new { rf = r, rt = t }
+                      )
+                .OrderBy(r => r.rf.StepId)
+                .Where(r => r.rf.Cls.Contains("醫工主管"));
+
+            var flowMgruf = flowMgr.Join(_context.AppUsers,
+                             r => r.rf.Rtp,
+                             u => u.Id,
+                             (r, u) => new { rR = r, ur = u }
+                 )
+                 .GroupBy(x => x.rR.rf.DocId)
+                 .ToDictionary(x => x.Key,
+                               x => (x.Select(u => u.ur.UserName).LastOrDefault() + x.Select(u => u.ur.FullName).LastOrDefault()));
+
+            var flowMgrRtt = flowMgr.GroupBy(x => x.rf.DocId)
+                 .ToDictionary(x => x.Key,
+                               x => x.Select(r => r.rf.Rtt));
+
+
             foreach (var item in result)
             {
                 ScrapAsset s = new ScrapAsset();
@@ -976,21 +1025,35 @@ namespace EDIS.Areas.BMED.Controllers
                 s.RepType = "維修";
                 s.CloseDate = item.dtl.CloseDate;
                 s.CloseTicketDate = null;
-                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId).OrderBy(r => r.StepId)
-                                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人") || r.Cls.Contains("單位主管")).LastOrDefault();
-                usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
-                s.FlowDptUser = usr == null ? "" : usr.UserName + usr.FullName;
-                if (rf != null)
+                s.FlowDptAcceptTime = null;
+                s.MedMgrAcceptTime = null;
+                //rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId).OrderBy(r => r.StepId)
+                //                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人") || r.Cls.Contains("單位主管")).LastOrDefault();
+                //usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
+                //s.FlowDptUser = usr == null ? "" : usr.UserName + usr.FullName;
+                s.FlowDptUser = flowuf.ContainsKey(item.repair.DocId) == false ? "" : flowuf[item.repair.DocId];
+
+                //if (rf != null)
+                //{
+                //    s.FlowDptAcceptTime = rf.Rtt;
+                //}
+                if (flowRtt.ContainsKey(item.repair.DocId) != false)
                 {
-                    s.FlowDptAcceptTime = rf.Rtt;
-                }
-                rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
-                                             .Where(r => r.Cls.Contains("醫工主管")).LastOrDefault();
-                usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
-                s.MedMgr = usr == null ? "" : usr.UserName + usr.FullName;
-                if (rf != null)
-                {
-                    s.MedMgrAcceptTime = rf.Rtt;
+                   s.FlowDptAcceptTime = flowRtt[item.repair.DocId].LastOrDefault();
+                }      
+                //rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
+                //                             .Where(r => r.Cls.Contains("醫工主管")).LastOrDefault();
+                //usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
+                //s.MedMgr = usr == null ? "" : usr.UserName + usr.FullName;
+                s.MedMgr = flowMgruf.ContainsKey(item.repair.DocId) == false ? "" : flowMgruf[item.repair.DocId];
+
+                //if (rf != null)
+                //{
+                //    s.MedMgrAcceptTime = rf.Rtt;
+                //}
+                if(flowMgrRtt.ContainsKey(item.repair.DocId) != false)
+                { 
+                     s.MedMgrAcceptTime =  flowMgrRtt[item.repair.DocId].LastOrDefault();
                 }
                 sa.Add(s);
             }
@@ -1779,11 +1842,10 @@ namespace EDIS.Areas.BMED.Controllers
                         {
                             DocId = r.DocId,
                             UserName = a.FullName
-                        })
-                        .ToList();
+                        });
 
             //財編申請單
-            var bmedA = _context.BMEDRepairs.Where(a => a.AssetNo == v.AssetNo).ToList();
+            var bmedA = _context.BMEDRepairs.Where(a => a.AssetNo == v.AssetNo);
 
             sv = bmedA
                 .Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status))
@@ -1826,16 +1888,15 @@ namespace EDIS.Areas.BMED.Controllers
 
             //保養工程師
             var keepE = _context.BMEDKeepEmps
-                        .Join(  _context.AppUsers, 
-                                r => r.UserId, 
+                        .Join(_context.AppUsers,
+                                r => r.UserId,
                                 a => a.Id,
                                 (r, a) => new
                                 {
                                     DocId = r.DocId,
                                     UserName = a.FullName
                                 }
-                             )
-                        .ToList();
+                             );
 
             sv2 = _context.BMEDKeeps.Where(a => a.AssetNo == v.AssetNo)
                 .Join(  _context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), 
@@ -5568,16 +5629,17 @@ namespace EDIS.Areas.BMED.Controllers
                 command.CommandText = query;
                 var reader = command.ExecuteReader();
 
-                DataTable dt = new DataTable();
+                //DataTable dt = new DataTable();
                 
 
                 while (reader.Read())
                 {
-                    dt.Load(reader);
-                    int numRows = dt.Rows.Count;
+                    //dt.Load(reader);
+                    //int numRows = dt.Rows.Count;
 
-                    var title = reader;
-                    
+                    var title = reader.GetString(0); 
+                    var name = reader.GetString(1);
+
 
                 }
 
