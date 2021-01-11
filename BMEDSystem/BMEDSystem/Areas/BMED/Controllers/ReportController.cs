@@ -78,6 +78,11 @@ namespace EDIS.Areas.BMED.Controllers
         // GET: /BMED/Report/FinishRateKeepIndex
         public IActionResult FinishRateKeepIndex(string rpname)
         {
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            ViewData["UserLoc"] = urLocation;
             ReportQryVModel pv = new ReportQryVModel();
             pv.ReportClass = rpname;
             return View(pv);
@@ -99,6 +104,8 @@ namespace EDIS.Areas.BMED.Controllers
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var building = v.Building;
+            var isProgress = v.IsProgress;
             //
             int? sendYm = v.SendYm;
             var qryFlowEng = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2").Select(kf => kf.DocId)
@@ -112,18 +119,39 @@ namespace EDIS.Areas.BMED.Controllers
                                               {
                                                   asset = a,
                                                   assetkeep = ak
+                                              })
+                                              .Join(_context.Departments, a => a.asset.DelivDpt, d => d.DptId,
+                                              (a, d) => new
+                                              { 
+                                                  asset = a.asset,
+                                                  assetkeep = a.assetkeep,
+                                                  delivDptLoc = d.Loc
                                               });
-            var qryKeep = _context.BMEDKeeps.AsQueryable();
+            var qryKeep = _context.BMEDKeeps.Where(k => k.Loc == urLocation).AsQueryable();
+            if (!string.IsNullOrEmpty(building))
+            {
+                if (building == "P")
+                {
+                    qryAsset = qryAsset.Where(a => a.delivDptLoc == "P");
+                }
+                else
+                {
+                    qryAsset = qryAsset.Where(a => a.delivDptLoc != "P");
+                }
+            }
             if (sendYm != null)
             {
                 var year =  (Convert.ToInt32(sendYm.ToString().Substring(0, 3)) + 1911).ToString();
                 var month = sendYm.ToString().Substring(3, 2);
                 var sendDateFrom = DateTime.Parse(year + "-" + month);
                 var sendDateTo = sendDateFrom.AddMonths(1).AddSeconds(-1);
+                if (isProgress)
+                {
+                    sendDateFrom = DateTime.Parse(year + "-01");
+                }
                 qryKeep = qryKeep.Where(k => k.SentDate >= sendDateFrom && k.SentDate <= sendDateTo);
             }
-            var data = qryKeep.Where(k => k.Loc == urLocation)
-                                .Join(_context.BMEDKeepDtls, k => k.DocId, kdtl => kdtl.DocId,
+            var data = qryKeep.Join(_context.BMEDKeepDtls, k => k.DocId, kdtl => kdtl.DocId,
                                 (k, kdtl) => new 
                                 {
                                     keep = k,

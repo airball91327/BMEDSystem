@@ -49,6 +49,10 @@ namespace EDIS.Models
         public string DateType { get; set; }
         [Display(Name = "保養起始年月")]
         public int? SendYm { get; set; }
+        [Display(Name = "大樓")]
+        public string Building { get; set; }
+        [Display(Name = "是否累進")]
+        public bool IsProgress { get; set; }
 
         [Display(Name = "院區")]
         public string Location { get; set; }
