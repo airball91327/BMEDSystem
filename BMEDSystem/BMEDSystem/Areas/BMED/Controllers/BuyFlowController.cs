@@ -415,7 +415,7 @@ namespace EDIS.Areas.BMED.Controllers
                         body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                         mail.message.Body = body;
                         mail.message.IsBodyHtml = true;
-                        //mail.SendMail();
+                        mail.SendMail();
                     }
                     return new JsonResult(BuyFlow)
                     {
@@ -491,7 +491,7 @@ namespace EDIS.Areas.BMED.Controllers
                 body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                 mail.message.Body = body;
                 mail.message.IsBodyHtml = true;
-                //mail.SendMail();
+                mail.SendMail();
 
                 return new JsonResult(BuyFlow)
                 {

@@ -100,7 +100,7 @@ namespace EDIS.Areas.BMED.Controllers
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
-            int? keepYm = v.KeepYm;
+            int? sendYm = v.SendYm;
             var qryFlowEng = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2").Select(kf => kf.DocId)
                                                    .Join(_context.BMEDKeepFlows, id => id, kf => kf.DocId,
                                                    (id, kf) => kf)
@@ -113,43 +113,48 @@ namespace EDIS.Areas.BMED.Controllers
                                                   asset = a,
                                                   assetkeep = ak
                                               });
-            if (keepYm != null)
+            var qryKeep = _context.BMEDKeeps.AsQueryable();
+            if (sendYm != null)
             {
-                qryAsset = qryAsset.Where(d => d.assetkeep.KeepYm == keepYm);
+                var year =  (Convert.ToInt32(sendYm.ToString().Substring(0, 3)) + 1911).ToString();
+                var month = sendYm.ToString().Substring(3, 2);
+                var sendDateFrom = DateTime.Parse(year + "-" + month);
+                var sendDateTo = sendDateFrom.AddMonths(1).AddSeconds(-1);
+                qryKeep = qryKeep.Where(k => k.SentDate >= sendDateFrom && k.SentDate <= sendDateTo);
             }
-            var data = _context.BMEDKeeps.Where(k => k.Loc == urLocation)
-                                         .Join(_context.BMEDKeepDtls, k => k.DocId, kdtl => kdtl.DocId,
-                                         (k, kdtl) => new 
-                                         {
-                                             keep = k,
-                                             dtl = kdtl
-                                         })
-                                         .Join(qryFlowEng, k => k.keep.DocId, f => f.DocId,
-                                         (k, f) => new
-                                         {
-                                             keep = k.keep,
-                                             dtl = k.dtl,
-                                             engflow = f
-                                         })
-                                         .Join(qryAsset, k => k.keep.AssetNo, a => a.asset.AssetNo,
-                                         (k, a) => new
-                                         {
-                                             keep = k.keep,
-                                             dtl = k.dtl,
-                                             engflow = k.engflow,
-                                             asset = a.asset,
-                                             assetkeep = a.assetkeep
-                                         })
-                                         .Join(_context.AppUsers, k => k.engflow.UserId, u => u.Id,
-                                         (k, u) => new
-                                         {
-                                             keep = k.keep,
-                                             dtl = k.dtl,
-                                             engflow = k.engflow,
-                                             asset = k.asset,
-                                             assetkeep = k.assetkeep,
-                                             eng = u
-                                         });
+            var data = qryKeep.Where(k => k.Loc == urLocation)
+                                .Join(_context.BMEDKeepDtls, k => k.DocId, kdtl => kdtl.DocId,
+                                (k, kdtl) => new 
+                                {
+                                    keep = k,
+                                    dtl = kdtl
+                                })
+                                .Join(qryFlowEng, k => k.keep.DocId, f => f.DocId,
+                                (k, f) => new
+                                {
+                                    keep = k.keep,
+                                    dtl = k.dtl,
+                                    engflow = f
+                                })
+                                .Join(qryAsset, k => k.keep.AssetNo, a => a.asset.AssetNo,
+                                (k, a) => new
+                                {
+                                    keep = k.keep,
+                                    dtl = k.dtl,
+                                    engflow = k.engflow,
+                                    asset = a.asset,
+                                    assetkeep = a.assetkeep
+                                })
+                                .Join(_context.AppUsers, k => k.engflow.UserId, u => u.Id,
+                                (k, u) => new
+                                {
+                                    keep = k.keep,
+                                    dtl = k.dtl,
+                                    engflow = k.engflow,
+                                    asset = k.asset,
+                                    assetkeep = k.assetkeep,
+                                    eng = u
+                                });
             var engIdList = data.Select(d => d.engflow.UserId).Distinct().ToList();
             var dataToList = data.ToList();
             List<FinishRateKeep> result = new List<FinishRateKeep>();
@@ -161,7 +166,7 @@ namespace EDIS.Areas.BMED.Controllers
                 frk.EngId = engid.ToString();
                 frk.EngUserName = engData.FirstOrDefault().eng.UserName;
                 frk.EngFullName = engData.FirstOrDefault().eng.FullName;
-                frk.KeepYm = engData.FirstOrDefault().assetkeep.KeepYm;
+                frk.SendYm = sendYm != null ? sendYm.ToString() : "";
                 //自行
                 frk.KeepCount0 = engData.Where(d => d.dtl.InOut == "0").Count();
                 frk.KeepEndCount0 = engData.Where(d => d.dtl.InOut == "0" && d.dtl.EndDate.HasValue == true).Count();
@@ -228,7 +233,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 sheet1.Cells[startPos, 1].Value = item.EngUserName;
                 sheet1.Cells[startPos, 2].Value = item.EngFullName;
-                sheet1.Cells[startPos, 3].Value = item.KeepYm;
+                sheet1.Cells[startPos, 3].Value = item.SendYm;
                 sheet1.Cells[startPos, 4].Value = item.KeepCount0;
                 sheet1.Cells[startPos, 5].Value = item.KeepEndCount0;
                 sheet1.Cells[startPos, 6].Value = item.KeepEndRate0;
