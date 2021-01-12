@@ -2824,49 +2824,18 @@ namespace EDIS.Models
     // 分攤費用清單
     public class ReKeShCosCheckVModel
     {
-        public string EngId { get; set; }
-        [Display(Name = "負責工程師")]
-        public string EngUserName { get; set; }
-        [Display(Name = "員工姓名")]
-        public string EngFullName { get; set; }
-        [Display(Name = "保養起始年月")]
-        public int? KeepYm { get; set; }
-        [Display(Name = "應保養(自行)")]
-        public int KeepCount0 { get; set; }
-        [Display(Name = "已保養(自行)")]
-        public int KeepEndCount0 { get; set; }
-        [Display(Name = "完成率(自行)")]
-        public string KeepEndRate0 { get; set; }
-        [Display(Name = "應保養(委外)")]
-        public int KeepCount1 { get; set; }
-        [Display(Name = "已保養(委外)")]
-        public int KeepEndCount1 { get; set; }
-        [Display(Name = "完成率(委外)")]
-        public string KeepEndRate1 { get; set; }
-        [Display(Name = "應保養(租賃)")]
-        public int KeepCount2 { get; set; }
-        [Display(Name = "已保養(租賃)")]
-        public int KeepEndCount2 { get; set; }
-        [Display(Name = "完成率(租賃)")]
-        public string KeepEndRate2 { get; set; }
-        [Display(Name = "應保養(保固)")]
-        public int KeepCount3 { get; set; }
-        [Display(Name = "已保養(保固)")]
-        public int KeepEndCount3 { get; set; }
-        [Display(Name = "完成率(保固)")]
-        public string KeepEndRate3 { get; set; }
-        [Display(Name = "應保養")]
-        public int KeepCount { get; set; }
-        [Display(Name = "已保養")]
-        public int KeepEndCount { get; set; }
-        [Display(Name = "完成率")]
-        public string KeepEndRate { get; set; }
-        [Display(Name = "應保養(高風險)")]
-        public int KeepCountRisk { get; set; }
-        [Display(Name = "已保養(高風險)")]
-        public int KeepEndCountRisk { get; set; }
-        [Display(Name = "完成率(高風險)")]
-        public string KeepEndRateRisk { get; set; }
-
+        [Display(Name = "成本中心")]
+        public string AccDpt { get; set; }
+        [Display(Name = "成本中心名稱")]
+        public string CustNam { get; set; }
+        [Display(Name = "請修件數")]
+        public int? RepAmt { get; set; }
+        [Display(Name = "管理/保養價值")]
+        public int? Keepcost { get; set; }
+        [Display(Name = "零件支出")]
+        public decimal? Partexp { get; set; }
+        [Display(Name = "合計")]
+        public decimal? Sum { get; set; }
+        
     }
 }

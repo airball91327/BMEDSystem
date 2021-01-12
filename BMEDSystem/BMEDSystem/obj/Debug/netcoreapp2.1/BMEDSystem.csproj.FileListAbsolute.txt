@@ -4687,3 +4687,4 @@ C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debu
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\BMEDSystem.csprojAssemblyReference.cache
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Report\FinishRateKeep.cshtml.g.cs
 C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Report\FinishRateKeepIndex.cshtml.g.cs
+C:\Users\mac\source\repos\airball91327\BMEDSystem\BMEDSystem\BMEDSystem\obj\Debug\netcoreapp2.1\Razor\Areas\BMED\Views\Report\ReKeShCosCheck.cshtml.g.cs

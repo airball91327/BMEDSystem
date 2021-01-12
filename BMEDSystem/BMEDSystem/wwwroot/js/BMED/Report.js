@@ -1,10 +1,12 @@
 ﻿function smgREPORT(data)
 {
+    
     if (data.success === false)
     {
         alert(data.error);
     }
 }
+
 var onFailed = function (data) {
     alert(data.error);
     $.Toast.hideToast();
