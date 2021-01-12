@@ -69,7 +69,7 @@ namespace EDIS.Areas.BMED.Controllers
 
             listItem2.Add( new SelectListItem{ Text = "請選擇", Value = "" });
             listItem2.Add(new SelectListItem { Text = "總院", Value = "總院" });
-            listItem2.Add(new SelectListItem { Text = "分院", Value = "總院" });
+            listItem2.Add(new SelectListItem { Text = "分院", Value = "分院" });
             ViewData["Location"] = new SelectList(listItem2, "Value", "Text");
 
             return View(pv);
@@ -690,7 +690,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "列管報廢清單":
                     return PartialView("ScrapAsset", ScrapAsset(v).ToPagedList(page, pageSize));
                 case "分攤費用清單":
-                    if (v.Edate == null && v.Sdate == null)
+                    if (v.Edate == null || v.Sdate == null)
                     {
                         return new JsonResult(v)
                         {
@@ -704,7 +704,7 @@ namespace EDIS.Areas.BMED.Controllers
                             Value = new { success = false, error = "請選擇院區!" }
                         };
                     }
-                    return PartialView("ReKeShCosCheck", ReKeShCosCheck(v));
+                    return PartialView("ReKeShCosCheck", ReKeShCosCheck(v).ToPagedList(page, pageSize));
                 //case "滿意度調查統計表":
                 //    return PartialView("QuestionAnalysis", QuestAnaly(v));
                 //case "儀器設備保養清單":
@@ -908,6 +908,7 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         private List<ScrapAsset> ScrapAsset(ReportQryVModel v)
         {
+            TempData["qry"] = JsonConvert.SerializeObject(v);
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
@@ -962,17 +963,25 @@ namespace EDIS.Areas.BMED.Controllers
                 .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"));
 
             var flowuf = flow.Join(_context.AppUsers,
-                             r => r.rf.Rtp,
+                             r => r.rf.UserId,
                              u => u.Id,
-                             (r, u) => new { rR = r, ur = u }
+                             (r, u) => new { 
+                                 DocId = r.rf.DocId,
+                                 UserName = u.UserName,
+                                 FullName = u.FullName
+                             }
                  )
-                 .GroupBy(x => x.rR.rf.DocId)
+                 .GroupBy(x => x.DocId)
                  .ToDictionary(x => x.Key,
-                               x => (x.Select(u => u.ur.UserName).LastOrDefault() + x.Select(u => u.ur.FullName).LastOrDefault()));
+                               x => (x.Select(u => u.UserName).LastOrDefault() + x.Select(u => u.FullName).LastOrDefault()));
 
-            var flowRtt = flow.GroupBy(x => x.rf.DocId)
+            var flowRtt = flow
+                .Select( f => new { Rtt =f.rf.Rtt ,
+                                    DocId = f.rf.DocId
+                                   })
+                 .GroupBy(x => x.DocId)
                  .ToDictionary(x => x.Key,
-                               x => x.Select(r => r.rf.Rtt));
+                               x => x.Select(r => r.Rtt));
 
             //
             var flowMgr = _context.BMEDRepairFlows
@@ -985,17 +994,26 @@ namespace EDIS.Areas.BMED.Controllers
                 .Where(r => r.rf.Cls.Contains("醫工主管"));
 
             var flowMgruf = flowMgr.Join(_context.AppUsers,
-                             r => r.rf.Rtp,
+                             r => r.rf.UserId,
                              u => u.Id,
-                             (r, u) => new { rR = r, ur = u }
+                             (r, u) => new {
+                                 DocId = r.rf.DocId,
+                                 UserName = u.UserName,
+                                 FullName = u.FullName
+                             }
                  )
-                 .GroupBy(x => x.rR.rf.DocId)
+                 .GroupBy(x => x.DocId)
                  .ToDictionary(x => x.Key,
-                               x => (x.Select(u => u.ur.UserName).LastOrDefault() + x.Select(u => u.ur.FullName).LastOrDefault()));
+                               x => (x.Select(u => u.UserName).LastOrDefault() + x.Select(u => u.FullName).LastOrDefault()));
 
-            var flowMgrRtt = flowMgr.GroupBy(x => x.rf.DocId)
-                 .ToDictionary(x => x.Key,
-                               x => x.Select(r => r.rf.Rtt));
+            var flowMgrRtt = flowMgr
+                .Select(f => new {
+                    Rtt = f.rf.Rtt,
+                    DocId = f.rf.DocId
+                })
+                .GroupBy(x => x.DocId)
+                .ToDictionary(x => x.Key,
+                              x => x.Select(r => r.Rtt));
 
 
             foreach (var item in result)
@@ -1058,6 +1076,87 @@ namespace EDIS.Areas.BMED.Controllers
                 sa.Add(s);
             }
             return sa;
+        }
+        //
+        public IActionResult ExcelScrapAssetList(ReportQryVModel v)
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("表單編號");
+            dt.Columns.Add("送單日期");
+            dt.Columns.Add("申請部門");
+            dt.Columns.Add("申請部門名稱");
+            dt.Columns.Add("成本中心");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("申請人");
+            dt.Columns.Add("申請人姓名");
+            dt.Columns.Add("數量");
+            dt.Columns.Add("財產類別");
+            dt.Columns.Add("財產編號");
+            dt.Columns.Add("財產名稱");
+            dt.Columns.Add("故障情形");
+            dt.Columns.Add("處理狀況");
+            dt.Columns.Add("處理描述");
+            dt.Columns.Add("完工日期");
+            dt.Columns.Add("工程師");
+            dt.Columns.Add("維修工時");
+            dt.Columns.Add("維修別");
+            dt.Columns.Add("完帳日/結案日");
+            dt.Columns.Add("關帳日");
+            dt.Columns.Add("使用單位");
+            dt.Columns.Add("使用單位同意時間");
+            dt.Columns.Add("醫工主管");
+            dt.Columns.Add("醫工主管同意時間");
+
+            List<ScrapAsset> mv = ScrapAsset(v);
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.DocId;
+                dw[1] = m.ApplyDate;
+                dw[2] = m.DptId;
+                dw[3] = m.DptName;
+                dw[4] = m.AccDpt;
+                dw[5] = m.AccDptName;
+                dw[6] = m.UserName;
+                dw[7] = m.UserFullName;
+                dw[8] = m.Amt;
+                dw[9] = m.AssetType;
+                dw[10] = m.AssetNo;
+                dw[11] = m.AssetName;
+                dw[12] = m.TroubleDes;
+                dw[13] = m.DealState;
+                dw[14] = m.EndDate;
+                dw[15] = m.EngName;
+                dw[16] = m.Hour;
+                dw[17] = m.RepType;
+                dw[18] = m.CloseDate;
+                dw[19] = m.CloseTicketDate;
+                dw[20] = m.FlowDptUser;
+                dw[21] = m.FlowDptAcceptTime;
+                dw[22] = m.MedMgr;
+                dw[23] = m.MedMgrAcceptTime;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("列管報廢清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "ExcelScrapAssetList.xlsx"
+            );
         }
 
         private IPagedList<ProperRate> AssetProperRate(ReportQryVModel v, int page = 1)
@@ -5071,19 +5170,19 @@ namespace EDIS.Areas.BMED.Controllers
             List<StokCostVModel> sv2 = new List<StokCostVModel>();
 
 
-            var repairD = _context.BMEDRepairDtls.ToList();
+            var repairD = _context.BMEDRepairDtls.AsQueryable();
                             //.Where(d => d.EndDate >= v.Sdate && d.EndDate <= v.Edate);
             if (v.Sdate != null)
             {
-                repairD = repairD.Where(d => d.EndDate >= v.Sdate).ToList();
+                repairD = repairD.Where(d => d.EndDate >= v.Sdate);
             }
 
             if (v.Edate != null)
             {
-                repairD = repairD.Where(d => d.EndDate <= v.Edate).ToList();
+                repairD = repairD.Where(d => d.EndDate <= v.Edate);
             }
 
-            var repair = _context.BMEDRepairs.Where(r => r.Loc == urLocation).ToList();
+            var repair = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
             //var costs = _context.BMEDRepairCosts.ToList();
             //if (!string.IsNullOrEmpty(v.VendorName))
             //{
@@ -5584,42 +5683,91 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<ReKeShCosCheckVModel> ReKeShCosCheck(ReportQryVModel v)
         {
+            TempData["qry"] = JsonConvert.SerializeObject(v);
             List<ReKeShCosCheckVModel> mv;
+            ReKeShCosCheckVModel rc;
             mv = new List<ReKeShCosCheckVModel>();
             var conn = _context.Database.GetDbConnection();
-            const string query = @"use [BMEDDB]
-                select * from (
-                select x.AccDpt as '成本中心代號', x.CustNam as '成本中心名稱', 
-                IIf(y.RepAmt is null,0,y.RepAmt) as '請修件數', x.keepcost as '管理/保養價值',
-                 IIf(z.零件支出 is null, 0, z.零件支出) as '零件支出', 
-                 (IIf(y.RepAmt is null,0,y.RepAmt)*50 + x.keepcost+ IIf(z.零件支出 is null, 0, z.零件支出)) as '合計', x.GroupId
-                from (
-                select a.AccDpt, c.Name_C CustNam, c.Loc GroupId, SUM(IIf(b.Cost is null, 0, b.Cost)) as keepcost
-                from BMEDAssets as a join BMEDAssetKeeps as b
-                on a.AssetNo = b.AssetNo left join Departments as c
-                on a.AccDpt = c.DptId
-                where a.AssetClass like '醫%' and c.Loc not in ('K','C','P','M','SN','G001','LEEH')
-                group by a.AccDpt, c.Name_C, c.Loc
-                ) as x left join
-                (
-                select Count(a.Docid) as RepAmt, a.AccDpt
-                from BMEDRepairs as a join BMEDRepairFlows as c
-                on a.Docid = c.Docid 
-                where (a.ApplyDate between '2020-11-01' and '2020-11-30')
-                and c.Status in ('?','2')
-                group by a.AccDpt
-                ) as y
-                on x.AccDpt = y.AccDpt left join
-                (
-                select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
-                from BMEDRepairs as a join BMEDRepairDtls as c
-                on a.Docid = c.Docid 
-                where (c.EndDate between '2020-11-01' and '2020-12-01')
-                group by a.AccDpt) as z
-                on x.AccDpt = z.AccDpt
-                ) as w
-                where w.成本中心代號 not in (select [成本中心代號] from [dbo].[排除部門單位])
-                order by w.成本中心代號";
+            string Sdate = DateTime.Parse(v.Sdate.ToString()).ToString("yyyy-MM-dd");
+            string Edate = DateTime.Parse(v.Edate.ToString()).ToString("yyyy-MM-dd");
+
+
+
+            //SqlParameter[] paras = new SqlParameter[]
+            //{
+            //    new SqlParameter("@Sdate",Convert.ToDateTime(Sdate)),
+            //    new SqlParameter("@Edate",Convert.ToDateTime(Edate))
+            //};
+            string query = "";
+            if (v.Location == "分院") { 
+              query = @"use [BMEDDB]
+                    select * from (
+                    select x.AccDpt as '成本中心代號', x.CustNam as '成本中心名稱', 
+                    IIf(y.RepAmt is null,0,y.RepAmt) as '請修件數', x.keepcost as '管理/保養價值',
+                     IIf(z.零件支出 is null, 0, z.零件支出) as '零件支出', 
+                     (IIf(y.RepAmt is null,0,y.RepAmt)*50 + x.keepcost+ IIf(z.零件支出 is null, 0, z.零件支出)) as '合計', x.GroupId
+                    from (
+                    select a.AccDpt, c.Name_C CustNam, c.Loc GroupId, SUM(IIf(b.Cost is null, 0, b.Cost)) as keepcost
+                    from BMEDAssets as a join BMEDAssetKeeps as b
+                    on a.AssetNo = b.AssetNo left join Departments as c
+                    on a.AccDpt = c.DptId
+                    where a.AssetClass like '醫%' and c.Loc not in ('K','C','P','M','SN','G001','LEEH')
+                    group by a.AccDpt, c.Name_C, c.Loc
+                    ) as x left join
+                    (
+                    select Count(a.Docid) as RepAmt, a.AccDpt
+                    from BMEDRepairs as a join BMEDRepairFlows as c
+                    on a.Docid = c.Docid 
+                    where (a.ApplyDate >= '"+ Sdate+ @"')
+                    and c.Status in ('?','2')
+                    group by a.AccDpt
+                    ) as y
+                    on x.AccDpt = y.AccDpt left join
+                    (
+                    select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
+                    from BMEDRepairs as a join BMEDRepairDtls as c
+                    on a.Docid = c.Docid 
+                    where (c.EndDate  <= '" + Edate + @"')
+                    group by a.AccDpt) as z
+                    on x.AccDpt = z.AccDpt
+                    ) as w
+                    where w.成本中心代號 not in (select [成本中心代號] from [dbo].[排除部門單位])
+                    order by w.成本中心代號";
+            }
+            else if (v.Location == "總院")
+            {
+                query = @"use [BMEDDB]
+                    select * from (
+                    select x.AccDpt as '成本中心代號', x.CustNam as '成本中心名稱', 
+                    IIf(y.RepAmt is null,0,y.RepAmt) as '請修件數', x.keepcost as '管理/保養價值',
+                     IIf(z.零件支出 is null, 0, z.零件支出) as '零件支出', 
+                     (IIf(y.RepAmt is null,0,y.RepAmt)*50 + x.keepcost+ IIf(z.零件支出 is null, 0, z.零件支出)) as '合計', x.GroupId
+                    from (
+                    select a.AccDpt, c.Name_C CustNam, c.Loc GroupId, SUM(IIf(b.Cost is null, 0, b.Cost)) as keepcost
+                    from BMEDAssets as a join BMEDAssetKeeps as b
+                    on a.AssetNo = b.AssetNo left join Departments as c
+                    on a.AccDpt = c.DptId
+                    where a.AssetClass like '醫%' and c.Loc in ('K','C','P')
+                    group by a.AccDpt, c.Name_C, c.Loc) as x left join
+                    (
+                    select Count(a.Docid) as RepAmt, a.AccDpt
+                    from BMEDRepairs as a join BMEDRepairFlows as c
+                    on a.Docid = c.Docid 
+                    where (a.ApplyDate >= '" + Sdate + @"')
+                    and c.Status in ('?','2')
+                    group by a.AccDpt) as y
+                    on x.AccDpt = y.AccDpt left join
+                    (
+                    select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
+                    from BMEDRepairs as a join BMEDRepairDtls as c
+                    on a.Docid = c.Docid 
+                    where (c.EndDate  <= '" + Edate + @"')
+                    group by a.AccDpt) as z
+                    on x.AccDpt = z.AccDpt
+                    ) as w
+                    where w.成本中心代號 not in (select [成本中心代號] from [dbo].[排除部門單位])
+                    order by w.成本中心代號";
+            }
 
             try
             {
@@ -5634,13 +5782,16 @@ namespace EDIS.Areas.BMED.Controllers
 
                 while (reader.Read())
                 {
-                    //dt.Load(reader);
-                    //int numRows = dt.Rows.Count;
+                    rc = new ReKeShCosCheckVModel();
+                    
+                    rc.AccDpt = reader.GetString(0); 
+                    rc.CustNam = reader.GetString(1);
+                    rc.RepAmt = reader.GetInt32(2);
+                    rc.Keepcost = reader.GetInt32(3);
+                    rc.Partexp = reader.GetDecimal(4);
+                    rc.Sum = reader.GetDecimal(5);
 
-                    var title = reader.GetString(0); 
-                    var name = reader.GetString(1);
-
-
+                    mv.Add(rc);
                 }
 
                 // Call Close when done reading.
@@ -5652,6 +5803,51 @@ namespace EDIS.Areas.BMED.Controllers
             }
 
             return mv;
+        }
+
+        public IActionResult ExcelReKeShCosCheckList(ReportQryVModel v)
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("成本中心");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("請修件數");
+            dt.Columns.Add("管理/保養價值");
+            dt.Columns.Add("零件支出");
+            dt.Columns.Add("合計");
+           
+
+            List<ReKeShCosCheckVModel> mv = ReKeShCosCheck(v);
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.AccDpt;
+                dw[1] = m.CustNam;
+                dw[2] = m.RepAmt;
+                dw[3] = m.Keepcost;
+                dw[4] = m.Partexp;
+                dw[5] = m.Sum;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("分攤費用清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "ExcelReKeShCosCheckList.xlsx"
+            );
         }
 
         public IActionResult EffectRatio()

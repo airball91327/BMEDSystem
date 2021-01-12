@@ -5,6 +5,7 @@
         alert(data.error);
     }
 }
+
 var onFailed = function (data) {
     alert(data.error);
     $.Toast.hideToast();
