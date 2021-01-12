@@ -77,15 +77,31 @@
             </div>
         </div>
         <div class="form-group">
-            @Html.LabelFor(model => model.KeepYm, htmlAttributes: new { @class = "control-label col-md-2" })
+            @Html.LabelFor(model => model.SendYm, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
-                @Html.EditorFor(model => model.KeepYm, new { htmlAttributes = new { @class = "form-control" } })
-                @Html.ValidationMessageFor(model => model.KeepYm, "", new { @class = "text-danger" })
+                @Html.EditorFor(model => model.SendYm, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.SendYm, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        @if (ViewData["UserLoc"].ToString() == "總院")
+        {
+            <div class="form-group">
+                <div class="col-md-2"></div>
+                <div class="col-md-10">
+                    @Html.RadioButton("Building", "L", true) 總院
+                    @Html.RadioButton("Building", "P") 兒童醫院
+                </div>
+            </div>
+        }
+        <div class="form-group">
+            <div class="col-md-2"></div>
+            <div class="col-md-10">
+                @Html.CheckBoxFor(model => model.IsProgress) 累進
             </div>
         </div>
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input type="button" value="查詢" class="btn btn-default" id="BtnQry"/>
+                <input type="button" value="查詢" class="btn btn-default" id="BtnQry" />
             </div>
         </div>
     </div>

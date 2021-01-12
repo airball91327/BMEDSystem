@@ -48,7 +48,11 @@ namespace EDIS.Models
         [Display(Name = "日期查詢")]
         public string DateType { get; set; }
         [Display(Name = "保養起始年月")]
-        public int? KeepYm { get; set; }
+        public int? SendYm { get; set; }
+        [Display(Name = "大樓")]
+        public string Building { get; set; }
+        [Display(Name = "是否累進")]
+        public bool IsProgress { get; set; }
 
         [Display(Name = "院區")]
         public string Location { get; set; }
@@ -2777,7 +2781,7 @@ namespace EDIS.Models
         [Display(Name = "員工姓名")]
         public string EngFullName { get; set; }
         [Display(Name = "保養起始年月")]
-        public int? KeepYm { get; set; }
+        public string SendYm { get; set; }
         [Display(Name = "應保養(自行)")]
         public int KeepCount0 { get; set; }
         [Display(Name = "已保養(自行)")]
