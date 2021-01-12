@@ -1,5 +1,6 @@
 ﻿function smgREPORT(data)
 {
+    
     if (data.success === false)
     {
         alert(data.error);

@@ -71,6 +71,10 @@
                 type: "POST",
                 data: s + "&page=" + page,
                 success: function (data) {
+                    if (data.success === false)
+                    {
+                        alert(data.error);
+                    }
 
                     window.location.hash = page;
                    

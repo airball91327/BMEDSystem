@@ -728,10 +728,12 @@ namespace EDIS.Areas.BMED.Controllers
                         return new JsonResult(v)
                         {
                             Value = new { success = false, error = "請輸入時間區間!" }
+                            //return NotFound("請輸入時間區間!");
                         };
                     }
                     else if (string.IsNullOrEmpty(v.Location))
                     {
+                        //return NotFound("請選擇院區!");
                         return new JsonResult(v)
                         {
                             Value = new { success = false, error = "請選擇院區!" }
