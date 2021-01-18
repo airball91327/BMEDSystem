@@ -5930,6 +5930,92 @@ namespace EDIS.Areas.BMED.Controllers
             return View(effectRatio);
         }
 
+        public IActionResult PDFRpKpHistory(ReportQryVModel v)
+        {
+            ViewData["Ano"] = v.AssetNo;
+
+            List<RpKpHistoryVModel> rk = RpKpHistory(v);
+            AssetAnalysis ay = new AssetAnalysis();
+            ay.RepairHour = rk.Where(r => r.DocType == "請修").Select(r => r.Hours).Sum().Value;
+            ay.RepCost = rk.Where(r => r.DocType == "請修").Select(r => r.Cost).Sum().Value;
+            ay.KeepHour = rk.Where(r => r.DocType == "保養").Select(r => r.Hours).Sum().Value;
+            ay.KeepCost = rk.Where(r => r.DocType == "保養").Select(r => r.Cost).Sum().Value;
+            AssetModel at = _context.BMEDAssets.Find(v.AssetNo);
+            if (at != null)
+            {
+                if (at.Cost != null)
+                {
+                    if (at.Cost > 0)
+                        ay.RepRatio = decimal.Round(ay.RepCost / at.Cost.Value * 100m, 2);
+                    else
+                        ay.RepRatio = 0;
+                }
+            }
+            else
+            {
+                return new JsonResult(v)
+                {
+                    Value = new { success = false, error = "無此財產!" }
+                };
+            }
+            double faildays = 0;
+            double d = 0;
+            rk.Where(r => r.DocType == "請修").ToList()
+                .ForEach(r =>
+                {
+                    if (r.EndDate == null)
+                    {
+                        faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
+                    }
+                    else if (v.Edate != null)
+                    {
+                        if (r.EndDate.Value.CompareTo(v.Edate.Value) > 0)
+                            faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
+                        else
+                        {
+
+                            d = r.EndDate.Value.Subtract(r.ApplyDate).TotalDays;
+                            if (d > 0)
+                            {
+                                if (d <= 1d)
+                                    faildays += 1d;
+                                else
+                                    faildays += d;
+                            }
+
+                        }
+                    }
+
+
+                });
+
+            if (v.Sdate == null && v.Edate == null)
+            {
+                ay.ProperRate = null;
+            }
+            else if (v.Sdate == null && v.Edate != null)
+            {
+                ay.ProperRate = null;
+            }
+            else if (v.Sdate != null && v.Edate == null)
+            {
+                v.Edate = DateTime.Now.AddHours(23)
+                .AddMinutes(59)
+                .AddSeconds(59);
+                ay.ProperRate = decimal.Round(100m -
+                Convert.ToDecimal(faildays / v.Edate.Value.Subtract(v.Sdate.Value).TotalDays) * 100m, 2);
+
+            }
+            else
+            {
+                ay.ProperRate = decimal.Round(100m -
+                Convert.ToDecimal(faildays / v.Edate.Value.Subtract(v.Sdate.Value).TotalDays) * 100m, 2);
+            }
+
+            ViewData["Analysis"] = ay;
+            return PartialView(rk);
+        }
+
         /// <summary>
         /// Get Assets by location, according to asset's delivDpt.
         /// </summary>

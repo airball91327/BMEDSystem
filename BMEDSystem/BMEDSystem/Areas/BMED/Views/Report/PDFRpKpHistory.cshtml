@@ -5,7 +5,7 @@
 @inject ApplicationDbContext _context
 
 @{
-    Layout = null;
+    Layout = "~/Views/Shared/_LayoutNoTitle.cshtml";
     var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
     var userDpt = "";
     var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
@@ -15,10 +15,6 @@
     }
 }
 
-<p>
-    <a class="btn btn-default" href="@Url.Action("ExcelRpKpHistory", qry)">匯出Excel</a>
-    <a class="btn btn-default" href="@Url.Action("PDFRpKpHistory", qry)" target="_blank">匯出PDF(舊)</a>
-</p>
 <div>
     @await Component.InvokeAsync("AssetView", new { id = ViewData["Ano"] })
 </div>
@@ -65,7 +61,7 @@
         </th>
     </tr>
 
-    @{ 
+    @{
         decimal hourTotal = 0;
         decimal costTotal = 0;
     }
