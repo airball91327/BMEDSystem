@@ -16128,11 +16128,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectUniqueName": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "projectName": "EDIS",
-      "projectPath": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+      "projectPath": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
       "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+      "outputPath": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
       "projectStyle": "PackageReference",
       "fallbackFolders": [
         "C:\\Microsoft\\Xamarin\\NuGet\\"
