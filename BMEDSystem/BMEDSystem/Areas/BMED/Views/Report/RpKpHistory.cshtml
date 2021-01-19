@@ -17,7 +17,7 @@
 
 <p>
     <a class="btn btn-default" href="@Url.Action("ExcelRpKpHistory", qry)">匯出Excel</a>
-    <a class="btn btn-default" href="@Url.Action("PDFRpKpHistory", qry)" target="_blank">匯出PDF(舊)</a>
+    <a class="btn btn-default" href="@Url.Action("PrintRpKpHistory", qry)" target="_blank">匯出PDF(舊)</a>
 </p>
 <div>
     @await Component.InvokeAsync("AssetView", new { id = ViewData["Ano"] })

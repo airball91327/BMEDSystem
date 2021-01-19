@@ -1975,7 +1975,7 @@ namespace EDIS.Areas.BMED.Controllers
                         (r, a) => new
                         {
                             DocId = r.DocId,
-                            UserName = a.FullName
+                            UserName = "(" + a.UserName + ")" + a.FullName
                         });
 
             //財編申請單
@@ -5930,7 +5930,7 @@ namespace EDIS.Areas.BMED.Controllers
             return View(effectRatio);
         }
 
-        public IActionResult PDFRpKpHistory(ReportQryVModel v)
+        public IActionResult PrintRpKpHistory(ReportQryVModel v)
         {
             ViewData["Ano"] = v.AssetNo;
 
@@ -6015,7 +6015,7 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["Analysis"] = ay;
             return PartialView(rk);
         }
-
+        
         /// <summary>
         /// Get Assets by location, according to asset's delivDpt.
         /// </summary>

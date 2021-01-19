@@ -1,0 +1,153 @@
+﻿@model IEnumerable<EDIS.Models.RpKpHistoryVModel>
+@using Newtonsoft.Json
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+@inject ApplicationDbContext _context
+
+@{
+    Layout = "~/Views/Shared/_LayoutNoTitle.cshtml";
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+    var userDpt = "";
+    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+    if (ur != null)
+    {
+        userDpt = ur.DptId;
+    }
+}
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title></title>
+    <style type="text/css">
+        @@media print {
+            @@page {
+                margin-bottom: 0;
+            }
+            Footer {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body style="margin:0px" onload='window.print(); setTimeout(window.close, 500); '>
+    <div>
+        @await Component.InvokeAsync("AssetView", new { id = ViewData["Ano"] })
+    </div>
+
+    <table class="table">
+        <tr style="text-align:center;">
+            <td colspan="7">
+                <h4>維修保養履歷</h4>
+            </td>
+        </tr>
+        <tr style="border-bottom: solid 2px; border-top: solid 2px;">
+            <th>
+                @Html.DisplayNameFor(model => model.DocType)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.DocId)
+            </th>
+            @*<th>
+                    @Html.DisplayNameFor(model => model.AssetNo)
+                </th>
+                <th>
+                    @Html.DisplayNameFor(model => model.AssetName)
+                </th>*@
+            <th>
+                @Html.DisplayNameFor(model => model.ApplyDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EndDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.EngName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Hours)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cost)
+            </th>
+        </tr>
+        <tr>
+            <th colspan="4">
+                @Html.DisplayNameFor(model => model.TroubleDes)
+            </th>
+            <th colspan="3">
+                @Html.DisplayNameFor(model => model.DealDes)
+            </th>
+        </tr>
+
+        @{
+            decimal hourTotal = 0;
+            decimal costTotal = 0;
+        }
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DocType)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DocId)
+                </td>
+                @*<td>
+                        @Html.DisplayFor(modelItem => item.AssetNo)
+                    </td>
+                    <td>
+                        @Html.DisplayFor(modelItem => item.AssetName)
+                    </td>*@
+                <td>
+                    @item.ApplyDate.ToString("yyyy/MM/dd")
+                </td>
+                <td>
+                    @if (@item.EndDate != null)
+                    {
+                        @item.EndDate.Value.ToString("yyyy/MM/dd");
+                    }
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Hours)
+                </td>
+                @if (userDpt == "8420") //醫工部與相關人員才顯示設備取得金額
+                {
+                    <td>@Html.DisplayFor(modelItem => item.Cost)</td>
+                }
+                else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                        UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                        UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                        UserManager.IsInRole(User, "MedToDo"))
+                {
+                    <td>@Html.DisplayFor(modelItem => item.Cost)</td>
+                }
+                else
+                {
+                    <td>******</td>
+                }
+            </tr>
+            <tr>
+                <td colspan="4">
+                    @Html.DisplayFor(modelItem => item.TroubleDes)
+                </td>
+                <td colspan="3">
+                    @Html.DisplayFor(modelItem => item.DealDes)
+                </td>
+            </tr>
+            hourTotal += item.Hours.HasValue ? item.Hours.Value : 0;
+            costTotal += item.Cost.HasValue ? item.Cost.Value : 0;
+        }
+        <tr>
+            <td colspan="5"></td>
+            <td>@hourTotal</td>
+            <td>@costTotal</td>
+        </tr>
+    </table>
+    <div>
+        @await Html.PartialAsync("AssetAnalysis", ViewData["Analysis"] as EDIS.Models.AssetAnalysis)
+    </div>
+
+</body>
+</html>
