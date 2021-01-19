@@ -3685,7 +3685,7 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var repairF = _context.BMEDRepairFlows
                           .Where(f => ss.Contains(f.Status));
-           
+            //
             var assets = _context.BMEDAssets
                           .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
                           .GroupJoin(departments, 
