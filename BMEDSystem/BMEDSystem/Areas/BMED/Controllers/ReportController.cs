@@ -3908,16 +3908,20 @@ namespace EDIS.Areas.BMED.Controllers
                     //.Select(g => new { Country = g.Key, CustCount = g.Count() })
                     .ToDictionary(o => o.Key, o => o.Count());
 
-            var perairDtl = repairM.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), rm => rm.rd.DocId, rdl => rdl.DocId,
+            var repairDtl = repairM.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), rm => rm.rd.DocId, rdl => rdl.DocId,
                                     (rm, rdl) => new { rm = rm, rdl = rdl })
                                     .GroupBy(g => g.rm.r.AccDpt)
                                     //.Select(g => new { Country = g.Key, CustCount = g.Count() })
                                     .ToDictionary(o => o.Key, o => o.Count());
            
-            var tols = repairM.GroupJoin(_context.BMEDRepairCosts.Where(c => c.TotalCost > 0), d => d.rd.DocId, c => c.DocId, 
-                              (d, c) => new { repM = d, repCost = c })
-                              .SelectMany(s => s.repCost.Select(c => c.TotalCost).DefaultIfEmpty(0),
-                              (r, c) => new { repM = r.repM, repCost = c })
+            var tols = repairM.GroupJoin(_context.BMEDRepairCosts.Where(c => c.TotalCost > 0),
+                                         d => d.rd.DocId,
+                                         c => c.DocId, 
+                                         (d, c) => new { repM = d, repCost = c }
+                                         )
+                              .SelectMany(s => s.repCost.Select(c => c.TotalCost).DefaultIfEmpty(0).DefaultIfEmpty(),
+                                          (r, c) => new { repM = r.repM, repCost = c }
+                                         )
                               .GroupBy(g => g.repM.r.AccDpt)
                               .ToDictionary(o => o.Key, o => o.Select(c => c.repCost).Sum());
 
@@ -3973,7 +3977,7 @@ namespace EDIS.Areas.BMED.Controllers
                 //          rd => rd.DocId, r => r.DocId,
                 //          (rd, r) => rd).Count();
 
-                rcnt = perairDtl.ContainsKey(p.DptId) == false ? 0 : perairDtl[p.DptId];
+                rcnt = repairDtl.ContainsKey(p.DptId) == false ? 0 : repairDtl[p.DptId];
                 m.RpEndAmt = rcnt;
                 //m.RepairAmt = rs.Count();
                 m.RepairAmt = rs.ContainsKey(p.DptId) == false ? 0 : rs[p.DptId];
@@ -4080,7 +4084,7 @@ namespace EDIS.Areas.BMED.Controllers
             var rs = repairM.GroupBy(g => g.r.AccDpt)
                     .ToDictionary(o => o.Key, o => o.Count());
 
-            var perairDtl = repairM.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
+            var repairDtl = repairM.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
                           rm => rm.rd.DocId, rdl => rdl.DocId,
                           (rm, rdl) => new { rm = rm, rdl = rdl })
                      .GroupBy(g => g.rm.r.AccDpt)
@@ -4139,7 +4143,7 @@ namespace EDIS.Areas.BMED.Controllers
                 rcnt = 0;
                 kcnt = 0;
                 tolcost = 0m;
-                rcnt = perairDtl.ContainsKey(p.DptId) == false ? 0 : perairDtl[p.DptId];
+                rcnt = repairDtl.ContainsKey(p.DptId) == false ? 0 : repairDtl[p.DptId];
                 m.RpEndAmt = rcnt;
                 m.RepairAmt = rs.ContainsKey(p.DptId) == false ? 0 : rs[p.DptId];
                 if (rcnt > 0)
@@ -4218,7 +4222,7 @@ namespace EDIS.Areas.BMED.Controllers
             var sr = repairF.GroupBy(g => g.r.AccDpt)
                     .ToDictionary(o => o.Key, o => o.Count());
 
-            var perairDtl = repairF.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
+            var repairDtl = repairF.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
                           rm => rm.rd.DocId, rdl => rdl.DocId,
                           (rm, rdl) => new { rm = rm, rdl = rdl })
                      .GroupBy(g => g.rm.r.AccDpt)
@@ -4292,7 +4296,7 @@ namespace EDIS.Areas.BMED.Controllers
                 //rcnt = rs.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
                 //          rd => rd.DocId, r => r.DocId,
                 //          (rd, r) => rd).ToList().Count();
-                rcnt = perairDtl.ContainsKey(p.DptId) == false ? 0 : perairDtl[p.DptId];
+                rcnt = repairDtl.ContainsKey(p.DptId) == false ? 0 : repairDtl[p.DptId];
 
                 m.RpEndAmt = rcnt;
                 //m.RepairAmt = rs.Count();
@@ -4401,7 +4405,7 @@ namespace EDIS.Areas.BMED.Controllers
             var sr = repairF.GroupBy(g => g.r.AccDpt)
                     .ToDictionary(o => o.Key, o => o.Count());
 
-            var perairDtl = repairF.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
+            var repairDtl = repairF.Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
                           rm => rm.rd.DocId, rdl => rdl.DocId,
                           (rm, rdl) => new { rm = rm, rdl = rdl })
                      .GroupBy(g => g.rm.r.AccDpt)
@@ -4462,7 +4466,7 @@ namespace EDIS.Areas.BMED.Controllers
                 tolcost = 0m;
                 //var ss = new[] { "?", "2" };
                 //維修
-                  rcnt = perairDtl.ContainsKey(p.DptId) == false ? 0 : perairDtl[p.DptId];
+                  rcnt = repairDtl.ContainsKey(p.DptId) == false ? 0 : repairDtl[p.DptId];
 
                 m.RpEndAmt = rcnt;
                 //m.RepairAmt = rs.Count();
