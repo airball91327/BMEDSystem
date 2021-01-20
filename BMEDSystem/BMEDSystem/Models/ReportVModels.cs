@@ -49,6 +49,7 @@ namespace EDIS.Models
         public string DateType { get; set; }
         [Display(Name = "保養起始年月")]
         public int? SendYm { get; set; }
+        public int? KeepYm { get; set; }
         [Display(Name = "大樓")]
         public string Building { get; set; }
         [Display(Name = "是否累進")]
@@ -308,7 +309,7 @@ namespace EDIS.Models
 
     }
 
-    //維修保養統計表
+    //各成本中心維修保養統計表
     public class RepairKeepVModel
     {
         [Display(Name = "單位代號")]
@@ -486,7 +487,7 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
-        [Display(Name = "關卡人員")]
+        [Display(Name = "目前關卡人員")]
         public string ClsNam { get; set; }
         [Display(Name = "總工時")]
         public decimal Hour { get; set; }
@@ -2665,8 +2666,10 @@ namespace EDIS.Models
         public string Type { get; set; }
         [Display(Name = "保養方式")]
         public string InOut { get; set; }
-        [Display(Name = "成本中心名稱")]
+        [Display(Name = "成本中心")]
         public string AccDptName { get; set; }
+        [Display(Name = "保管部門")]
+        public string DelivDptName { get; set; }
         [Display(Name = "存放地點")]
         public string LeaveSite { get; set; }
         [Display(Name = "起始年月")]

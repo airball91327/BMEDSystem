@@ -1,25 +1,24 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
+    "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
+    "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "projectUniqueName": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
         "projectName": "EDIS",
-        "projectPath": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-        "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mac\\Source\\Repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+        "projectPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "packagesPath": "C:\\Users\\Inori\\.nuget\\packages\\",
+        "outputPath": "J:\\GitHub\\Repos\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\"
+          "C:\\Program Files\\dotnet\\sdk\\NuGetFallbackFolder"
         ],
         "configFilePaths": [
-          "C:\\Users\\mac\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\Inori\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -156,7 +155,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.401\\RuntimeIdentifierGraph.json"
         }
       }
     }
