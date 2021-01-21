@@ -585,8 +585,22 @@ namespace EDIS.Areas.BMED.Controllers
                 case "各成本中心維修保養統計表":
                     return PartialView("RepairKeep", RepairKeep(v).ToPagedList(page, pageSize));
                 case "維修金額統計表":
+                    if (v.Edate == null || v.Sdate == null)
+                    {
+                        return new JsonResult(v)
+                        {
+                            Value = new { success = false, error = "請輸入時間區間!" }
+                        };
+                    }
                     return PartialView("RepairCost", RepairCost(v,page));
                 case "保養金額統計表":
+                    if (v.Edate == null || v.Sdate == null)
+                    {
+                        return new JsonResult(v)
+                        {
+                            Value = new { success = false, error = "請輸入時間區間!" }
+                        };
+                    }
                     return PartialView("KeepCost", KeepCost(v,page));
                 case "工作時數統計表":
                     if (v.Edate == null && v.Sdate == null)
