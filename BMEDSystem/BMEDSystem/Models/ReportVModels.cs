@@ -306,6 +306,11 @@ namespace EDIS.Models
         public string Nov { get; set; }
         [Display(Name = "十二月")]
         public string Dec { get; set; }
+        [Display(Name = "表單單號")]
+        public string DocId { get; set; }
+        [DataType(DataType.Date)]
+        [Display(Name = "完工日期")]
+        public DateTime? EDate { get; set; }
 
     }
 
@@ -2840,5 +2845,40 @@ namespace EDIS.Models
         [Display(Name = "合計")]
         public decimal? Sum { get; set; }
         
+    }
+
+    //超過五日案件
+    public class CaseOverFiveVModel
+    {
+        [Display(Name = "表單編號")]
+        public string DocId { get; set; }
+        [Display(Name = "財產編號")]
+        public string AssetNo { get; set; }
+        [Display(Name = "成本中心")]
+        public string AccDpt { get; set; }
+        [Display(Name = "成本中心名稱")]
+        public string AccDptName { get; set; }
+       
+        [Display(Name = "儀器名稱")]
+        public string AssetName { get; set; }
+        [Display(Name = "故障情形")]
+        public string TroubleDes { get; set; }
+        [Display(Name = "處理狀況")]
+        public string DealState { get; set; }
+        [Display(Name = "處理描述")]
+        public string DealDes { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        [Display(Name = "請修日期")]
+        public DateTime SDate { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        [Display(Name = "完修日期")]
+        public DateTime EDate { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
+        [Display(Name ="超過天數")]
+        public int Days { get; set; }
+
     }
 }

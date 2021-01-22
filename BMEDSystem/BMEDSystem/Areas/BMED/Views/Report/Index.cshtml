@@ -212,7 +212,7 @@
                     </div>
                 </div>
             }
-            @if (Model.ReportClass == "分攤費用清單")
+            @if (Model.ReportClass == "分攤費用清單" || Model.ReportClass == "超過五日案件清單")
             {
                 <div class="form-group">
                     @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })

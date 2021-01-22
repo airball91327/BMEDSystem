@@ -322,7 +322,28 @@ namespace EDIS.Areas.BMED.Controllers
                     asset = a.asset,
                     assetkeep = a.assetkeep,
                     dept = d
-                });
+                })
+                .Join(_context.BMEDKeeps, a => a.asset.AssetNo, k => k.AccDpt,
+                (a, k) => new {
+                    asset = a.asset,
+                    assetkeep = a.assetkeep,
+                    dept = a.dept,
+                    DocId = k.DocId
+                })
+                .GroupJoin(_context.BMEDKeepDtls.Where(kd => kd.Result == 1),
+                        a => a.DocId, 
+                        k => k.DocId,
+                        (a, k) => new {
+                            asset = a,
+                            dtls = k
+                        })
+                .SelectMany( x => x.dtls.DefaultIfEmpty(), 
+                            (a, k) => new {
+                                asset = a.asset.asset,
+                                assetkeep = a.asset.assetkeep,
+                                dept = a.asset.dept,
+                                dtls = k
+                            }) ;
             if (urLocation == "總院")
             {
                 data = data.Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K");
@@ -366,6 +387,8 @@ namespace EDIS.Areas.BMED.Controllers
                 aks.DelivDptName = s.dept.Name_C;
                 aks.Brand = s.asset.Brand;
                 aks.Type = s.asset.Type;
+                aks.DocId = s.dtls.DocId;
+                aks.EDate = s.dtls.EndDate;
                 yyymm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value;
                 cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value;
                 y1 = yyymm / 100;
@@ -754,10 +777,26 @@ namespace EDIS.Areas.BMED.Controllers
                         };
                     }
                     return PartialView("ReKeShCosCheck", ReKeShCosCheck(v).ToPagedList(page, pageSize));
-                //case "滿意度調查統計表":
-                //    return PartialView("QuestionAnalysis", QuestAnaly(v));
-                //case "儀器設備保養清單":
-                //    return PartialView("AssetKeepList", AssetKeepList(v));
+                case "超過五日案件清單":
+                    if (v.Edate == null || v.Sdate == null)
+                    {
+                        return new JsonResult(v)
+                        {
+                            Value = new { success = false, error = "時間區間皆都需選擇!" }
+                        };
+                    }
+                    else if (string.IsNullOrEmpty(v.Location))
+                    {
+                        return new JsonResult(v)
+                        {
+                            Value = new { success = false, error = "請選擇院區!" }
+                        };
+                    }
+                    return PartialView("CaseOverFive", CaseOverFive(v).ToPagedList(page, pageSize));
+                    //case "滿意度調查統計表":
+                    //    return PartialView("QuestionAnalysis", QuestAnaly(v));
+                    //case "儀器設備保養清單":
+                    //    return PartialView("AssetKeepList", AssetKeepList(v));
             }
 
             return View();
@@ -5907,6 +5946,188 @@ namespace EDIS.Areas.BMED.Controllers
             );
         }
 
+        //超過五日案件
+        public List<CaseOverFiveVModel> CaseOverFive(ReportQryVModel v)
+        {
+            List<CaseOverFiveVModel> mv = new List<CaseOverFiveVModel>();
+            CaseOverFiveVModel dv;
+            TempData["qry"] = JsonConvert.SerializeObject(v);
+
+            var repairs = _context.BMEDRepairs
+                .Where(r => r.Loc == v.Location)
+                .Where(r => r.ApplyDate >= v.Sdate);
+
+            var query = _context.BMEDRepairDtls
+                 .Where(d => d.EndDate <= v.Edate)
+                 .Join(repairs,
+                         rd => rd.DocId,
+                         r => r.DocId,
+                 (rd, r) => new
+                 {
+                     rd.DocId,
+                     rd.FailFactor,
+                     EndDate = rd.EndDate.Value,
+                     rd.InOut,
+                     rd.DealDes,
+                     rd.DealState,
+                     r.ApplyDate,
+                     r.AccDpt,
+                     r.AssetNo,
+                     r.PlantClass,
+                     r.EngId,
+                     r.TroubleDes,
+                     r.AssetName
+                 })
+                 .Join(_context.AppUsers,
+                         rd => rd.EngId,
+                         r => r.Id,
+                 (rd, u) => new
+                 {
+                     rd.DocId,
+                     rd.FailFactor,
+                     rd.EndDate,
+                     rd.InOut,
+                     rd.DealDes,
+                     rd.DealState,
+                     rd.ApplyDate,
+                     rd.AccDpt,
+                     rd.AssetNo,
+                     rd.PlantClass,
+                     rd.EngId,
+                     rd.TroubleDes,
+                     rd.AssetName,
+                     u.FullName
+                 })
+                 .Join(_context.Departments,
+                         rd => rd.AccDpt,
+                         r => r.DptId,
+                 (rd, d) => new
+                 {
+                     rd.DocId,
+                     rd.FailFactor,
+                     rd.EndDate,
+                     rd.InOut,
+                     rd.DealDes,
+                     rd.DealState,
+                     rd.ApplyDate,
+                     rd.AccDpt,
+                     rd.AssetNo,
+                     rd.PlantClass,
+                     rd.EngId,
+                     rd.TroubleDes,
+                     rd.AssetName,
+                     rd.FullName,
+                     d.Name_C
+                 })
+                 .Join(_context.BMEDDealStatuses,
+                         rd => rd.DealState,
+                         r => r.Id,
+                 (rd, dl) => new
+                 {
+                     rd.DocId,
+                     rd.FailFactor,
+                     rd.EndDate,
+                     rd.InOut,
+                     rd.DealDes,
+                    //rd.DealState,
+                    rd.ApplyDate,
+                     rd.AccDpt,
+                     rd.AssetNo,
+                     rd.PlantClass,
+                     rd.EngId,
+                     rd.TroubleDes,
+                     rd.AssetName,
+                     rd.FullName,
+                     rd.Name_C,
+                     dl.Title
+                 })
+                 .Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days > 5);
+
+            //
+            if (!string.IsNullOrEmpty(v.AccDpt))
+            {
+                query = query.Where(vv => vv.AccDpt == v.AccDpt);
+            }
+            //
+
+            foreach (var g in query.ToList())
+            {
+                dv = new CaseOverFiveVModel();
+                dv.DocId = g.DocId;
+                dv.AssetNo = g.AssetNo;
+                dv.AccDpt = g.AccDpt;
+                dv.AccDptName = g.Name_C;
+                dv.AssetName = g.AssetName;
+                dv.TroubleDes = g.TroubleDes;
+                dv.DealState = g.Title;
+                dv.DealDes = g.DealDes;
+                dv.SDate = g.ApplyDate;
+                dv.EDate = g.EndDate;
+                dv.EngName = g.FullName;
+                dv.Days = dv.EDate.Subtract(dv.SDate).Days - 4;
+                mv.Add(dv);
+            }
+            //
+            return mv;
+        }
+
+        public IActionResult ExcelCaseOverFiveList(ReportQryVModel v)
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("表單編號");
+            dt.Columns.Add("財產編號");
+            dt.Columns.Add("成本中心");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("設備名稱");
+            dt.Columns.Add("故障情形");
+            dt.Columns.Add("處理狀況");
+            dt.Columns.Add("工程師");
+            dt.Columns.Add("請修日期");
+            dt.Columns.Add("完工日期");
+            dt.Columns.Add("超過天數");
+            
+
+
+            List<CaseOverFiveVModel> mv = CaseOverFive(v);
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.DocId;
+                dw[1] = m.AssetNo;
+                dw[2] = m.AccDpt;
+                dw[3] = m.AccDptName;
+                dw[4] = m.AssetName;
+                dw[5] = m.TroubleDes;
+                dw[6] = m.DealState;
+                dw[7] = m.EngName;
+                dw[8] = m.SDate;
+                dw[9] = m.EDate;
+                dw[10] = m.Days;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("超過五日案件清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "ExcelCaseOverFiveList.xlsx"
+            );
+        }
+
+
         public IActionResult EffectRatio()
         {
             return View();
@@ -6037,6 +6258,8 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["Analysis"] = ay;
             return PartialView(rk);
         }
+
+
         
         /// <summary>
         /// Get Assets by location, according to asset's delivDpt.
@@ -6070,6 +6293,8 @@ namespace EDIS.Areas.BMED.Controllers
             }
             return bmedAssets;
         }
+
+       
 
         /// <summary>
         /// Get Departments by location.

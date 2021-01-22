@@ -120,6 +120,15 @@
             </div>
         </div>
         <div class="row">
+            <div class="form-inline">
+                <label asp-for="IsSecurity" class="control-title" style="color:red"></label>
+                @Html.RadioButtonFor(model => model.IsSecurity, "Y",new {@checked="false" }) 是
+                @Html.RadioButtonFor(model => model.IsSecurity, "N",new {@checked="false" }) 否
+                <span style="color: #ff9c00;">*</span>
+                <span asp-validation-for="IsSecurity" class="text-danger"></span>
+            </div>
+        </div>
+        <div class="row">
             <div class=form-inline>
                 <div class="form-group">
                     <label asp-for="EndDate" class="control-title"></label>
