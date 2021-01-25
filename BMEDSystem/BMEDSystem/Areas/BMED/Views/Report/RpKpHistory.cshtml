@@ -17,14 +17,18 @@
 
 <p>
     <a class="btn btn-default" href="@Url.Action("ExcelRpKpHistory", qry)">匯出Excel</a>
+    <a class="btn btn-default" href="@Url.Action("PrintRpKpHistory", qry)" target="_blank">匯出PDF(舊)</a>
 </p>
 <div>
     @await Component.InvokeAsync("AssetView", new { id = ViewData["Ano"] })
 </div>
-<div>
-    <h4>維修保養履歷</h4>
-</div>
+
 <table class="table">
+    <tr style="text-align:center; border-bottom: solid 2px; border-top: solid 2px;">
+        <td colspan="9">
+            <h4>維修保養履歷</h4>
+        </td>
+    </tr>
     <tr>
         <th>
             @Html.DisplayNameFor(model => model.DocType)
@@ -61,6 +65,10 @@
         </th>
     </tr>
 
+    @{ 
+        decimal hourTotal = 0;
+        decimal costTotal = 0;
+    }
     @foreach (var item in Model)
     {
         <tr>
@@ -120,8 +128,14 @@
                 @Html.DisplayFor(modelItem => item.DealDes)
             </td>
         </tr>
+        hourTotal += item.Hours.HasValue ? item.Hours.Value : 0;
+        costTotal += item.Cost.HasValue ? item.Cost.Value : 0;
     }
-
+    <tr>
+        <td colspan="5"></td>
+        <td>@hourTotal</td>
+        <td>@costTotal</td>
+    </tr>
 </table>
 <div>
     @await Html.PartialAsync("AssetAnalysis", ViewData["Analysis"] as EDIS.Models.AssetAnalysis)

@@ -61,6 +61,9 @@ namespace EDIS.Models
         public string NotInExceptDevice { get; set; }
         [Display(Name = "[是][否]為器械")]
         public string IsInstrument { get; set; }
+        [Required(ErrorMessage = "必選擇欄位")]
+        [Display(Name = "[是][否]為資安事件")]
+        public string IsSecurity { get; set; }
         [NotMapped]
         public List<SelectListItem> DealStates { get; set; }
         [NotMapped]

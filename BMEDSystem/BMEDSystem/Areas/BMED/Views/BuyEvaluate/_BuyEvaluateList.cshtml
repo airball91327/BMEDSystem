@@ -6,6 +6,17 @@
 
 <script src="~/js/BMED/AssetFileUpload.js" asp-append-version="true"></script>
 
+<script>
+    function RecoverySuccess() {
+        alert("流程已恢復");
+        BuyEvaReSubmit();
+    }
+    var RecoveryFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>
+
 @{
     int i = 0;
     var s = "";
@@ -62,7 +73,7 @@
                 <td>
                     @if (item.Flg == "?" && UserManager.GetCurrentUserId(User) == item.FlowUid)
                     {
-                        @Html.ActionLink("編輯", "Edit", "BuyEvaluate", new { id = item.DocId, sid = item.DocSid}, new { target = "_blank" })
+                        @Html.ActionLink("編輯", "Edit", "BuyEvaluate", new { id = item.DocId, sid = item.DocSid }, new { target = "_blank" })
                         if (UserManager.IsInRole(User, "BuyerMgr"))
                         {
                             @Html.Raw("| ")
@@ -80,6 +91,17 @@
                             @Html.Raw("| ")
                             @Html.ActionLink("驗收", "Create", "Delivery", new { id = item.DocId }, null)
                         }
+                    }
+                    @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedToDo"))))
+                    {
+                        @Html.Raw("| ")
+                        <a asp-action="FlowRecovery" asp-controller="BuyFlow" asp-area="BMED" asp-route-DocId="@item.DocId"
+                           data-ajax="true" class="btn btn-danger btn-sm"
+                           data-ajax-method="POST" id="btnRecovery"
+                           data-ajax-failure="RecoveryFailed"
+                           data-ajax-success="RecoverySuccess()">
+                            恢復流程
+                        </a>
                     }
                 </td>
                 <td>

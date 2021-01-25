@@ -81,62 +81,86 @@
 
     @foreach (var item in Model)
     {
-<tr>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetNo)</p>
-    </td>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetName)</p>
-    </td>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.DelivDptName)</p>
-    </td>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.Brand)</p>
-    </td>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.Type)</p>
-    </td>
-    <td>
-        <p class="hdtitle">@Html.DisplayFor(modelItem => item.EngName)</p>
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Jan)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Feb)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Mar)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Apr)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.May)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Jun)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Jul)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Aug)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Sep)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Oct)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Nov)
-    </td>
-    <td class="Sche">
-        @Html.DisplayFor(modelItem => item.Dec)
-    </td>
-</tr>
+        <tr>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetNo)</p>
+            </td>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetName)</p>
+            </td>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.DelivDptName)</p>
+            </td>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.Brand)</p>
+            </td>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.Type)</p>
+            </td>
+            <td>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.EngName)</p>
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Jan)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Feb)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Mar)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Apr)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.May)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Jun)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Jul)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Aug)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Sep)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Oct)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Nov)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+            <td class="Sche">
+                @Html.DisplayFor(modelItem => item.Dec)
+                @Html.DisplayFor(modelItem => item.DocId)
+                @Html.DisplayFor(modelItem => item.EDate.Value.ToString("yyy/MM/dd"))
+            </td>
+        </tr>
     }
 
 </table>

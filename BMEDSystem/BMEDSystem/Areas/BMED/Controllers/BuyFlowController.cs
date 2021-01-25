@@ -697,6 +697,41 @@ namespace EDIS.Areas.BMED.Controllers
             }
             return Json(list);
         }
+
+        [HttpPost]
+        public ActionResult FlowRecovery(string docId)
+        {
+            // Get Login User's details.
+            var loginUser = _userRepo.Find(ur => ur.UserName == User.Identity.Name).FirstOrDefault();
+            var lastFlow = _context.BuyFlows.Where(bf => bf.DocId == docId && bf.Status == "2").FirstOrDefault();
+            if (lastFlow != null)
+            {
+                lastFlow.Status = "1";
+                lastFlow.Opinions += "(*恢復流程)";
+                BuyFlowModel rf = new BuyFlowModel();
+                rf.DocId = docId;
+                rf.StepId = lastFlow.StepId + 1;
+                rf.UserId = loginUser.Id;
+                rf.Status = "?";
+                rf.Role = roleManager.GetRolesForUser(loginUser.Id).FirstOrDefault();
+                rf.Rtp = null;
+                rf.Rdt = null;
+                rf.Rtt = DateTime.Now;
+                rf.Cls = "設備經辦";
+                _context.BuyFlows.Add(rf);
+                //
+                _context.SaveChanges();
+                return new JsonResult(docId)
+                {
+                    Value = new { success = true, error = "" },
+                };
+            }
+            else
+            {
+                throw new Exception("流程恢復失敗!");
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             _context.Dispose();

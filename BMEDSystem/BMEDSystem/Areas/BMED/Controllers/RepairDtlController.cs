@@ -118,6 +118,7 @@ namespace EDIS.Areas.BMED.Controllers
                             repairModel.AssetName = tempAsset.Cname;
                         }
                     }
+                    
                     _context.Entry(repairModel).State = EntityState.Modified;
 
                     _context.SaveChanges();
