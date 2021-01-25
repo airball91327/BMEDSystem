@@ -5,10 +5,13 @@
     <RestoreTool Condition=" '$(RestoreTool)' == '' ">NuGet</RestoreTool>
     <ProjectAssetsFile Condition=" '$(ProjectAssetsFile)' == '' ">$(MSBuildThisFileDirectory)project.assets.json</ProjectAssetsFile>
     <NuGetPackageRoot Condition=" '$(NuGetPackageRoot)' == '' ">$(UserProfile)\.nuget\packages\</NuGetPackageRoot>
-    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\mac\.nuget\packages\;C:\Microsoft\Xamarin\NuGet\</NuGetPackageFolders>
+    <NuGetPackageFolders Condition=" '$(NuGetPackageFolders)' == '' ">C:\Users\hcimac\.nuget\packages\</NuGetPackageFolders>
     <NuGetProjectStyle Condition=" '$(NuGetProjectStyle)' == '' ">PackageReference</NuGetProjectStyle>
-    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">5.4.0</NuGetToolVersion>
+    <NuGetToolVersion Condition=" '$(NuGetToolVersion)' == '' ">5.8.0</NuGetToolVersion>
   </PropertyGroup>
+  <ItemGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
+    <SourceRoot Include="$([MSBuild]::EnsureTrailingSlash($(NuGetPackageFolders)))" />
+  </ItemGroup>
   <PropertyGroup>
     <MSBuildAllProjects>$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
   </PropertyGroup>
@@ -22,11 +25,11 @@
     <Import Project="$(NuGetPackageRoot)microsoft.aspnetcore.all\2.1.9\build\netcoreapp2.1\Microsoft.AspNetCore.All.props" Condition="Exists('$(NuGetPackageRoot)microsoft.aspnetcore.all\2.1.9\build\netcoreapp2.1\Microsoft.AspNetCore.All.props')" />
   </ImportGroup>
   <PropertyGroup Condition=" '$(ExcludeRestorePackageImports)' != 'true' ">
-    <PkgZen_Barcode_Rendering_Framework Condition=" '$(PkgZen_Barcode_Rendering_Framework)' == '' ">C:\Users\mac\.nuget\packages\zen.barcode.rendering.framework\3.1.10729.1</PkgZen_Barcode_Rendering_Framework>
-    <PkgZen_Barcode_Rendering_Framework_Web Condition=" '$(PkgZen_Barcode_Rendering_Framework_Web)' == '' ">C:\Users\mac\.nuget\packages\zen.barcode.rendering.framework.web\3.1.10729.1</PkgZen_Barcode_Rendering_Framework_Web>
-    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\mac\.nuget\packages\microsoft.codeanalysis.analyzers\1.1.0</PkgMicrosoft_CodeAnalysis_Analyzers>
-    <PkgjQuery Condition=" '$(PkgjQuery)' == '' ">C:\Users\mac\.nuget\packages\jquery\1.8.0</PkgjQuery>
-    <PkgMicrosoft_EntityFrameworkCore_Tools Condition=" '$(PkgMicrosoft_EntityFrameworkCore_Tools)' == '' ">C:\Users\mac\.nuget\packages\microsoft.entityframeworkcore.tools\2.1.14</PkgMicrosoft_EntityFrameworkCore_Tools>
-    <PkgMicrosoft_AspNetCore_Razor_Design Condition=" '$(PkgMicrosoft_AspNetCore_Razor_Design)' == '' ">C:\Users\mac\.nuget\packages\microsoft.aspnetcore.razor.design\2.1.2</PkgMicrosoft_AspNetCore_Razor_Design>
+    <PkgZen_Barcode_Rendering_Framework Condition=" '$(PkgZen_Barcode_Rendering_Framework)' == '' ">C:\Users\hcimac\.nuget\packages\zen.barcode.rendering.framework\3.1.10729.1</PkgZen_Barcode_Rendering_Framework>
+    <PkgZen_Barcode_Rendering_Framework_Web Condition=" '$(PkgZen_Barcode_Rendering_Framework_Web)' == '' ">C:\Users\hcimac\.nuget\packages\zen.barcode.rendering.framework.web\3.1.10729.1</PkgZen_Barcode_Rendering_Framework_Web>
+    <PkgMicrosoft_CodeAnalysis_Analyzers Condition=" '$(PkgMicrosoft_CodeAnalysis_Analyzers)' == '' ">C:\Users\hcimac\.nuget\packages\microsoft.codeanalysis.analyzers\1.1.0</PkgMicrosoft_CodeAnalysis_Analyzers>
+    <PkgjQuery Condition=" '$(PkgjQuery)' == '' ">C:\Users\hcimac\.nuget\packages\jquery\1.8.0</PkgjQuery>
+    <PkgMicrosoft_EntityFrameworkCore_Tools Condition=" '$(PkgMicrosoft_EntityFrameworkCore_Tools)' == '' ">C:\Users\hcimac\.nuget\packages\microsoft.entityframeworkcore.tools\2.1.14</PkgMicrosoft_EntityFrameworkCore_Tools>
+    <PkgMicrosoft_AspNetCore_Razor_Design Condition=" '$(PkgMicrosoft_AspNetCore_Razor_Design)' == '' ">C:\Users\hcimac\.nuget\packages\microsoft.aspnetcore.razor.design\2.1.2</PkgMicrosoft_AspNetCore_Razor_Design>
   </PropertyGroup>
 </Project>

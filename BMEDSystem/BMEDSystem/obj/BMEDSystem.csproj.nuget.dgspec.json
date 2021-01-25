@@ -1,25 +1,21 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
+    "E:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {}
   },
   "projects": {
-    "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
+    "E:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "projectUniqueName": "E:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
         "projectName": "EDIS",
-        "projectPath": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
-        "packagesPath": "C:\\Users\\mac\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\mac\\source\\repos\\airball91327\\BMEDSystem\\BMEDSystem\\BMEDSystem\\obj\\",
+        "projectPath": "E:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\BMEDSystem.csproj",
+        "packagesPath": "C:\\Users\\hcimac\\.nuget\\packages\\",
+        "outputPath": "E:\\OneDrive\\CchHosp\\8420\\BMEDSystem0\\BMEDSystem\\BMEDSystem\\obj\\",
         "projectStyle": "PackageReference",
-        "fallbackFolders": [
-          "C:\\Microsoft\\Xamarin\\NuGet\\"
-        ],
         "configFilePaths": [
-          "C:\\Users\\mac\\AppData\\Roaming\\NuGet\\NuGet.Config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config",
-          "C:\\Program Files (x86)\\NuGet\\Config\\Xamarin.Offline.config"
+          "C:\\Users\\hcimac\\AppData\\Roaming\\NuGet\\NuGet.Config",
+          "C:\\Program Files (x86)\\NuGet\\Config\\Microsoft.VisualStudio.Offline.config"
         ],
         "originalTargetFrameworks": [
           "netcoreapp2.1"
@@ -30,6 +26,7 @@
         },
         "frameworks": {
           "netcoreapp2.1": {
+            "targetAlias": "netcoreapp2.1",
             "projectReferences": {}
           }
         },
@@ -41,6 +38,7 @@
       },
       "frameworks": {
         "netcoreapp2.1": {
+          "targetAlias": "netcoreapp2.1",
           "dependencies": {
             "ClosedXML": {
               "target": "Package",
@@ -156,7 +154,7 @@
           ],
           "assetTargetFallback": true,
           "warn": true,
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\3.1.101\\RuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\5.0.101\\RuntimeIdentifierGraph.json"
         }
       }
     }
