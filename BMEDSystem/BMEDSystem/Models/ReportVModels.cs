@@ -308,9 +308,9 @@ namespace EDIS.Models
         public string Dec { get; set; }
         [Display(Name = "表單單號")]
         public string DocId { get; set; }
-        [DataType(DataType.Date)]
-        [Display(Name = "完工日期")]
-        public DateTime? EDate { get; set; }
+        
+        [Display(Name = "完修日期")]
+        public string EDate { get; set; }
 
     }
 

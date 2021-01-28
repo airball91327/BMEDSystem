@@ -91,10 +91,6 @@ namespace EDIS.Models
         [Display(Name = "[是][否]為統包")]
         public string NotInExceptDevice { get; set; }
         [NotMapped]
-        [Required]
-        [Display(Name = "[是][否]為資安事件")]
-        public string IsSecurity { get; set; }
-        [NotMapped]
         [Display(Name = "費用")]
         [DisplayFormat(DataFormatString = "{0:N0}")]
         public decimal Cost { get; set; }
