@@ -309,50 +309,85 @@ namespace EDIS.Areas.BMED.Controllers
             //
             TempData["qry2"] = JsonConvert.SerializeObject(v);
             List<AssetKpScheVModel> sv = new List<AssetKpScheVModel>();
-            
+            var assetK = _context.BMEDAssetKeeps.Where(x => x.Cycle > 0);
+            //完成保養
+            var dtls = _context.BMEDKeepDtls.Where(d => d.Result == 1);
+            var depar = _context.Departments.AsQueryable();
+            if (urLocation == "總院")
+            {
+                depar = _context.Departments.Where(r => r.Loc == "C" || r.Loc == "P" || r.Loc == "K");
+            }
+            else
+            {
+                depar = _context.Departments.Where(r => r.Loc == urLocation);
+            }
+
             var data = _context.BMEDAssets
-                .Join(_context.BMEDAssetKeeps.Where(x => x.Cycle > 0), a => a.AssetNo, k => k.AssetNo,
+                .Join(assetK, a => a.AssetNo, k => k.AssetNo,
                 (a, k) => new
                 {
                     asset = a,
                     assetkeep = k
                 })
-                .Join(_context.Departments, a => a.asset.DelivDpt, d => d.DptId,
-                (a, d) => new {
+                .Join(depar, a => a.asset.DelivDpt, d => d.DptId,
+                (a, d) => new
+                {
                     asset = a.asset,
                     assetkeep = a.assetkeep,
                     dept = d
                 })
-                .Join(_context.BMEDKeeps, a => a.asset.AssetNo, k => k.AccDpt,
-                (a, k) => new {
-                    asset = a.asset,
-                    assetkeep = a.assetkeep,
-                    dept = a.dept,
-                    DocId = k.DocId
-                })
-                .GroupJoin(_context.BMEDKeepDtls.Where(kd => kd.Result == 1),
-                        a => a.DocId, 
-                        k => k.DocId,
-                        (a, k) => new {
-                            asset = a,
-                            dtls = k
+                .GroupJoin(_context.BMEDKeeps,
+                        a => a.asset.AssetNo,
+                        k => k.AssetNo,
+                        (a, k) => new
+                        {
+                            asset = a.asset,
+                            assetkeep = a.assetkeep,
+                            dept = a.dept,
+                            keep = k
                         })
-                .SelectMany( x => x.dtls.DefaultIfEmpty(), 
-                            (a, k) => new {
+                .SelectMany( x => x.keep.DefaultIfEmpty() ,
+                         (a, k) => new
+                         {
+                             asset = a.asset,
+                             assetkeep = a.assetkeep,
+                             dept = a.dept,
+                             DocId = k.DocId
+                         }
+                )
+                .GroupJoin( dtls.Where(kd => kd.Result == 1),
+                            a => a.DocId,
+                            k => k.DocId,
+                            (a, k) => new
+                            {
+                                asset = a,
+                                dtls = k
+                            })
+                .SelectMany(x => x.dtls.DefaultIfEmpty(),
+                            (a, k) => new
+                            {
                                 asset = a.asset.asset,
                                 assetkeep = a.asset.assetkeep,
                                 dept = a.asset.dept,
                                 dtls = k
-                            }) ;
-            if (urLocation == "總院")
-            {
-                data = data.Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K");
-            }
-            else
-            {
-                data = data.Where(r => r.dept.Loc == urLocation);
-            }
+                            });
+            //var data = _context.BMEDAssets
+            //   .Join(_context.BMEDAssetKeeps.Where(x => x.Cycle > 0), a => a.AssetNo, k => k.AssetNo,
+            //   (a, k) => new
+            //   {
+            //       asset = a,
+            //       assetkeep = k
+            //   })
+            //   .Join(depar, a => a.asset.DelivDpt, d => d.DptId,
+            //   (a, d) => new {
+            //       asset = a.asset,
+            //       assetkeep = a.assetkeep,
+            //       dept = d
+            //   });
+
             data = data.Where(r => r.asset.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
+
+            
             if (!string.IsNullOrEmpty(v.AssetName))
             {
                 data = data.Where(r => r.asset.Cname.Contains(v.AssetName));
@@ -372,8 +407,9 @@ namespace EDIS.Areas.BMED.Controllers
                 engid = Convert.ToInt32(v.EngId);
                 data = data.Where(x => x.assetkeep.KeepEngId == engid);
             }
-                AssetKpScheVModel aks;
-            int year = DateTime.Now.Year - 1911;
+
+            AssetKpScheVModel aks;
+            int year = DateTime.Now.Year - 1911 ;
             int yyymm = 0;
             int cycle = 0;
             int y1 = 0;
@@ -387,8 +423,8 @@ namespace EDIS.Areas.BMED.Controllers
                 aks.DelivDptName = s.dept.Name_C;
                 aks.Brand = s.asset.Brand;
                 aks.Type = s.asset.Type;
-                aks.DocId = s.dtls.DocId;
-                aks.EDate = s.dtls.EndDate;
+                aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                aks.EDate = s.dtls == null ? null : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
                 yyymm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value;
                 cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value;
                 y1 = yyymm / 100;
@@ -398,17 +434,18 @@ namespace EDIS.Areas.BMED.Controllers
                     for (i = 1; i <= 12; i++)
                     {
                         if (((year - y1) * 12 + (i - m1)) % cycle == 0)
-                        {
+                        {//哪一天保養
+                            
                             switch (i)
                             {
                                 case 1:
-                                    aks.Jan = "*";
+                                    aks.Jan = "*" ;
                                     break;
                                 case 2:
                                     aks.Feb = "*";
                                     break;
                                 case 3:
-                                    aks.Mar = "*";
+                                    aks.Mar = "*" ;
                                     break;
                                 case 4:
                                     aks.Apr = "*";
@@ -417,16 +454,16 @@ namespace EDIS.Areas.BMED.Controllers
                                     aks.May = "*";
                                     break;
                                 case 6:
-                                    aks.Jun = "*";
+                                    aks.Jun = "*" ;
                                     break;
                                 case 7:
                                     aks.Jul = "*";
                                     break;
                                 case 8:
-                                    aks.Aug = "*";
+                                    aks.Aug = "*" ;
                                     break;
                                 case 9:
-                                    aks.Sep = "*";
+                                    aks.Sep = "*" ;
                                     break;
                                 case 10:
                                     aks.Oct = "*";
@@ -435,7 +472,7 @@ namespace EDIS.Areas.BMED.Controllers
                                     aks.Nov = "*";
                                     break;
                                 case 12:
-                                    aks.Dec = "*";
+                                    aks.Dec = "*" ;
                                     break;
                             }
                         }

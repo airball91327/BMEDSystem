@@ -55,7 +55,7 @@ namespace EDIS.Components.BMEDBuyEvaluate
                     .ForEach(d =>
                     {
                         li = new SelectListItem();
-                        li.Text = d.Name_C;
+                        li.Text = d.Name_C + "(" + d.DptId + ")";
                         li.Value = d.DptId;
                         listItem2.Add(li);
 
