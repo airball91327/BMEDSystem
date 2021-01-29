@@ -81,6 +81,8 @@ $(function () {
             $('#btnQtyProduct').show();
             $('#btnQtyStock').hide();
             $("#SignNo").val('');
+            $("#Price").val('');
+            $("#TotalCost").val('0.0');
             $("#pnlSIGN").hide();
             $("#pnlACCDATE").show();
             $("#CVendor").show();
@@ -107,6 +109,8 @@ $(function () {
             $('#btnQtyStock').show();    // 點選"庫存"
             $('#btnQtyProduct').hide();
             $('#PartName').attr('readonly', true);
+            $("#Price").val('');
+            $("#TotalCost").val('0.0');
             //$('#Price').attr('readonly', true);
             $("#CVendor").hide();
             $("#pnlTICKET").hide();

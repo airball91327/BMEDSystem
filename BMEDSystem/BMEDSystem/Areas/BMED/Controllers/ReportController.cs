@@ -1040,19 +1040,22 @@ namespace EDIS.Areas.BMED.Controllers
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             /* Get assets by user's location. */
             var bmedAssets = GetAssetsByLoc(urLocation);
+
+            //var repair = _context.BMEDRepairs.ToList();
             // 報廢案件
             var repairDtl = _context.BMEDRepairDtls.Where(rd => rd.DealState == 4)
                                                    .Where(rd => rd.CloseDate != null);
-            //var repair = _context.BMEDRepairs.ToList();
             //非報廢設備
-            var asstes = _context.BMEDAssets.Where(a => a.DisposeKind != "報廢");
-            // 列管財產
-            var repair = _context.BMEDRepairs.Where(r => r.AssetNo.Length > 6 || r.AssetNo == "99999")
-                                 .Join(asstes,
+            var asstes = bmedAssets.Where(a => a.DisposeKind != "報廢");
+            //列管財產
+            var repair = _context.BMEDRepairs
+                        .Where(re => re.AssetNo.Length > 6 || re.AssetNo != "99999")
+                        .Join( asstes,
                                         r => r.AssetNo,
                                         a => a.AssetNo,
                                         (r,a) => r);
-            // Query Conditions.
+
+            // Query Conditions.條件篩選
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
                 repair = repair.Where(r => r.AccDpt == v.AccDpt);
@@ -1061,13 +1064,18 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 repair = repair.Where(r => r.AssetNo == v.AssetNo);
             }
-            if (v.Sdate != null || v.Edate != null)
+            if (v.Sdate != null )
             {
-                repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate && rd.CloseDate <= v.Edate);
+                repairDtl = repairDtl.Where(rd => rd.EndDate >= v.Sdate);
             }
-            //
-            var result = repairDtl.Join(repair, rd => rd.DocId, r => r.DocId,
-                                    (rd, r) => new
+            if (v.Edate != null)
+            {
+                repairDtl = repairDtl.Where(rd => rd.EndDate <= v.Edate);
+            }
+
+            //列管財產join報廢案件
+            var result = repair.Join(repairDtl, r => r.DocId, rd => rd.DocId,
+                                    (r, rd) => new
                                     {
                                         dtl = rd,
                                         repair = r
@@ -1076,8 +1084,9 @@ namespace EDIS.Areas.BMED.Controllers
             List<ScrapAsset> sa = new List<ScrapAsset>();
             DepartmentModel dpt;
             AppUserModel usr;
-            RepairFlowModel rf;
-            //
+            //RepairFlowModel rf;
+
+            //關卡:申請人驗收人單位主管的案件
             var flow = _context.BMEDRepairFlows
                 .Join(result ,
                       r => r.DocId,
@@ -1087,6 +1096,7 @@ namespace EDIS.Areas.BMED.Controllers
                 .OrderBy(r => r.rf.StepId)
                 .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"));
 
+           //目前最後關卡人員名稱與異動時間
             var flowuf = flow.Join(_context.AppUsers,
                              r => r.rf.UserId,
                              u => u.Id,
@@ -1108,7 +1118,7 @@ namespace EDIS.Areas.BMED.Controllers
                  .ToDictionary(x => x.Key,
                                x => x.Select(r => r.Rtt));
 
-            //
+            //關卡:申醫工主管的案件
             var flowMgr = _context.BMEDRepairFlows
                 .Join(result,
                       r => r.DocId,
@@ -1118,6 +1128,8 @@ namespace EDIS.Areas.BMED.Controllers
                 .OrderBy(r => r.rf.StepId)
                 .Where(r => r.rf.Cls.Contains("醫工主管"));
 
+
+            //目前最後關卡人員名稱與異動時間
             var flowMgruf = flowMgr.Join(_context.AppUsers,
                              r => r.rf.UserId,
                              u => u.Id,
@@ -1140,16 +1152,19 @@ namespace EDIS.Areas.BMED.Controllers
                 .ToDictionary(x => x.Key,
                               x => x.Select(r => r.Rtt));
 
+           
 
             foreach (var item in result)
             {
                 ScrapAsset s = new ScrapAsset();
+                s.Loc = item.repair.Loc;
                 s.DocId = item.repair.DocId;
                 s.ApplyDate = item.repair.ApplyDate;
                 s.DptId = item.repair.DptId;
                 dpt = _context.Departments.Find(item.repair.DptId);
                 s.DptName = dpt == null ? "" : dpt.Name_C;
                 s.AccDpt = item.repair.AccDpt;
+                dpt = _context.Departments.Find(item.repair.AccDpt);
                 s.AccDptName = dpt == null ? "" : dpt.Name_C;
                 usr = _context.AppUsers.Find(item.repair.UserId);
                 s.UserName = usr == null ? "" : usr.UserName;
@@ -1251,16 +1266,17 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[11] = m.AssetName;
                 dw[12] = m.TroubleDes;
                 dw[13] = m.DealState;
-                dw[14] = m.EndDate;
-                dw[15] = m.EngName;
-                dw[16] = m.Hour;
-                dw[17] = m.RepType;
-                dw[18] = m.CloseDate;
-                dw[19] = m.CloseTicketDate;
-                dw[20] = m.FlowDptUser;
-                dw[21] = m.FlowDptAcceptTime;
-                dw[22] = m.MedMgr;
-                dw[23] = m.MedMgrAcceptTime;
+                dw[14] = m.DealDes;
+                dw[15] = m.EndDate;
+                dw[16] = m.EngName;
+                dw[17] = m.Hour;
+                dw[18] = m.RepType;
+                dw[19] = m.CloseDate;
+                dw[20] = m.CloseTicketDate;
+                dw[21] = m.FlowDptUser;
+                dw[22] = m.FlowDptAcceptTime;
+                dw[23] = m.MedMgr;
+                dw[24] = m.MedMgrAcceptTime;
                 dt.Rows.Add(dw);
             });
             //
@@ -6306,27 +6322,26 @@ namespace EDIS.Areas.BMED.Controllers
         public List<AssetModel> GetAssetsByLoc(string location)
         {
             List<AssetModel> bmedAssets = null;
+            string[] s = new string[] { "C", "P" ,"K" };
+
             if (location == "總院")
             {
-                bmedAssets = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
-                                                (a, d) => new
-                                                {
-                                                    asset = a,
-                                                    dept = d
-                                                })
-                                                .Where(r => r.dept.Loc == "C" || r.dept.Loc == "P" || r.dept.Loc == "K")
-                                                .Select(r => r.asset).ToList();
+                var depar = _context.Departments.Where(r => s.Contains(r.Loc));
+
+                bmedAssets = _context.BMEDAssets.Join(  depar, 
+                                                        a => a.DelivDpt, 
+                                                        d => d.DptId,
+                                                        (a, d) => a
+                                                     )
+                                                .ToList();
             }
             else
-            {
-                bmedAssets = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
-                                (a, d) => new
-                                {
-                                    asset = a,
-                                    dept = d
-                                })
-                                .Where(r => r.dept.Loc == location)
-                                .Select(r => r.asset).ToList();
+            { 
+                var depar = _context.Departments.Where(r => r.Loc == location);
+
+                bmedAssets = _context.BMEDAssets.Join(depar, a => a.DelivDpt, d => d.DptId,
+                                (a, d) => a )
+                              .ToList();
             }
             return bmedAssets;
         }

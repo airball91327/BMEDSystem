@@ -2777,6 +2777,8 @@ namespace EDIS.Models
         public string MedMgr { get; set; }
         [Display(Name = "醫工主管同意時間")]
         public DateTime? MedMgrAcceptTime { get; set; }
+        [Display(Name ="院區")]
+        public string Loc { get; set; }
 
     }
 
