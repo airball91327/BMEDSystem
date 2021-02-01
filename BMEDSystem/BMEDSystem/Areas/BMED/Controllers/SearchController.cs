@@ -28,6 +28,7 @@ namespace EDIS.Areas.BMED.Controllers
         private readonly IRepository<AppUserModel, int> _userRepo;
         private readonly CustomUserManager userManager;
         private readonly CustomRoleManager roleManager;
+       
         private int pageSize = 50;
 
         public SearchController(ApplicationDbContext context,
@@ -136,6 +137,18 @@ namespace EDIS.Areas.BMED.Controllers
                 });
             }
             ViewData["BMEDUsers"] = new SelectList(userList, "Value", "Text");
+
+            //院區選擇
+            List<SelectListItem> LoclistItem = new List<SelectListItem>();
+           
+            LoclistItem.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            LoclistItem.Add(new SelectListItem { Text = "二林", Value = "L" });
+            LoclistItem.Add(new SelectListItem { Text = "員林", Value = "B" });
+            LoclistItem.Add(new SelectListItem { Text = "南投", Value = "N" });
+            LoclistItem.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            LoclistItem.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["BMEDLoc"] = new SelectList(LoclistItem, "Value", "Text");
+
             QryRepListData data = new QryRepListData();
 
             return View(data);
@@ -385,6 +398,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyTroubledes = qdata.BMEDqtyTROUBLEDES;
             string qtyUserId = qdata.BMEDqtyUserId;
             string qtyClsUser = qdata.BMEDqtyClsUser;
+            string qtyLoc = qdata.BMEDqtyLoc;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -425,9 +439,16 @@ namespace EDIS.Areas.BMED.Controllers
 
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+           
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
-            //
+
+            //賀康主管可選擇
+            if (userManager.IsInRole(User, "MedAssetMgr") &&　!string.IsNullOrEmpty(qtyLoc))
+            {
+                urLocation = qtyLoc;
+            }
+
             // 依照院區搜尋Repair主檔
             var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
             //var repairFlows = _context.BMEDRepairFlows.AsQueryable();

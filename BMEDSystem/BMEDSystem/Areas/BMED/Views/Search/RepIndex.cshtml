@@ -1,5 +1,8 @@
 ﻿@model EDIS.Models.QryRepListData
 
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
 @{
     Layout = "~/Views/Shared/_PassedLayout.cshtml";
     ViewData["Title"] = "請修單查詢";
@@ -27,7 +30,7 @@
             return false;
         });
 
-        
+
         //
         $('.combobox').combobox();
 
@@ -84,7 +87,7 @@
         });
     };
 
-   
+
 </script>
 
 <h3>請修單查詢 - 全院</h3>
@@ -185,6 +188,16 @@
                     <label for="BMEDqtyTROBLEDES" class="control-title">故障描述<br />(關鍵字)</label>
                     <input asp-for="BMEDqtyTROUBLEDES" class="form-control" />
                 </div>
+
+                @if (UserManager.IsInRole(User, "MedAssetMgr"))
+                {
+                    <div class="form-group">
+                        <label for="BMEDqtyLoc" class="control-title">院區</label>
+                        <select asp-for="BMEDqtyLoc" asp-items="@ViewData["BMEDLoc"] as SelectList" class="form-control-s">
+                            <option value="">請選擇</option>
+                        </select>
+                    </div>
+                }
             </div>
         </div>
         <div class="row">
