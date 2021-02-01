@@ -1034,6 +1034,7 @@ namespace EDIS.Areas.BMED.Controllers
         private List<ScrapAsset> ScrapAsset(ReportQryVModel v)
         {
             TempData["qry"] = JsonConvert.SerializeObject(v);
+            string[] status = new[] { "申請人", "驗收人","單位主管" };
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             /* Get login user's location. */
@@ -1049,7 +1050,7 @@ namespace EDIS.Areas.BMED.Controllers
             var asstes = bmedAssets.Where(a => a.DisposeKind != "報廢");
             //列管財產
             var repair = _context.BMEDRepairs
-                        .Where(re => re.AssetNo.Length > 6 || re.AssetNo != "99999")
+                        .Where(re => re.AssetNo.Length > 6 )
                         .Join( asstes,
                                         r => r.AssetNo,
                                         a => a.AssetNo,
@@ -1066,15 +1067,17 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (v.Sdate != null )
             {
-                repairDtl = repairDtl.Where(rd => rd.EndDate >= v.Sdate);
+                repairDtl = repairDtl.Where(rd => rd.CloseDate >= v.Sdate);
             }
             if (v.Edate != null)
             {
-                repairDtl = repairDtl.Where(rd => rd.EndDate <= v.Edate);
+                repairDtl = repairDtl.Where(rd => rd.CloseDate <= v.Edate);
             }
 
             //列管財產join報廢案件
-            var result = repair.Join(repairDtl, r => r.DocId, rd => rd.DocId,
+            var result = repair.Join(repairDtl, 
+                                     r => r.DocId, 
+                                     rd => rd.DocId,
                                     (r, rd) => new
                                     {
                                         dtl = rd,
@@ -1086,37 +1089,31 @@ namespace EDIS.Areas.BMED.Controllers
             AppUserModel usr;
             //RepairFlowModel rf;
 
-            //關卡:申請人驗收人單位主管的案件
+            //關卡:單位開單者的案件
             var flow = _context.BMEDRepairFlows
                 .Join(result ,
                       r => r.DocId,
                       t => t.repair.DocId,
                       (r,t) => new { rf = r , rt = t}
                       )
-                .OrderBy(r => r.rf.StepId)
-                .Where(r => r.rf.Cls.Contains("申請人") || r.rf.Cls.Contains("驗收人") || r.rf.Cls.Contains("單位主管"));
+                .OrderByDescending(r => r.rf.StepId)
+                .Where(r => status.Contains(r.rf.Cls));
 
-           //目前最後關卡人員名稱與異動時間
+            //目前最後關卡人員名稱與異動時間
             var flowuf = flow.Join(_context.AppUsers,
                              r => r.rf.UserId,
                              u => u.Id,
                              (r, u) => new { 
                                  DocId = r.rf.DocId,
-                                 UserName = u.UserName,
-                                 FullName = u.FullName
+                                 Rtt = r.rf.Rtt,
+                                 UserName = u.UserName + u.FullName
                              }
                  )
                  .GroupBy(x => x.DocId)
                  .ToDictionary(x => x.Key,
-                               x => (x.Select(u => u.UserName).LastOrDefault() + x.Select(u => u.FullName).LastOrDefault()));
+                               x => x);
 
-            var flowRtt = flow
-                .Select( f => new { Rtt =f.rf.Rtt ,
-                                    DocId = f.rf.DocId
-                                   })
-                 .GroupBy(x => x.DocId)
-                 .ToDictionary(x => x.Key,
-                               x => x.Select(r => r.Rtt));
+            
 
             //關卡:申醫工主管的案件
             var flowMgr = _context.BMEDRepairFlows
@@ -1125,7 +1122,7 @@ namespace EDIS.Areas.BMED.Controllers
                       t => t.repair.DocId,
                       (r, t) => new { rf = r, rt = t }
                       )
-                .OrderBy(r => r.rf.StepId)
+                .OrderByDescending(r => r.rf.StepId)
                 .Where(r => r.rf.Cls.Contains("醫工主管"));
 
 
@@ -1135,22 +1132,16 @@ namespace EDIS.Areas.BMED.Controllers
                              u => u.Id,
                              (r, u) => new {
                                  DocId = r.rf.DocId,
-                                 UserName = u.UserName,
-                                 FullName = u.FullName
+                                 Rtt = r.rf.Rtt,
+                                 UserName = u.UserName + u.FullName
+                                 
                              }
                  )
                  .GroupBy(x => x.DocId)
                  .ToDictionary(x => x.Key,
-                               x => (x.Select(u => u.UserName).LastOrDefault() + x.Select(u => u.FullName).LastOrDefault()));
+                               x => x);
 
-            var flowMgrRtt = flowMgr
-                .Select(f => new {
-                    Rtt = f.rf.Rtt,
-                    DocId = f.rf.DocId
-                })
-                .GroupBy(x => x.DocId)
-                .ToDictionary(x => x.Key,
-                              x => x.Select(r => r.Rtt));
+           
 
            
 
@@ -1189,29 +1180,29 @@ namespace EDIS.Areas.BMED.Controllers
                 //                             .Where(r => r.Cls.Contains("申請人") || r.Cls.Contains("驗收人") || r.Cls.Contains("單位主管")).LastOrDefault();
                 //usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
                 //s.FlowDptUser = usr == null ? "" : usr.UserName + usr.FullName;
-                s.FlowDptUser = flowuf.ContainsKey(item.repair.DocId) == false ? "" : flowuf[item.repair.DocId];
+                s.FlowDptUser = flowuf.ContainsKey(item.repair.DocId) == false ? "" :  flowuf[item.repair.DocId].Select(x => x.UserName).FirstOrDefault();
 
                 //if (rf != null)
                 //{
                 //    s.FlowDptAcceptTime = rf.Rtt;
                 //}
-                if (flowRtt.ContainsKey(item.repair.DocId) != false)
+                if (flowuf.ContainsKey(item.repair.DocId) != false)
                 {
-                   s.FlowDptAcceptTime = flowRtt[item.repair.DocId].LastOrDefault();
+                   s.FlowDptAcceptTime = flowuf[item.repair.DocId].Select(x => x.Rtt).FirstOrDefault();
                 }      
                 //rf = _context.BMEDRepairFlows.Where(r => r.DocId == item.repair.DocId)
                 //                             .Where(r => r.Cls.Contains("醫工主管")).LastOrDefault();
                 //usr = rf == null ? null : _context.AppUsers.Find(rf.Rtp);
                 //s.MedMgr = usr == null ? "" : usr.UserName + usr.FullName;
-                s.MedMgr = flowMgruf.ContainsKey(item.repair.DocId) == false ? "" : flowMgruf[item.repair.DocId];
+                s.MedMgr = flowMgruf.ContainsKey(item.repair.DocId) == false ? "" : flowMgruf[item.repair.DocId].Select(x => x.UserName).FirstOrDefault();
 
                 //if (rf != null)
                 //{
                 //    s.MedMgrAcceptTime = rf.Rtt;
                 //}
-                if(flowMgrRtt.ContainsKey(item.repair.DocId) != false)
+                if(flowMgruf.ContainsKey(item.repair.DocId) != false)
                 { 
-                     s.MedMgrAcceptTime =  flowMgrRtt[item.repair.DocId].LastOrDefault();
+                     s.MedMgrAcceptTime = flowMgruf[item.repair.DocId].Select(x => x.Rtt).FirstOrDefault();
                 }
                 sa.Add(s);
             }
