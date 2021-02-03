@@ -74,10 +74,10 @@ else
                     @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))))
                     {
                         <a asp-action="RecoveryDoc" asp-controller="Repair" asp-area="BMED" asp-route-DocId ="@item.DocId" data-ajax="true"  class="btn btn-danger btn-sm"
+                          
                            data-ajax-update="#pnlREPLIST" data-ajax-method="POST" id="recovery"
-                              
-                              data-ajax-failure="RecoveryFailed"
-                              data-ajax-success="RecoverySuccess()"
+                           data-ajax-failure="RecoveryFailed"
+                           data-ajax-success="RecoverySuccess()"
                            >
                           恢復流程
                         </a>        
@@ -175,10 +175,20 @@ else
 </div>
 
 <script>
-    function RecoverySuccess() {
-        
-        alert("流程已恢復");
+   
 
+    $('#recovery').click(function (e) {
+        if (confirm("確定流程恢復嗎?")) {
+                return true;
+            }
+        else {
+                //$("#recovery").unbind('submit').submit();
+                return false;
+             }
+    });
+
+    function RecoverySuccess() {
+       alert("流程已恢復");
        var strArray = window.location.href.split("/");
        var strArray2 = strArray[strArray.length - 1].split("#");
        var page = strArray2[strArray2.length - 1];

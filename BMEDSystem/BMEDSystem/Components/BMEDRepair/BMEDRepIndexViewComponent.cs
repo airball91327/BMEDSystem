@@ -96,9 +96,11 @@ namespace EDIS.Components.BMEDRepair
                 }
             }
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
-
             /* 擷取該使用者單位底下所有人員 */
-            var dptUsers = _context.AppUsers.Where(a => a.DptId == user.DptId && a.Status == "Y").ToList();
+            var dptUsers = _context.AppUsers
+                            .Where(a => a.DptId == user.DptId && a.Status == "Y")
+                            .ToList();
+            
             List<SelectListItem> dptMemberList = new List<SelectListItem>();
             foreach (var item in dptUsers)
             {

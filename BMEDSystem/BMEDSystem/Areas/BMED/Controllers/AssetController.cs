@@ -803,6 +803,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("保養方式");
             dt.Columns.Add("維修工程師(保養用)");
             dt.Columns.Add("購入日(取得日期)");
+            dt.Columns.Add("院區");
 
             List<AssetModel> mv = QryAsset(v);
             mv.Join(_context.AppUsers, a => a.AssetEngId, u => u.Id,
@@ -862,6 +863,7 @@ namespace EDIS.Areas.BMED.Controllers
                          m.assetkeep.InOut == "3" ? "保固" : "";
                 dw[18] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
                 dw[19] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
+                dw[20] = m.asset.Location;
                 dt.Rows.Add(dw);
             });
             //
@@ -935,8 +937,10 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     p.Asset.DelivDptName = p.Department == null ? "" : p.Department.Name_C;
                     p.Asset.DelivEmp = p.AppUser == null ? "" : p.AppUser.FullName;
+                    p.Asset.Location = p.Department == null ? "" : p.Department.Loc;
                     at.Add(p.Asset);
                 });
+
             at.GroupJoin(_context.Departments, a => a.AccDpt, d => d.DptId,
                 (a, d) => new { Asset = a, Department = d })
                 .SelectMany(p => p.Department.DefaultIfEmpty(),
@@ -945,7 +949,6 @@ namespace EDIS.Areas.BMED.Controllers
                 .ForEach(p =>
                 {
                     p.Asset.AccDptName = p.Department == null ? "" : p.Department.Name_C;
-                    p.Asset.Location = p.Department == null ? "" : p.Department.Loc;
                     at.Add(p.Asset);
                 });
             if (!string.IsNullOrEmpty(qryAsset.Location))

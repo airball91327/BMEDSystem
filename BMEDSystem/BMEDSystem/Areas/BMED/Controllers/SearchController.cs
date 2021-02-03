@@ -818,6 +818,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyTroubledes = qdata.BMEDqtyTROUBLEDES;
             string qtyUserId = qdata.BMEDqtyUserId;
             string qtyClsUser = qdata.BMEDqtyClsUser;
+            string qtyLoc = qdata.BMEDqtyLoc;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -861,6 +862,13 @@ namespace EDIS.Areas.BMED.Controllers
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
+
+            //賀康主管可選擇
+            if (userManager.IsInRole(User, "MedAssetMgr") && !string.IsNullOrEmpty(qtyLoc))
+            {
+                urLocation = qtyLoc;
+            }
+
             // 依照院區搜尋Repair主檔
             var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
             //var repairFlows = _context.BMEDRepairFlows.AsQueryable();
