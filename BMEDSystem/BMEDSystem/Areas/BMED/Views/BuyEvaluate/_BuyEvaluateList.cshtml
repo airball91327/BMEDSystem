@@ -5,17 +5,8 @@
 @inject CustomRoleManager RoleManager
 
 <script src="~/js/BMED/AssetFileUpload.js" asp-append-version="true"></script>
+<script src="~/js/Rel.js"></script>
 
-<script>
-    function RecoverySuccess() {
-        alert("流程已恢復");
-        BuyEvaReSubmit();
-    }
-    var RecoveryFailed = function (data) {
-        alert(data.responseText);
-        $.Toast.hideToast();
-    };
-</script>
 
 @{
     int i = 0;
@@ -135,7 +126,7 @@
             </tr>
             if (item.Flg == "2")
             {
-                <tr @*style="background-color: @s"*@ >
+                <tr @*style="background-color: @s"*@>
                     <td colspan="5" style="padding-left: 30px; color: lightblue">
                         @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = item.DocId, upload = "採購人員" })
                     </td>
@@ -145,3 +136,30 @@
 
     </table>
 }
+
+
+<script>
+
+
+    $('#recovery').click(function (e) {
+        if (confirm("確定流程恢復嗎?")) {
+            return true;
+        }
+        else {
+            //$("#recovery").unbind('submit').submit();
+            return false;
+        }
+    });
+
+    function RecoverySuccess() {
+        alert("流程已恢復");
+        var strArray = window.location.href.split("/");
+        var strArray2 = strArray[strArray.length - 1].split("#");
+        var page = strArray2[strArray2.length - 1];
+        fetchPage(page);
+    }
+    var RecoveryFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>

@@ -102,9 +102,11 @@
         }
     });
 </script>
+<script src="~/js/Rel.js"></script>
+
 
 @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-     UserManager.IsInRole(User, "MedAssetMgr"))
+    UserManager.IsInRole(User, "MedAssetMgr"))
 {
     @*@Html.ActionLink("新增設備", "Create", null, new { @class = "btn btn-default" })
         <button type="button" class="btn btn-default" data-toggle="modal" data-target="#modalFILES">
@@ -135,21 +137,21 @@
 }
 <!-- 夾帶檔案 Modal -->
 @*<div id="modalFILES" class="modal fade" role="dialog">
-    <div class="modal-dialog" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">選擇上傳檔案</h4>
-            </div>
-            <div class="modal-body">
-                @Html.Action("UpdAssetExcel", "AttainFiles")
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">離開</button>
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">選擇上傳檔案</h4>
+                </div>
+                <div class="modal-body">
+                    @Html.Action("UpdAssetExcel", "AttainFiles")
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">離開</button>
+                </div>
             </div>
         </div>
-    </div>
-</div>*@
+    </div>*@
 <div>
     <table class="table">
         <tr>

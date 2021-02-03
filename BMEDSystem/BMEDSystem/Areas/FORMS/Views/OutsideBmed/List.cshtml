@@ -2,6 +2,7 @@
 
 
 <script src="~/js/FORMS/OutsideBmedFlow.js" asp-append-version="true"></script>
+<script src="~/js/Rel.js"></script>
 
 @if (Model.Count() <= 0)
 {
@@ -30,7 +31,7 @@ else
                                 <th>
                                     @Html.DisplayNameFor(model => model.UserName)
                                 </th>
-                                
+
                                 <th>
                                     @Html.DisplayNameFor(model => model.ApplyDate)
                                 </th>
@@ -57,8 +58,8 @@ else
                                     <td>
                                         @Html.DisplayFor(modelItem => item.UserName)
                                     </td>
-                               
-                                
+
+
                                     <td>
                                         @Html.DisplayFor(modelItem => item.ApplyDate)
                                     </td>
@@ -106,7 +107,7 @@ else
                                 <th>
                                     @Html.DisplayNameFor(model => model.UserName)
                                 </th>
-                                
+
                                 <th>
                                     @Html.DisplayNameFor(model => model.ApplyDate)
                                 </th>

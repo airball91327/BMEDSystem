@@ -29,7 +29,6 @@
 
 <script type="text/javascript">
     $(document).ready(function () {
-
         $('.BMEDcombobox').combobox();
         $("#BMEDrepSearchForm").submit();
         /* Only first visit the page, will submit the form. */
@@ -105,7 +104,7 @@
                   //通過呼叫 window.location.href 直接跳轉到下載 action 進行檔案下載操作
                   window.location.href = "@Url.RouteUrl(new { Controller = "Excels", Action = "Download"})/?file=" + data.fileName;
                 }
-            });;
+            });
         });
     });
     function BMEDRepReSubmit() {

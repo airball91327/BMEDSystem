@@ -11,6 +11,7 @@
          * 非彈出視窗，即是指（opener=null 及 非window.open()開啟的視窗,比如URL直接輸入的瀏覽器窗體， 或由其它程式呼叫產生的瀏覽器視窗）
          */
         if (window.opener == null) {
+           
             location.replace(homeHref);
         }
         else {

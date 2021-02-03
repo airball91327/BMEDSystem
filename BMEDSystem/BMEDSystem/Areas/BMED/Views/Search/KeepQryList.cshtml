@@ -150,14 +150,24 @@ else
 </div>
 
 <script>
+
+
+    $('#recovery').click(function (e) {
+        if (confirm("確定流程恢復嗎?")) {
+            return true;
+        }
+        else {
+            //$("#recovery").unbind('submit').submit();
+            return false;
+        }
+    });
+
     function RecoverySuccess() {
-
         alert("流程已恢復");
-
-       var strArray = window.location.href.split("/");
-       var strArray2 = strArray[strArray.length - 1].split("#");
-       var page = strArray2[strArray2.length - 1];
-       fetchPage(page);
+        var strArray = window.location.href.split("/");
+        var strArray2 = strArray[strArray.length - 1].split("#");
+        var page = strArray2[strArray2.length - 1];
+        fetchPage(page);
     }
     var RecoveryFailed = function (data) {
         alert(data.responseText);
