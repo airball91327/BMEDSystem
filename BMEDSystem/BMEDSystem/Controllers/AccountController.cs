@@ -58,71 +58,72 @@ namespace EDIS.Controllers
         public async Task<IActionResult> Login(int? docId, string dealType, string returnUrl = null)
         {
             /* If user has already authenticated */
-            if (User.Identity.IsAuthenticated == true)
-            {
-                string MailDocId = docId.ToString();
-                string MailType = dealType;
-                /* If login from mail. */
-                if (MailDocId != "")
-                {
-                    if (MailType == "BMEDRepEdit") //Edit BMED Repair Doc.
-                    {
-                        var editDoc = _BMEDcontext.BMEDRepairFlows.Where(r => r.DocId == MailDocId).OrderByDescending(r => r.StepId)
-                                                                  .FirstOrDefault();
-                        int userId = _context.AppUsers.Where(a => a.UserName == User.Identity.Name).First().Id;
-                        /* 編輯流程在登入者身上，進入Edit，否則導回首頁 */
-                        if (editDoc.Status == "?" && editDoc.UserId == userId)
-                        {
-                            return RedirectToAction("Edit", "Repair", new { Area = "BMED", id = MailDocId });
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
-                    }
-                    else if (MailType == "BMEDRepViews") //View BMED Repair doc.
-                    {
-                        return RedirectToAction("Views", "Repair", new { Area = "BMED", id = MailDocId });
-                    }
-                    else if (MailType == "BMEDKeepEdit") //Edit BMED Keep Doc.
-                    {
-                        var editDoc = _BMEDcontext.BMEDKeepFlows.Where(r => r.DocId == MailDocId).OrderByDescending(r => r.StepId)
-                                                                .FirstOrDefault();
-                        int userId = _context.AppUsers.Where(a => a.UserName == User.Identity.Name).First().Id;
-                        /* 編輯流程在登入者身上，進入Edit，否則導回首頁 */
-                        if (editDoc.Status == "?" && editDoc.UserId == userId)
-                        {
-                            return RedirectToAction("Edit", "Keep", new { Area = "BMED", id = MailDocId });
-                        }
-                        else
-                        {
-                            return RedirectToAction("Index", "Home");
-                        }
-                    }
-                    else if (MailType == "BMEDKeepViews") //View BMED Keep doc.
-                    {
-                        return RedirectToAction("Views", "Keep", new { Area = "BMED", id = MailDocId });
-                    }
-                    else
-                    {
-                        return RedirectToAction("Index", "Home");
-                    }
+            //if (User.Identity.IsAuthenticated == true)
+            //{
+            //    string MailDocId = docId.ToString();
+            //    string MailType = dealType;
+            //    /* If login from mail. */
+            //    if (MailDocId != "")
+            //    {
+            //        if (MailType == "BMEDRepEdit") //Edit BMED Repair Doc.
+            //        {
+            //            var editDoc = _BMEDcontext.BMEDRepairFlows.Where(r => r.DocId == MailDocId).OrderByDescending(r => r.StepId)
+            //                                                      .FirstOrDefault();
+            //            int userId = _context.AppUsers.Where(a => a.UserName == User.Identity.Name).First().Id;
+            //            /* 編輯流程在登入者身上，進入Edit，否則導回首頁 */
+            //            if (editDoc.Status == "?" && editDoc.UserId == userId)
+            //            {
+            //                return RedirectToAction("Edit", "Repair", new { Area = "BMED", id = MailDocId });
+            //            }
+            //            else
+            //            {
+            //                return RedirectToAction("Index", "Home");
+            //            }
+            //        }
+            //        else if (MailType == "BMEDRepViews") //View BMED Repair doc.
+            //        {
+            //            return RedirectToAction("Views", "Repair", new { Area = "BMED", id = MailDocId });
+            //        }
+            //        else if (MailType == "BMEDKeepEdit") //Edit BMED Keep Doc.
+            //        {
+            //            var editDoc = _BMEDcontext.BMEDKeepFlows.Where(r => r.DocId == MailDocId).OrderByDescending(r => r.StepId)
+            //                                                    .FirstOrDefault();
+            //            int userId = _context.AppUsers.Where(a => a.UserName == User.Identity.Name).First().Id;
+            //            /* 編輯流程在登入者身上，進入Edit，否則導回首頁 */
+            //            if (editDoc.Status == "?" && editDoc.UserId == userId)
+            //            {
+            //                return RedirectToAction("Edit", "Keep", new { Area = "BMED", id = MailDocId });
+            //            }
+            //            else
+            //            {
+            //                return RedirectToAction("Index", "Home");
+            //            }
+            //        }
+            //        else if (MailType == "BMEDKeepViews") //View BMED Keep doc.
+            //        {
+            //            return RedirectToAction("Views", "Keep", new { Area = "BMED", id = MailDocId });
+            //        }
+            //        else
+            //        {
+            //            return RedirectToAction("Index", "Home");
+            //        }
 
-                }
-                else
-                {
-                    return RedirectToAction("Index", "Home");
-                }
-            }
+            //    }
+            //    else
+            //    {
+            //        return RedirectToAction("Index", "Home");
+            //    }
+            //}
+
             // Clear the existing external cookie to ensure a clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
 
             /* Login from mail. */
-            if(docId != null)
-            {
-                ViewData["MailDocId"] = docId;
-                ViewData["MailType"] = dealType;
-            }
+            //if(docId != null)
+            //{
+            //    ViewData["MailDocId"] = docId;
+            //    ViewData["MailType"] = dealType;
+            //}
 
             ViewData["ReturnUrl"] = returnUrl;
             return View();

@@ -435,6 +435,7 @@ namespace EDIS.Areas.BMED.Controllers
                             })
                             .Where(d => locList.Contains(d.dpt.Loc))
                             .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                            
                             if (u != null)
                             {
                                 li = new SelectListItem();
@@ -446,33 +447,23 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     else
                     {
-                        s = roleManager.GetUsersInRole("Manager").OrderBy(x => x).ToList();
-                        var dep = _context.BMEDAssets.Where(a => a.AssetNo == r.AssetNo).Select(a => a.AccDpt).FirstOrDefault();
-                       
                         list = new List<SelectListItem>();
                         li = new SelectListItem();
                         li.Text = "請選擇";
                         li.Value = "請選擇";
                         list.Add(li);
                         //
-                        foreach (string l in s)
-                        {
-                            u = _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
-                            .Join(_context.Departments, ur => ur.DptId, d => d.DptId, (ur, d) => new
-                            {
-                                appuser = ur,
-                                dpt = d
-                            })
-                            .Where(d => d.dpt.DptId == dep)
-                            .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
-                            if (u != null)
-                            {
-                                li = new SelectListItem();
-                                li.Text = u.FullName + "(" + u.UserName + ")";
-                                li.Value = u.Id.ToString();
-                                list.Add(li);
-                            }
-                        }
+
+                        _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                        .Where(ur => ur.DptId == r.DptId)
+                        .Where(ur => ur.Status == "Y")
+                        .ToList()
+                        .ForEach(ur => {
+                            li = new SelectListItem();
+                            li.Text = ur.FullName + "(" + ur.UserName + ")";
+                            li.Value = ur.Id.ToString();
+                            list.Add(li);
+                        });
                     }
                     break;
                 case "單位主任":  //Not Used

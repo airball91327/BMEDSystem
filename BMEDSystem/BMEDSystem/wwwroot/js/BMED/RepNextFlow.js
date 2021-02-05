@@ -263,7 +263,6 @@ $(function () {
     $("#UpdCheckerBtn").click(function () {
         var updChecker = $("#UpdChecker").val();
         var docId = $("#DocId").val();
-        $('#imgLOADING_CHK').show();
         $.ajax({
             url: '../../Repair/UpdateChecker',
             type: "POST",
@@ -276,7 +275,10 @@ $(function () {
                     'icon': 'loading',
                     'duration': 0
                 });
-                window.location.reload();
+                //document.getElementById('pnlREPDTL2').reload(true);
+                document.getElementById("checkerName").textContent = $("#UpdChecker").text();
+                //$("#pnlREPDTL2").html("MedEngineer");
+                $.Toast.hideToast();
             }
         });
     });

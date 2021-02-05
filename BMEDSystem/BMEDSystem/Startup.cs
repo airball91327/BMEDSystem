@@ -63,7 +63,7 @@ namespace EDIS
 
             services.ConfigureApplicationCookie(options =>
             {
-                options.Cookie.Name = "Asp.Net.Core.Identity.RepairSys";
+                options.Cookie.Name = "Asp.Net.Core.Identity.BMED_System";//更改BMED_System
                 options.ExpireTimeSpan = TimeSpan.FromHours(2);
                 options.SlidingExpiration = true;   //動態更新Cookie的過期時間，超過50%自動更新，無設定時預設值為true
             });

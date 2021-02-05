@@ -7,10 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using EDIS.Models;
 using EDIS.Models.Identity;
+using Microsoft.AspNetCore.Authorization;
 
 namespace EDIS.Areas.BMED.Controllers
 {
     [Area("BMED")]
+    [Authorize]
     public class EngsInDptsController : Controller
     {
         private readonly ApplicationDbContext _context;

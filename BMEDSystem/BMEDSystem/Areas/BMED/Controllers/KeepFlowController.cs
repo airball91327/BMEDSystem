@@ -395,10 +395,22 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     else
                     {
+                        list = new List<SelectListItem>();
                         li = new SelectListItem();
                         li.Text = "請選擇";
                         li.Value = "請選擇";
                         list.Add(li);
+                        //
+                        _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                        .Where(ur => ur.DptId == k.DptId)
+                        .Where(ur => ur.Status == "Y")
+                        .ToList()
+                        .ForEach(ur => {
+                            li = new SelectListItem();
+                            li.Text = ur.FullName + "(" + ur.UserName + ")";
+                            li.Value = ur.Id.ToString();
+                            list.Add(li);
+                        });
                     }
                     break;
                 case "單位主任":  //Not Used
