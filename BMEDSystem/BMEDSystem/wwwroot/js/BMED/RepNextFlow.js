@@ -275,9 +275,7 @@ $(function () {
                     'icon': 'loading',
                     'duration': 0
                 });
-                //document.getElementById('pnlREPDTL2').reload(true);
-                document.getElementById("checkerName").textContent = $("#UpdChecker").text();
-                //$("#pnlREPDTL2").html("MedEngineer");
+                document.getElementById("checkerName").textContent = $("#UpdChecker option:selected").text();
                 $.Toast.hideToast();
             }
         });
