@@ -1302,18 +1302,19 @@ namespace EDIS.Areas.BMED.Controllers
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
             double faildays = 0;
             double dd = 0;
-            //int cnt = 0;
+           // int cnt = 0;
             List<ProperRate> sv = new List<ProperRate>();
             ProperRate pr;
             //依照院區區分設備
             var bmedAssets = GetAssetsByLoc(urLocation);
             //
             var test = _context.BMEDRepairs
-                 .Where(r => r.ApplyDate >=  v.Sdate && r.ApplyDate <= v.Edate)
-                 .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), 
-                         r => r.DocId, 
-                         d => d.DocId,
-                         (r, d) => new { repair = r, d.EndDate });
+                     .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
+                     .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), 
+                     r => r.DocId, 
+                     d => d.DocId,
+                     (r, d) => new { repair = r, d.EndDate })
+                     .ToList();
 
             
             var assets = bmedAssets
@@ -1383,7 +1384,7 @@ namespace EDIS.Areas.BMED.Controllers
                 pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
                 faildays = 0;
                 dd = 0;
-               // cnt = 0;
+                //cnt = 0;
                 var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
                 var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
                 //_context.BMEDRepairs.Where(r => r.AssetNo == asset._assetM.assetD.AssetNo)
