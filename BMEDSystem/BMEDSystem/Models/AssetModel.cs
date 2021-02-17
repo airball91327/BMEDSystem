@@ -103,6 +103,8 @@ namespace EDIS.Models
         public int? Rtp { get; set; }
         [Display(Name = "異動時間")]
         public DateTime? Rtt { get; set; }
+        [Display(Name = "是否為高風險設備")]
+        public string HighRisk { get; set; }
 
         [NotMapped]
         public string upload { get; set; }

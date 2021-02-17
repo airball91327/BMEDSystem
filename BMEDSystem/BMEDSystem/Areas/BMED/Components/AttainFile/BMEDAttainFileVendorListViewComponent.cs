@@ -35,7 +35,7 @@ namespace EDIS.Areas.BMED.Components.AttainFile
                     {
                         BuyVendorModel b = _context.BuyVendors.Find(a.DocId, a.Rtp);
                         if (b != null)
-                            a.UserName = b.VendorNam;
+                            a.UserName = b.VendorNam;   
                         else
                         {
                             if (a.Rtp != null)

@@ -123,4 +123,75 @@ namespace EDIS.Models
         [Display(Name = "醫工主任")]
         public string EngDirector { get; set; }
     }
+
+    public class OutsideBmedPrintVModel
+    {
+        [Display(Name = "表單編號")]
+        public string DocId { get; set; }
+        [Display(Name = "申請人代號")]
+        public int UserId { get; set; }
+        [Display(Name = "申請人姓名")]
+        public string UserName { get; set; }
+        [Display(Name = "申請人帳號")]
+        public string UserAccount { get; set; }
+        [Display(Name = "聯絡電話")]
+        public string Contact { get; set; }
+        [Display(Name = "所屬單位")]
+        public string Company { get; set; }
+        [Display(Name = "儀器名稱")]
+        public string AssetNam { get; set; }
+        [Display(Name = "儀器型號")]
+        public string Model { get; set; }
+        [Display(Name = "儀器序號")]
+        public string Serial { get; set; }
+        [Display(Name = "用途說明")]
+        public string Application { get; set; }
+        [Display(Name = "說明")]
+        public string Description { get; set; }
+        [Display(Name = "計畫編號")]
+        public string ProjectId { get; set; }
+        [Display(Name = "IRB_NO")]
+        public string IRB_NO { get; set; }
+        [Display(Name = "試驗主持人")]
+        public string TrialHost { get; set; }
+        [Display(Name = "廠牌")]
+        public string Label { get; set; }
+        [Display(Name = "廠商")]
+        public string Vendor { get; set; }
+        [Display(Name = "廠商電話")]
+        public string Phone { get; set; }
+        [Display(Name = "使用單位試用人員")]
+        public string Personnel { get; set; }
+
+        [Display(Name = "使用開始日期")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? ApplyDate { get; set; }
+        
+        [Display(Name = "使用結束日期")]
+        [DisplayFormat(DataFormatString = "{0:yyyy-MM-dd}", ApplyFormatInEditMode = true)]
+        public DateTime? EndDate { get; set; }
+
+        [Display(Name = "使用天數")]
+        public string Day { get; set; }
+
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
+        [Display(Name = "醫工主管")]
+        public string EngMgr { get; set; }
+        [Display(Name = "醫工承辦")]
+        public string EngUndertake { get; set; }
+        [Display(Name = "單位主管")]
+        public string DelivMgr { get; set; }
+        [Display(Name = "結案日期")]
+        public Nullable<DateTime> CloseDate { get; set; }
+        [Display(Name = "結案人代號")]
+        public string DelivEmp { get; set; }
+        [Display(Name = "結案人姓名")]
+        public string DelivEmpName { get; set; }
+        [Display(Name = "審核內容")]
+        public string Content { get; set; }
+        public bool item1 { get; set; }
+        public bool item4 { get; set; }
+        public bool item7 { get; set; }
+    }
 }

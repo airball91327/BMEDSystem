@@ -1,0 +1,154 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.FinishRateKeep>
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@{
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+}
+<p>
+    <a class="btn btn-default" href="@Url.Action("ExcelFinishRateKeep", qry)">匯出Excel</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EngUserName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EngFullName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().SendYm)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCount0)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCount0)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRate0)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCount1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCount1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRate1)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCount2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCount2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRate2)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCount3)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCount3)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRate3)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCount)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCountRisk)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndCountRisk)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().KeepEndRateRisk)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngUserName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngFullName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SendYm)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCount0)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCount0)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRate0)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCount1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCount1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRate1)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCount2)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCount2)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRate2)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCount3)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCount3)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRate3)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCount)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepCountRisk)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndCountRisk)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.KeepEndRateRisk)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("FinishRateKeepIndex", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

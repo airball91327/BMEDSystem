@@ -43,15 +43,18 @@ namespace EDIS.Areas.BMED.Components.BuyFlow
                 listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
                 listItem.Add(new SelectListItem { Text = "申請者", Value = "申請者" });
                 //listItem.Add(new SelectListItem { Text = "採購人員", Value = "採購人員" });
+                listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });//
                 listItem.Add(new SelectListItem { Text = "評估工程師", Value = "評估工程師" });
                 listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
                 listItem.Add(new SelectListItem { Text = "設備經辦", Value = "設備經辦" });
                 //listItem.Add(new SelectListItem { Text = "採購主管", Value = "採購主管" });
+                listItem.Add(new SelectListItem { Text = "資訊工程師", Value = "資訊工程師" });
                 if (rf.Cls == "設備經辦")
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
             }
             else
             {
+                listItem.Add(new SelectListItem { Text = "賀康主管", Value = "賀康主管" });
                 if (rf.Cls == "申請者")
                 {
                     listItem.Add(new SelectListItem { Text = "設備工程師", Value = "設備工程師" });
@@ -75,6 +78,7 @@ namespace EDIS.Areas.BMED.Components.BuyFlow
                     listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
                     listItem.Add(new SelectListItem { Text = "結案", Value = "結案" });
                 }
+                listItem.Add(new SelectListItem { Text = "資訊工程師", Value = "資訊工程師" });
             }
             ViewData["Item"] = new SelectList(listItem, "Value", "Text", "");
             //

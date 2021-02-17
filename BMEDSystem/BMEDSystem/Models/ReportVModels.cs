@@ -39,18 +39,38 @@ namespace EDIS.Models
         public string DelivDpt { get; set; }
         [Display(Name = "零件名稱")]
         public string StockName { get; set; }
+        [Display(Name = "工程師")]
+        public string EngId { get; set; }
+        [Display(Name = "廠商名稱")]
+        public string VendorName { get; set; }
+        [Display(Name = "廠商統編")]
+        public string VendorUniteNo { get; set; }
+        [Display(Name = "日期查詢")]
+        public string DateType { get; set; }
+        [Display(Name = "保養起始年月")]
+        public int? SendYm { get; set; }
+        public int? KeepYm { get; set; }
+        [Display(Name = "大樓")]
+        public string Building { get; set; }
+        [Display(Name = "是否累進")]
+        public bool IsProgress { get; set; }
+
+        [Display(Name = "院區")]
+        public string Location { get; set; }
     }
     //
     public class UserHour
     {
         public int Uid { get; set; }
-        public decimal Hour { get; set; }
-        public DateTime ApplyDate { get; set; }
+        public decimal? Hour { get; set; }
+        public DateTime? ApplyDate { get; set; }
         public DateTime EndDate { get; set; }
         [Display(Name = "設備類別")]
         public string AssetClass { get; set; }
         public string InOut { get; set; }
         public string AccDpt { get; set; }
+        public string AssetNo { get; set; }
+        
     }
 
     public class Cust
@@ -97,7 +117,7 @@ namespace EDIS.Models
         [Display(Name = "維修費用")]
         public decimal RepCost { get; set; }
         [Display(Name = "妥善率")]
-        public decimal ProperRate { get; set; }
+        public decimal? ProperRate { get; set; }
         [Display(Name = "維修比")]
         public decimal RepRatio { get; set; }
     }
@@ -138,26 +158,26 @@ namespace EDIS.Models
     //月故障率報表
     public class MonthFailRateVModel
     {
-        [Display(Name = "財產編號")]
-        public string AssetNo { get; set; }
-        [Display(Name = "中文名稱")]
-        public string Cname { get; set; }
+        //[Display(Name = "財產編號")]
+        //public string AssetNo { get; set; }
+        //[Display(Name = "中文名稱")]
+        //public string Cname { get; set; }
         [Display(Name = "單位代號")]
         public string CustId { get; set; }
         [Display(Name = "單位名稱")]
         public string CustNam { get; set; }
-        [Display(Name = "維修工時(分)")]
-        public decimal RepairMins { get; set; }
-        [Display(Name = "總工時(分)")]
-        public decimal TotalMins { get; set; }
+        //[Display(Name = "維修工時(分)")]
+        //public decimal RepairMins { get; set; }
+        //[Display(Name = "總工時(分)")]
+        //public decimal TotalMins { get; set; }
         [Display(Name = "故障率")]
         public string FailRate { get; set; }
         //[Display(Name = "廠牌")]
         //public string Brand { get; set; }
-        //[Display(Name = "設備件數")]
-        //public int PlantAmt { get; set; }
-        //[Display(Name = "月維修件數")]
-        //public int RepairAmt { get; set; }
+        [Display(Name = "設備件數")]
+        public int PlantAmt { get; set; }
+        [Display(Name = "維修件數")]
+        public int RepairAmt { get; set; }
 
 
         //public List<MonthFailRateVModel> GetList(string gid, DateTime sdate, DateTime edate, string cls)
@@ -260,6 +280,8 @@ namespace EDIS.Models
         public string Brand { get; set; }
         [Display(Name = "型號")]
         public string Type { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
         [Display(Name = "一月")]
         public string Jan { get; set; }
         [Display(Name = "二月")]
@@ -284,10 +306,15 @@ namespace EDIS.Models
         public string Nov { get; set; }
         [Display(Name = "十二月")]
         public string Dec { get; set; }
+        [Display(Name = "表單單號")]
+        public string DocId { get; set; }
+        
+        [Display(Name = "完修日期")]
+        public string EDate { get; set; }
 
     }
 
-    //維修保養統計表
+    //各成本中心維修保養統計表
     public class RepairKeepVModel
     {
         [Display(Name = "單位代號")]
@@ -465,10 +492,20 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "目前關卡人員")]
+        public string ClsNam { get; set; }
         [Display(Name = "總工時")]
         public decimal Hour { get; set; }
         [Display(Name = "設備類別")]
         public string PlantClass { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "放置地點")] //放置地點
+        public string PlaceLoc { get; set; }
+        [Display(Name = "數量")]
+        public int Amt { get; set; }
 
         private readonly ApplicationDbContext db;
         public MonthRepairVModel(ApplicationDbContext context)
@@ -586,7 +623,7 @@ namespace EDIS.Models
         [Display(Name = "送單日期")]
         public DateTime SentDate { get; set; }
         [Display(Name = "完工日期")]
-        public DateTime EndDate { get; set; }
+        public DateTime? EndDate { get; set; }
         [Display(Name = "財產編號")]
         public string AssetNo { get; set; }
         [Display(Name = "儀器名稱")]
@@ -607,6 +644,17 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "保養結果")]
+        public string Result { get; set; }
+        [Display(Name = "計算基數")]
+        public decimal? Shares { get; set; }
+        [Display(Name = "關帳年月")]
+        public string ShutDateYm { get; set; }
+        [Display(Name = "保養工時")]
+        public decimal? Hours { get; set; }
+        [Display(Name = "存放地點")]
+        public string LeaveSite { get; set; }
+
 
         private readonly ApplicationDbContext db;
         public MonthKeepVModel(ApplicationDbContext context)
@@ -735,18 +783,36 @@ namespace EDIS.Models
     {
         [Display(Name = "工程師代號")]
         public int UserId { get; set; }
+
+        [Display(Name = "工程師代碼")]
+        public string FullName { get; set; }
+
         [Display(Name = "工程師姓名")]
         public string UserNam { get; set; }
         [Display(Name = "工時")]
-        public decimal Hours { get; set; }
+        public decimal? Hours { get; set; }
+        [Display(Name = "工時(維修)")]
+        public decimal? HoursR { get; set; }
+        [Display(Name = "工時(保養)")]
+        public decimal? HoursK { get; set; }
         [Display(Name = "件數")]
         public int Cases { get; set; }
+        [Display(Name = "維修件數")]
+        public int RCases { get; set; }
+        [Display(Name = "保養件數")]
+        public int KCases { get; set; }
         [Display(Name = "轉撥計價費用")]
         public decimal Costs { get; set; }
-        [Display(Name = "超過五天件數")]
+        [Display(Name = "超過五天件數(維修)")]
         public int OverFive { get; set; }
+        [Display(Name = "超過五天件數(保養)")]
+        public int OverFiveKeep { get; set; }
+        [Display(Name = "超過五天件數(高風險)")]
+        public int OverFiveHigh { get; set; }
         [Display(Name = "五日完修率")]
         public decimal OverFiveRate { get; set; }
+        [Display(Name = "五日完修率(高風險)")]
+        public decimal OverFiveRateHigh { get; set; }
         [Display(Name = "自修率")]
         public decimal SelfRate { get; set; }
         [Display(Name = "三個月維修總件數")]
@@ -823,8 +889,8 @@ namespace EDIS.Models
                 dv.UserNam = db.AppUsers.Find(g.Key).FullName;
                 dv.Cases = g.Count();
                 dv.Hours = g.Sum(s => s.Hour);
-                case1 = g.Where(g1 => g1.EndDate.Subtract(g1.ApplyDate).Days < 5).Count();
-                case5 = g.Where(g1 => g1.EndDate.Subtract(g1.ApplyDate).Days >= 5).Count();
+                case1 = g.Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days < 5).Count();
+                case5 = g.Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days >= 5).Count();
                 dv.OverFive = case5;
                 if (case1 + case5 > 0)
                 {
@@ -944,8 +1010,14 @@ namespace EDIS.Models
         public Nullable<DateTime> CloseDate { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "廠商代號")]
+        public string VendorId { get; set; }
         public string AssetClass { get; set; }
-
+        [Display(Name = "廠商名稱")]
+        public string VendorName { get; set; }
+        [Display(Name = "廠商統編")]
+        public string VendorUniteNo { get; set; }
+       
         private readonly ApplicationDbContext db;
         public StokCostVModel(ApplicationDbContext context)
         {
@@ -2599,10 +2671,16 @@ namespace EDIS.Models
         public string Type { get; set; }
         [Display(Name = "保養方式")]
         public string InOut { get; set; }
-        [Display(Name = "成本中心名稱")]
+        [Display(Name = "成本中心")]
         public string AccDptName { get; set; }
+        [Display(Name = "保管部門")]
+        public string DelivDptName { get; set; }
         [Display(Name = "存放地點")]
         public string LeaveSite { get; set; }
+        [Display(Name = "起始年月")]
+        public int? YYYMM { get; set; }
+        [Display(Name = "週期")]
+        public int? Cycle { get; set; }
         [Display(Name = "保固起始日")]
         [DataType(DataType.Date)]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
@@ -2617,6 +2695,8 @@ namespace EDIS.Models
         public string Edate { get; set; }
         [Display(Name = "備註")]
         public string Note { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
     }
     //成效指標
     public class EffectRatio
@@ -2697,6 +2777,110 @@ namespace EDIS.Models
         public string MedMgr { get; set; }
         [Display(Name = "醫工主管同意時間")]
         public DateTime? MedMgrAcceptTime { get; set; }
+        [Display(Name ="院區")]
+        public string Loc { get; set; }
+
+    }
+
+    // 保養完成率統計表
+    public class FinishRateKeep
+    {
+        public string EngId { get; set; }
+        [Display(Name = "負責工程師")]
+        public string EngUserName { get; set; }
+        [Display(Name = "員工姓名")]
+        public string EngFullName { get; set; }
+        [Display(Name = "保養起始年月")]
+        public string SendYm { get; set; }
+        [Display(Name = "應保養(自行)")]
+        public int KeepCount0 { get; set; }
+        [Display(Name = "已保養(自行)")]
+        public int KeepEndCount0 { get; set; }
+        [Display(Name = "完成率(自行)")]
+        public string KeepEndRate0 { get; set; }
+        [Display(Name = "應保養(委外)")]
+        public int KeepCount1 { get; set; }
+        [Display(Name = "已保養(委外)")]
+        public int KeepEndCount1 { get; set; }
+        [Display(Name = "完成率(委外)")]
+        public string KeepEndRate1 { get; set; }
+        [Display(Name = "應保養(租賃)")]
+        public int KeepCount2 { get; set; }
+        [Display(Name = "已保養(租賃)")]
+        public int KeepEndCount2 { get; set; }
+        [Display(Name = "完成率(租賃)")]
+        public string KeepEndRate2 { get; set; }
+        [Display(Name = "應保養(保固)")]
+        public int KeepCount3 { get; set; }
+        [Display(Name = "已保養(保固)")]
+        public int KeepEndCount3 { get; set; }
+        [Display(Name = "完成率(保固)")]
+        public string KeepEndRate3 { get; set; }
+        [Display(Name = "應保養")]
+        public int KeepCount { get; set; }
+        [Display(Name = "已保養")]
+        public int KeepEndCount { get; set; }
+        [Display(Name = "完成率")]
+        public string KeepEndRate { get; set; }
+        [Display(Name = "應保養(高風險)")]
+        public int KeepCountRisk { get; set; }
+        [Display(Name = "已保養(高風險)")]
+        public int KeepEndCountRisk { get; set; }
+        [Display(Name = "完成率(高風險)")]
+        public string KeepEndRateRisk { get; set; }
+
+    }
+
+    // 分攤費用清單
+    public class ReKeShCosCheckVModel
+    {
+        [Display(Name = "成本中心")]
+        public string AccDpt { get; set; }
+        [Display(Name = "成本中心名稱")]
+        public string CustNam { get; set; }
+        [Display(Name = "請修件數")]
+        public int? RepAmt { get; set; }
+        [Display(Name = "管理/保養價值")]
+        public int? Keepcost { get; set; }
+        [Display(Name = "零件支出")]
+        public decimal? Partexp { get; set; }
+        [Display(Name = "合計")]
+        public decimal? Sum { get; set; }
+        
+    }
+
+    //超過五日案件
+    public class CaseOverFiveVModel
+    {
+        [Display(Name = "表單編號")]
+        public string DocId { get; set; }
+        [Display(Name = "財產編號")]
+        public string AssetNo { get; set; }
+        [Display(Name = "成本中心")]
+        public string AccDpt { get; set; }
+        [Display(Name = "成本中心名稱")]
+        public string AccDptName { get; set; }
+       
+        [Display(Name = "儀器名稱")]
+        public string AssetName { get; set; }
+        [Display(Name = "故障情形")]
+        public string TroubleDes { get; set; }
+        [Display(Name = "處理狀況")]
+        public string DealState { get; set; }
+        [Display(Name = "處理描述")]
+        public string DealDes { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        [Display(Name = "請修日期")]
+        public DateTime SDate { get; set; }
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
+        [Display(Name = "完修日期")]
+        public DateTime EDate { get; set; }
+        [Display(Name = "工程師")]
+        public string EngName { get; set; }
+        [Display(Name ="超過天數")]
+        public int Days { get; set; }
 
     }
 }

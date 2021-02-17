@@ -3,13 +3,23 @@
 @using EDIS.Models.Identity
 @inject CustomUserManager UserManager
 
-<script src="~/js/BMED/RepNextFlow.js" asp-append-version="true"></script>
 <link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
 <script src="~/js/bootstrap-combobox.js"></script>
+<script src="~/js/BMED/RepNextFlow.js" asp-append-version="true"></script>
 
 <script type="text/javascript">
     $(document).ready(function () {
         $('.qryCombobox').combobox();
+
+        if (document.getElementById("DealState").value == "4") {
+
+            var obj = document.getElementById("FlowCls");
+            var index = obj.selectedIndex;
+            document.getElementById("FlowCls").selectedIndex = "2";
+            //obj.options[index] = new Option("單位主管", "單位主管"); //更改對應的值
+            $("#FlowCls").change();
+
+        }
     });
 </script>
 
@@ -35,7 +45,7 @@
         </div>
 
         @if (UserManager.IsInRole(User, "MedEngineer") == true || UserManager.IsInRole(User, "MedAdmin") == true ||
-            UserManager.IsInRole(User, "Admin") == true)
+           UserManager.IsInRole(User, "Admin") == true)
         {
             <div class="form-group">
                 <label class="control-label col-md-2">預設驗收人</label>

@@ -1,33 +1,47 @@
-﻿@model IEnumerable<EDIS.Models.RepairKeepVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.RepairKeepVModel>
+
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
 @{
-    Layout = null;
+    //Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+
 }
-<script src="~/js/HtmltoExcel.js"></script>
+@*<script src="~/js/HtmltoExcel.js"></script>*@
 
 @*<p>
         @Html.ActionLink("匯出Excel", "RepairKeepExcel")
     </p>*@
-<input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
-       onclick="javascript:exportExcel('tbToExcel')" />
+@*<input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
+       onclick="javascript:exportExcel('tbToExcel')" />*@
+    <p>
+        <a class="btn btn-default" href="@Url.Action("ExcelRepairCost", qry)">匯出Excel</a>
+    </p>
+
 <table class="table" id="tbToExcel">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.CustId)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CustNam)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepairAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepairAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RpEndAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RpEndAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepFinishedRate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepFinishedRate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepCost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepCost)
         </th>
     </tr>
     @{
@@ -80,3 +94,8 @@
     }
 
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

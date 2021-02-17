@@ -17,12 +17,13 @@
         <link rel="stylesheet" href="~/fonts/font-awesome/css/font-awesome.min.css" />
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
+        <script src="~/js/Rel.js"></script>
     </environment>
     <environment exclude="Development">
         @*<link rel="stylesheet" href="https://ajax.aspnetcdn.com/ajax/bootstrap/3.3.7/css/bootstrap.min.css"
-              asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
-              asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
-        <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />*@
+                  asp-fallback-href="~/lib/bootstrap/dist/css/bootstrap.min.css"
+                  asp-fallback-test-class="sr-only" asp-fallback-test-property="position" asp-fallback-test-value="absolute" />
+            <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />*@
         <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.css" />
         <link rel="stylesheet" href="~/css/site.css" />
         <link rel="stylesheet" href="~/css/style.css" />
@@ -30,7 +31,7 @@
         <script src="~/lib/jquery/dist/jquery.js"></script>
         <script src="~/lib/bootstrap/dist/js/bootstrap.js"></script>
     </environment>
-
+    
     @*@Html.Raw(JavaScriptSnippet.FullScript)*@
 
 </head>
@@ -52,14 +53,14 @@
     </div>
     <!-- Navigation -->
     @*@await Html.PartialAsync("_Navigation")
-    <div id="page-wrapper" class="container body-content">
-        @RenderBody()
+        <div id="page-wrapper" class="container body-content">
+            @RenderBody()
 
-        <footer>
-            <hr />
-            <p>&copy; 2020 - 醫工智能保修系統</p>
-        </footer>
-    </div>*@
+            <footer>
+                <hr />
+                <p>&copy; 2020 - 醫工智能保修系統</p>
+            </footer>
+        </div>*@
 
     <environment include="Development">
         @*<script src="~/lib/jquery/dist/jquery.js"></script>
@@ -79,8 +80,7 @@
         <script src="~/js/jquery.unobtrusive-ajax.js" asp-append-version="true"></script>
         <script src="~/js/jquery.toast.js" asp-append-version="true"></script>
     </environment>
-
-
+    
     @RenderSection("Scripts", required: false)
 </body>
 

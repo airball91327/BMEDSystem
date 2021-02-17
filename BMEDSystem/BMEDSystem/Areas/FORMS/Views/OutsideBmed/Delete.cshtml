@@ -1,7 +1,9 @@
 ﻿
-@model MedEue.Models.Instrument
+@model EDIS.Areas.FORMS.Models.Instrument
+
 
 @{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
     ViewBag.Title = "廢除 | 外部醫療儀器使用申請單";
 }
 
@@ -154,9 +156,10 @@
     {
         @Html.AntiForgeryToken()
 
-        <div class="form-actions no-color" style="text-align:center;">
-            <input type="submit" value="確定廢除" class="btn btn-default" />
-            @*@Html.ActionLink("Back to List", "Index")*@
+        
+        <div style="text-align:center;">
+            <a class="btn btn-default" href="@Url.Action("Index", "Home", new { Area = "" } )" id="homeBtn">回到簽核列表</a>
+            <input type="submit" value="確定廢除" class="btn btn-default"  />
         </div>
     }
 </div>

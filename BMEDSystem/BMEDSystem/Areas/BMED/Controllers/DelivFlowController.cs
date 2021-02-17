@@ -300,6 +300,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 case "設備工程師":
                     s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                    s = s.OrderBy(ss => ss).ToList();
                     foreach (string l in s)
                     {
                         u = _context.AppUsers.Where(usr => usr.UserName == l).FirstOrDefault();
@@ -437,6 +438,52 @@ namespace EDIS.Areas.BMED.Controllers
                             li.Text = "(" + u.UserName + ")" + u.FullName;
                             li.Value = u.Id.ToString();
                             list.Add(li);
+                        }
+                    }
+                    break;
+                    case "賀康主管":
+                    s = roleManager.GetUsersInRole("MedAssetMgr").ToList();
+                    list = new List<SelectListItem>();
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(usr => usr.UserName == l).FirstOrDefault();
+                        
+                        if (u != null  && u.Status == "Y")
+                        {
+                            DepartmentModel o = _context.Departments.Find(u.DptId);
+                            //DepartmentModel e = _context.Departments.Where( n => n.Name_C == r.Place).FirstOrDefault();
+                            if (o.Loc == "C" || o.Loc == "P" || o.Loc == "K")
+                            {
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
+                            else if (o.Loc != "C" || o.Loc != "P" || o.Loc != "K")
+                            {
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
+                        }
+                    }
+                    break;
+                case "資訊工程師":
+                    list = new List<SelectListItem>();
+                    s = roleManager.GetUsersInRole("IT_Engineer").ToList();
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(usr => usr.UserName == l).FirstOrDefault();
+                        if (u != null)
+                        {
+                            if (u.Status == "Y")
+                            {
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
                         }
                     }
                     break;

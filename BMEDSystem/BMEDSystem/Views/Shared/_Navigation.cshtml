@@ -26,31 +26,32 @@
                 </div>
                 <!--  The _LoginPartial -->
                 @*<div>
-                    @if (SignInManager.IsSignedIn(User))
-                    {
-                        <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
-                            <span style="font-size:14px;">
-                                <a asp-area="" asp-controller="" asp-action="">Hello @UserManager.GetUserFullName(User)!</a>
-                            </span>
-                            <span style="font-size:14px;">
-                                <button type="submit" class="btn btn-link navbar-btn navbar-link">登出</button>
-                            </span>
-                        </form>
-                    }
-                </div>*@
+                @if (SignInManager.IsSignedIn(User))
+                {
+                    <form asp-area="" asp-controller="Account" asp-action="Logout" method="post" id="logoutForm">
+                        <span style="font-size:14px;">
+                            <a asp-area="" asp-controller="" asp-action="">Hello @UserManager.GetUserFullName(User)!</a>
+                        </span>
+                        <span style="font-size:14px;">
+                            <button type="submit" class="btn btn-link navbar-btn navbar-link">登出</button>
+                        </span>
+                    </form>
+                }
+            </div>*@
             </li>
             <li class="">
                 <a href="@Url.Action("Index", "Home", new { Area = "" })"><span class="nav-label">個人首頁</span></a>
             </li>
-
-            <li class="@Html.IsSelected(area: null) @Html.IsSelected(area: "BMED") @Html.IsSelected(area: "Admin")">
+            
+            <li class="@Html.IsSelected(area: null) @Html.IsSelected(area: "BMED") @Html.IsSelected(area: "Admin")@Html.IsSelected(area: "FORMS")">
                 @*<a href="#"><span class="nav-label">醫療儀器</span><span class="fa arrow"></span></a>*@
-                <ul class="nav collapse @Html.IsSelected(area: "BMED", cssClass: "in")">
+                <ul class="nav collapse @Html.IsSelected(area: "BMED", cssClass: "in") @Html.IsSelected(area: "FORMS", cssClass: "in")">
 
                     <li class="@Html.IsSelected(controller: "Repair", area: "BMED") @Html.IsSelected(controller: "Keep", area: "BMED")
-                               @Html.IsSelected(controller: "Delivery", area: "BMED") @Html.IsSelected(controller: "BuyEvaluate", area: "BMED")">
+                               @Html.IsSelected(controller: "Delivery", area: "BMED") @Html.IsSelected(controller: "BuyEvaluate", area: "BMED")
+                               ">
                         <a href="#"><i class="fa fa-edit "></i><span class="nav-label">申請表單</span><span class="fa arrow"></span></a>
-                        <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "Repair", area: "BMED", cssClass: "in") @Html.IsSelected(controller: "Keep", area: "BMED", cssClass: "in")">
+                        <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "Repair", area: "BMED", cssClass: "in") @Html.IsSelected(controller: "Keep", area: "BMED", cssClass: "in") @Html.IsSelected(controller: "OutsideBmed", area: "FORMS", cssClass: "in") ">
                             <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                 <a href="@Url.Action("Create", "Repair", new { Area = "BMED" })">請修單</a>
                             </li>
@@ -58,9 +59,9 @@
                                 <a href="@Url.Action("Create", "Keep", new { Area = "BMED" })">保養單</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                              UserManager.IsInRole(User, "MedToDo"))
+                           UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                           UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
+                           UserManager.IsInRole(User, "MedToDo"))
                             {
                                 <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                     <a href="@Url.Action("Create", "Delivery", new { Area = "BMED" })">驗收單</a>
@@ -69,13 +70,13 @@
                                     <a href="@Url.Action("Create", "BuyEvaluate", new { Area = "BMED" })">採購評估單</a>
                                 </li>
                             }
+                            <li class="@Html.IsSelected(action: "Create", area: "FORMS")">
+                                <a href="@Url.Action("Create", "OutsideBmed", new { Area = "FORMS" })">外部醫療儀器使用</a>
+                            </li>
                         </ul>
                     </li>
 
-                    @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                       UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                       UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
-                       UserManager.IsInRole(User, "MedToDo"))
+                    @if (UserManager.IsInRole(User, "MedToDo"))
                     {
                         <li class="@Html.IsSelected(controller: "Budget", area: "BMED")">
                             <a href="@Url.Action("Index", "Budget", new { Area = "BMED" })"><i class="fa fa-money"></i><span class="nav-label">預算</span></a>
@@ -130,9 +131,9 @@
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })">設備保養排程年報</a>
                             </li>
                             @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
-                              UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
-                              UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
-                              UserManager.IsInRole(User, "DeviceMgr"))
+                        UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
+                        UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
+                        UserManager.IsInRole(User, "DeviceMgr"))
                             {
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "月故障率統計表" })">月故障率統計表</a>
@@ -150,23 +151,24 @@
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "零件帳務清單" })">零件帳務清單</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
-                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養統計表" })">維修保養統計表</a>
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "各成本中心維修保養統計表" })">各成本中心維修保養統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "工作時數統計表" })">工作時數統計表</a>
                                 </li>
+                                @*<li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件統計表" })">維修保養零件統計表</a>
+            </li>*@
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
-                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件統計表" })">維修保養零件統計表</a>
-                                </li>
-                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
-                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "維修保養零件(廠牌)統計表" })">維修保養零件(廠牌)統計表</a>
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "廠商支出統計表" })">廠商支出統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "儀器設備保養清單" })">儀器設備保養清單</a>
                                 </li>
-                                <li class="@Html.IsSelected(controller: "Report", action: "EffectRatio", area: "BMED")">
-                                    <a href="@Url.Action("EffectRatio", "Report", new { Area = "BMED" })">成效指標</a>
-                                </li>
+                                @*2020-12-03
+            <li class="@Html.IsSelected(controller: "Report", action: "EffectRatio", area: "BMED")">
+                <a href="@Url.Action("EffectRatio", "Report", new { Area = "BMED" })">成效指標</a>
+            </li>*@
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "設備妥善率統計表" })">設備妥善率統計表</a>
                                 </li>
@@ -177,7 +179,16 @@
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "保養金額統計表" })">保養金額統計表</a>
                                 </li>
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "分攤費用清單" })">分攤費用清單</a>
+                                </li>
+                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "列管報廢清單" })">列管報廢清單</a>
+                                </li>
+                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "保養完成率統計表" })">保養完成率統計表</a>
+                                </li>
+                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                                    <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "超過五日案件清單" })">超過五日案件清單</a>
                                 </li>
                             }
 
@@ -242,9 +253,9 @@
                             </li>
                         }
                     }
+
                 </ul>
             </li>
-        
         </ul>
     </div>
 </nav>

@@ -1,7 +1,16 @@
-﻿@model IEnumerable<EDIS.Models.RepairKeepVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.RepairKeepVModel>
+
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
 @{
-    Layout = null;
+    //Layout = null;
 }
+
 <script src="~/js/HtmltoExcel.js"></script>
 
 @*<p>
@@ -9,37 +18,38 @@
     </p>*@
 <input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
        onclick="javascript:exportExcel('tbToExcel')" />
+
 <table class="table" id="tbToExcel">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.CustId)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CustNam)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.KeepAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().KeepAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.KpEndAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().KpEndAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.KeepFinishedRate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().KeepFinishedRate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.KeepCost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().KeepCost)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepairAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepairAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RpEndAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RpEndAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepFinishedRate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepFinishedRate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepCost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepCost)
         </th>
     </tr>
     @{
@@ -105,3 +115,8 @@
     }
 
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

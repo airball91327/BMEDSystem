@@ -1,11 +1,13 @@
 ﻿@model IEnumerable<EDIS.Models.AssetKeepListVModel>
+@using Newtonsoft.Json
 @{
     Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry2"].ToString());
 }
 
 <h4>儀器設備保養清單</h4>
 <p>
-    <a class="btn btn-default" href="@Url.Action("ExcelAssetKeepList")">匯出Excel</a>
+    <a class="btn btn-default" href="@Url.Action("ExcelAssetKeepList", qry)">匯出Excel</a>
 </p>
 <table class="table">
     <tr>
@@ -31,7 +33,19 @@
             @Html.DisplayNameFor(model => model.AccDptName)
         </th>
         <th>
+            @Html.DisplayNameFor(model => model.DelivDptName)
+        </th>
+        <th>
             @Html.DisplayNameFor(model => model.LeaveSite)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.YYYMM)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Cycle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.EngName)
         </th>
         <th>
             @Html.DisplayNameFor(model => model.WartySt)
@@ -74,7 +88,19 @@
                 @Html.DisplayFor(modelItem => item.AccDptName)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.DelivDptName)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.LeaveSite)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.YYYMM)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cycle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EngName)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.WartySt)

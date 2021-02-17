@@ -1,91 +1,101 @@
-﻿@model IEnumerable<EDIS.Models.ScrapAsset>
+﻿@model X.PagedList.IPagedList<EDIS.Models.ScrapAsset>
+
+@using Newtonsoft.Json;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
 @{
     Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
 }
 
-<script src="~/js/HtmltoExcel.js"></script>
+    <p>
+        <a class="btn btn-default" href="@Url.Action("ExcelScrapAssetList", qry)">匯出Excel</a>
+    </p>
+
+@*<script src="~/js/HtmltoExcel.js"></script>
 
 <input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
-       onclick="javascript:exportExcel('tbToExcel')" />
+       onclick="javascript:exportExcel('tbToExcel')" />*@
 
 
 <table class="table" id="tbToExcel" style="display:block; overflow-x:auto;">
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.DocId)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.ApplyDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().ApplyDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DptId)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DptId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDpt)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDpt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AccDptName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().UserName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.UserFullName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().UserFullName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Amt)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Amt)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetType)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetNo)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.AssetName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.TroubleDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealState)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealState)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.DealDes)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EndDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EndDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.EngName)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EngName)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.Hour)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Hour)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.RepType)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().RepType)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CloseDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().CloseDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.CloseTicketDate)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().CloseTicketDate)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FlowDptUser)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().FlowDptUser)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.FlowDptAcceptTime)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().FlowDptAcceptTime)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MedMgr)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().MedMgr)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.MedMgrAcceptTime)
+                @Html.DisplayNameFor(model => model.FirstOrDefault().MedMgrAcceptTime)
             </th>
         </tr>
     </thead>
@@ -93,6 +103,7 @@
         @foreach (var item in Model)
         {
             <tr>
+               
                 <td>
                     @Html.DisplayFor(modelItem => item.DocId)
                 </td>
@@ -172,3 +183,8 @@
         }
     </tbody>
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page, ReportClass = "列管報廢清單" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

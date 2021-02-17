@@ -12,25 +12,33 @@
     }
 }
 
-<div>
-    <h4>儀器基本資料</h4>
-</div>
 <table class="table table-bordered">
-    <tr>
-        <td>財產編號</td>
-        <td>@Model.AssetNo</td>
-        <td>成本中心</td>
-        <td>@Model.AccDptName</td>
-    </tr>
-    <tr>
-        <td>廠    牌</td>
-        <td>@Model.Brand</td>
-        <td>型    號</td>
-        <td>@Model.Type</td>
+    <tr style="text-align:center;border-bottom: solid 2px; border-top: solid 2px;">
+        <td colspan="6">
+            <h4>儀器基本資料</h4>
+        </td>
     </tr>
     <tr>
         <td>中文名稱</td>
         <td>@Model.Cname</td>
+        <td>財產編號</td>
+        <td>@Model.AssetNo</td>
+        <td>型    號</td>
+        <td>@Model.Type</td>
+    </tr>
+    <tr>
+        <td>英文名稱</td>
+        <td>@Model.Ename</td>
+        <td>代理商</td>
+        <td>@Model.VendorId</td>
+        <td>廠    牌</td>
+        <td>@Model.Brand</td>
+    </tr>
+    <tr>
+        <td>成本中心</td>
+        <td>@Model.AccDpt @Model.AccDptName</td>
+        <td>財產立帳日</td>
+        <td>@Model.AccDate</td>
         <td>取得金額</td>
         @if (userDpt == "8420") //醫工部與相關人員才顯示設備取得金額
         {

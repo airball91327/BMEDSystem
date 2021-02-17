@@ -415,7 +415,7 @@ namespace EDIS.Areas.BMED.Controllers
                         body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                         mail.message.Body = body;
                         mail.message.IsBodyHtml = true;
-                        //mail.SendMail();
+                        mail.SendMail();
                     }
                     return new JsonResult(BuyFlow)
                     {
@@ -491,7 +491,7 @@ namespace EDIS.Areas.BMED.Controllers
                 body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
                 mail.message.Body = body;
                 mail.message.IsBodyHtml = true;
-                //mail.SendMail();
+                mail.SendMail();
 
                 return new JsonResult(BuyFlow)
                 {
@@ -525,21 +525,39 @@ namespace EDIS.Areas.BMED.Controllers
                     li.Value = u2.Id.ToString();
                     list.Add(li);
                     break;
-                case "評估工程師":
+                case "資訊工程師":
                     list = new List<SelectListItem>();
-                    s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                    s = roleManager.GetUsersInRole("IT_Engineer").ToList();
                     foreach (string l in s)
                     {
                         u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
                         if (u != null)
                         {
-                            li = new SelectListItem();
-                            li.Text = "(" + u.UserName + ")" + u.FullName;
-                            li.Value = u.Id.ToString();
-                            list.Add(li);
+                            if (u.Status == "Y")
+                            {
+                                li = new SelectListItem();
+                                li.Text = "(" + u.UserName + ")" + u.FullName;
+                                li.Value = u.Id.ToString();
+                                list.Add(li);
+                            }
                         }
                     }
                     break;
+                //case "評估工程師":
+                //    list = new List<SelectListItem>();
+                //    s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                //    foreach (string l in s)
+                //    {
+                //        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                //        if (u != null)
+                //        {
+                //            li = new SelectListItem();
+                //            li.Text = "(" + u.UserName + ")" + u.FullName;
+                //            li.Value = u.Id.ToString();
+                //            list.Add(li);
+                //        }
+                //    }
+                //    break;
                 case "設備主管":
                     list = new List<SelectListItem>();
                     s = roleManager.GetUsersInRole("MedMgr").ToList();
@@ -639,12 +657,81 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     break;
+
+                case "賀康主管":
+                    s = roleManager.GetUsersInRole("MedAssetMgr").ToList();
+                    list = new List<SelectListItem>();
+                    foreach (string l in s)
+                    {
+                        u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                        
+                        if (u != null  && u.Status == "Y")
+                        {
+                            DepartmentModel o = _context.Departments.Find(u.DptId);
+                            DepartmentModel e = _context.Departments.Where( n => n.Name_C == r.Place).FirstOrDefault();
+                            if (e.Loc == "C" || e.Loc == "P" || e.Loc == "K") { 
+                                if (o.Loc == "C" || o.Loc == "P" || o.Loc == "K")
+                                {
+                                    li = new SelectListItem();
+                                    li.Text = "(" + u.UserName + ")" + u.FullName;
+                                    li.Value = u.Id.ToString();
+                                    list.Add(li);
+                                }
+                            }
+                            else
+                            {
+                                if (o.Loc != "C" || o.Loc != "P" || o.Loc != "K")
+                                {
+                                    li = new SelectListItem();
+                                    li.Text = "(" + u.UserName + ")" + u.FullName;
+                                    li.Value = u.Id.ToString();
+                                    list.Add(li);
+                                }
+                            }
+                        }
+                    }
+                    break;
                 default:
                     list = new List<SelectListItem>();
                     break;
             }
             return Json(list);
         }
+
+        [HttpPost]
+        public ActionResult FlowRecovery(string docId)
+        {
+            // Get Login User's details.
+            var loginUser = _userRepo.Find(ur => ur.UserName == User.Identity.Name).FirstOrDefault();
+            var lastFlow = _context.BuyFlows.Where(bf => bf.DocId == docId && bf.Status == "2").FirstOrDefault();
+            if (lastFlow != null)
+            {
+                lastFlow.Status = "1";
+                lastFlow.Opinions += "(*恢復流程)";
+                BuyFlowModel rf = new BuyFlowModel();
+                rf.DocId = docId;
+                rf.StepId = lastFlow.StepId + 1;
+                rf.UserId = loginUser.Id;
+                rf.Status = "?";
+                rf.Role = roleManager.GetRolesForUser(loginUser.Id).FirstOrDefault();
+                rf.Rtp = null;
+                rf.Rdt = null;
+                rf.Rtt = DateTime.Now;
+                rf.Cls = "設備經辦";
+                _context.BuyFlows.Add(rf);
+                //
+                _context.SaveChanges();
+                return new JsonResult(docId)
+                {
+                    Value = new { success = true, error = "" },
+                };
+            }
+            else
+            {
+                throw new Exception("流程恢復失敗!");
+            }
+        }
+
         protected override void Dispose(bool disposing)
         {
             _context.Dispose();

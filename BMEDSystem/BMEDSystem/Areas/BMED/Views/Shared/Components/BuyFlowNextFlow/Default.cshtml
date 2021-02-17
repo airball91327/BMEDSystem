@@ -6,6 +6,9 @@
     }
 </style>
 
+
+
+
 <form asp-action="NextFlow" asp-controller="BuyFlow" asp-area="BMED" method="post"
     data-ajax="true" data-ajax-method="POST" id="fmFLOW"
     data-ajax-begin="$.Toast.showToast({
@@ -32,6 +35,22 @@
                 <td>
                     <div style="font-weight: bold;">
                         @Html.DisplayFor(model => model.FlowHint)
+                    </div>
+                </td>
+            </tr>
+        }
+        else
+        {
+            <tr>
+                <td class="head">
+                    <div class="editor-label">
+                        <label asp-for="FlowHint" class="control-title"></label>
+                    </div>
+                </td>
+                <td>
+                    <div style="color:orange;">
+                        採購起案→設備工程師開立規格→(聯網系统設備需經過資訊工程師)→設備主管審核→採購評估收紙本→設備工程師評核表議
+                        價規範(聯網系統設備需經過資訊工程師)→設備主管審核→設備經辦結案
                     </div>
                 </td>
             </tr>
@@ -77,12 +96,26 @@
                     <label asp-for="UserId" class="control-title"></label>
                 </div>
             </td>
-            <td>
+            <td id="FirstUserId">
                 <div class="form-inline">
                     <select asp-for="UserId" asp-items="@ViewData["Item2"] as SelectList" class="form-control" id="SelectEng">
                         <option disabled selected>請選擇</option>
                     </select>
                     <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </td>
+            <td id="FidenUserId">
+                <div class="form-inline">
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                    <div class="form-group">
+                        <input type="text" placeholder="輸入關鍵字或員工代碼查詢" class="form-control" id="UserIdQry" />
+                        <button type="button" class="btn btn-default" id="UserIdQryBtn" data-request-url="@Url.Action("GetToNameByKeyname", "UseUnitFind",new { Area ="FORMS"})">查詢</button>
+                        <select asp-for="UserId" asp-items="@ViewData["Item2"] as SelectList" class="form-control" style="width: auto">
+                            <option disabled selected>請選擇</option>
+                        </select>
+                        <span asp-validation-for="UserId" class="text-danger"></span>
+                        <span style="color:red" id="UserIdNoErrorMsg"></span>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -94,3 +127,7 @@
     </div>
 
 </form>
+
+<script>
+    $('#FidenUserId').hide();
+</script>

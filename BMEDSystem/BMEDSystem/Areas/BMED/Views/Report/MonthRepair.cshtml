@@ -1,5 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.MonthRepairVModel>
-@using Newtonsoft.Json
+﻿@model X.PagedList.IPagedList<EDIS.Models.MonthRepairVModel>
+@using Newtonsoft.Json;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @{
     Layout = null;
     var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
@@ -8,44 +10,55 @@
 <p>
     <a class="btn btn-default" href="@Url.Action("ExcelMR", qry)">匯出Excel</a>
 </p>
-<h3>*[申請日]為條件</h3>
+@*<h3>*[申請日]為條件</h3>*@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.DocId)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.ApplyDate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ApplyDate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EndDate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EndDate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AssetNo)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo) /
+            <br />
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AccDpt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AccDpt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.TroubleDes)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.FailFactor)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().FailFactor)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DealState)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DealState)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DealDes)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Cost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().InOut)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EngNam)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EngNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Hour)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().ClsNam)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Hour)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().PlaceLoc)
         </th>
     </tr>
 
@@ -62,11 +75,13 @@
                 @Html.DisplayFor(modelItem => item.EndDate)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AssetNo)<br />
+                @Html.DisplayFor(modelItem => item.AssetNo)
+                <br />
                 @Html.DisplayFor(modelItem => item.AssetNam)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AccDpt)<br />
+                @Html.DisplayFor(modelItem => item.AccDpt)
+                <br />
                 @Html.DisplayFor(modelItem => item.AccDptNam)
             </td>
             <td>
@@ -82,15 +97,72 @@
                 @Html.DisplayFor(modelItem => item.DealDes)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.Cost)
+                @Html.DisplayFor(modelItem => item.InOut)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.EngNam)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.ClsNam)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Hour)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Cost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.PlaceLoc)
             </td>
         </tr>
     }
 
 </table>
+
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page, ReportClass = "月維修清單" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+
+<script>
+    // Use ajax to fetch page.
+    var fetchPage = function (page) {
+        var pagedPartialUrl = '@Url.Action("Index", "Report", new { Area = "BMED" })';
+        var s = $('#BMEReportForm').serialize();
+        $.Toast.showToast({
+            'title': '查詢中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url: pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page + "&ReportClass=月維修清單",
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlREPORT').html(data);
+
+                $('#pnlREPORT .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPage(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
+            }
+        });
+    };
+</script>

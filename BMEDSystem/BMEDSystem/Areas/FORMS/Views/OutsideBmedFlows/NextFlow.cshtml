@@ -1,0 +1,126 @@
+﻿@model EDIS.Areas.FORMS.Models.Assign
+
+
+
+    <form asp-action="NextFlow" asp-controller="OutsideBmedFlows" asp-area="FORMS" data-ajax="true" data-ajax-method="POST"
+          data-ajax-begin="$.Toast.showToast({
+            'title':'建立表單中，請稍待...',
+            'icon':'loading',
+            'duration':0
+            })"
+          data-ajax-success="showmsg">
+        @Html.ValidationSummary(true)
+        @Html.HiddenFor(model => model.DocId)
+        @Html.HiddenFor(model => model.ClsNow)
+        @Html.HiddenFor(model => model.Application)
+
+        <div class="form-horizontal">
+            @*<div class="form-group">
+                @Html.LabelFor(model => model.Hint, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10" style="color: green">
+                    @Html.DisplayFor(model => model.Hint)
+                </div>
+            </div>*@
+            <div class="form-group">
+                @Html.LabelFor(model => model.AssignCls, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.RadioButtonFor(model => model.AssignCls, "同意")同意
+                    @Html.RadioButtonFor(model => model.AssignCls, "不同意")不同意
+                    @Html.RadioButtonFor(model => model.AssignCls, "其他")其他
+                    @Html.ValidationMessageFor(model => model.AssignCls, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.AssignOpn, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.TextAreaFor(model => model.AssignOpn, 5, 50, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.AssignOpn, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FlowCls, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10 ">
+                    @Html.DropDownListFor(model => model.FlowCls, null, "請選擇", new { @class = "form-control form-line", @style = "width:auto" })
+                    @Html.ValidationMessageFor(model => model.FlowCls, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.FlowUid, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10 text-left">
+                    <div class="form-inline">
+                        @Html.DropDownListFor(model => model.FlowUid, null, "請選擇", new { @class = "form-control", @style = "width:auto" })
+                        @* <input id="btnSelUsr" type="button" value="..." class="btn btn-default" data-toggle="modal" data-target="#modalSELUSER" />*@
+                        @Html.ValidationMessageFor(model => model.FlowUid, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            </div>
+            @if (Model.Application != "患者自帶")
+            {
+                <div class="form-group">
+                    <label class="control-label col mb-3">審核內容(審核內容檢查後請點選)</label>
+                    @*@Html.Label("審核內容(審核內容檢查後請點選)", htmlAttributes: new { @class = "control-label col mb-3" })*@
+                    <div class="col-md-10 text-left">
+                        @Html.CheckBoxFor(model => model.item1)
+                        @Html.LabelFor(model => model.item1)
+                        <br />
+
+                        @Html.CheckBoxFor(model => model.item2)
+                        @Html.LabelFor(model => model.item2)
+                        <br />
+
+                        @Html.CheckBoxFor(model => model.item3)
+                        @Html.LabelFor(model => model.item3)
+                        <br />
+
+                        @Html.ValidationMessageFor(model => model.item1, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+            }
+
+            else
+            {
+                <div class="form-group">
+                    <label class = "control-label col mb-3">審核內容(審核內容檢查後請點選)</label>
+                    @*@Html.Label("審核內容(審核內容檢查後請點選)", htmlAttributes: new { @class = "control-label col mb-3" })*@
+
+                    <span class="col">患者自帶之設備,工程師做安全性檢查後,始可使用(可檢查時段為8:00~1730,但CPAP呼吸器的檢查時間不受限):</span>
+                    <div class="col-md-10 text-left mt-2">
+                        @Html.CheckBoxFor(model => model.item4)
+                        @Html.LabelFor(model => model.item4)
+                        <br />
+
+                        @Html.CheckBoxFor(model => model.item5)
+                        @Html.LabelFor(model => model.item5)
+                        <br />
+
+                        @Html.CheckBoxFor(model => model.item6)
+                        @Html.LabelFor(model => model.item6)
+                        <br />
+
+                        @Html.CheckBoxFor(model => model.item7)
+                        @Html.LabelFor(model => model.item7)
+                        <br />
+
+                        @Html.ValidationMessageFor(model => model.item4, "", new { @class = "text-danger" })
+                    </div>
+                </div>
+
+
+                <div class="form-group">
+                    <div class="col-auto">
+                        <input id="btnGO" type="submit" value="確定送出" class="btn btn-success" />
+                        <img id="imgLOADING" src="~/Images/opc-ajax-loader.gif" style="display: none" />
+                    </div>
+                </div>
+            
+            }
+         </div>
+     </form>
+        <div>
+            @*@Html.Action("GetList", "OutsideBmedFlows", new { id = Model.DocId })*@
+            <form asp-action="GetList" asp-controller="OutsideBmedFlows" asp-route-id="Model.DocId"></form>
+        </div>
+

@@ -1,0 +1,100 @@
+﻿@model EDIS.Areas.FORMS.Models.Assign
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+
+
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+<script >
+    $(document).ready(function () {
+        $('.qryCombobox').combobox();
+    });
+        var url = '@Url.Action("Index","Home",new{Area=""})';
+        var onFailed = function (data) {
+            alert(data.responseText);
+            $.Toast.hideToast();
+        }
+
+    
+        function updatemsg(data) {
+            document.getElementById('btnGO').disabled = true;
+            alert("送出成功!");
+            location.href = url;
+        }
+</script>
+<script src="~/js/FORMS/OsbNextFlow.js" asp-append-version="true"></script>
+
+<form asp-action="NextFlow" asp-controller="OutsideBmedFlows" asp-area="FORMS" data-ajax="true" data-ajax-method="POST"
+      id="nextSFlowForm"
+      data-ajax-begin="$.Toast.showToast({
+          'title':'作業進行中，請稍待...',
+          'icon':'loading',
+          'duration':0
+          })"
+      data-ajax-complete="$.Toast.hideToast()"
+      data-ajax-success="updatemsg()" data-ajax-failure="onFailed">
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.DocId)
+    @Html.HiddenFor(model => model.FlowUid)
+    @Html.HiddenFor(model => model.Application)
+    @Html.HiddenFor(model => model.item1)
+    @Html.HiddenFor(model => model.item2)
+    @Html.HiddenFor(model => model.item3)
+    @Html.HiddenFor(model => model.item4)
+    @Html.HiddenFor(model => model.item5)
+    @Html.HiddenFor(model => model.item6)
+    @Html.HiddenFor(model => model.item7)
+    <div class="form-horizontal">
+        <div class="form-group">
+            @Html.LabelFor(model => model.AssignCls, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.RadioButtonFor(model => model.AssignCls, "同意")同意
+                @Html.RadioButtonFor(model => model.AssignCls, "不同意")不同意
+                @Html.RadioButtonFor(model => model.AssignCls, "其他")其他
+                @Html.ValidationMessageFor(model => model.AssignCls, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.AssignOpn, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextAreaFor(model => model.AssignOpn, 5, 50, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.AssignOpn, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="FlowCls" class="control-label col-md-2"></label>
+            <div class="col-md-10 ">
+                <select asp-for="FlowCls" asp-items="@ViewData["FlowCls"] as SelectList" class="form-control form-line" style="width:auto">
+                    <option disabled selected>請選擇</option>
+                </select>
+                <span asp-validation-for="FlowCls" class="text-danger"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label class="control-label col-md-2">關卡人員</label>
+            <div class="col-md-10 form-inline">
+                <input type="text" placeholder="輸入關鍵字或員工代碼查詢" class="form-control" id="ClsNowQry" />
+                <button type="button" class="btn btn-default" id="ClsNowQryBtn">查詢</button>
+                <select asp-for="ClsNow" asp-items="@ViewData["ClsNow"] as SelectList" class="form-control form-line" style="width:auto">
+                    <option disabled selected>請選擇</option>
+                </select>
+                <span asp-validation-for="ClsNow" class="text-danger"></span>
+                <span style="color:red" id="ClsNowNoErrorMsg"></span>
+            </div>
+        </div>
+
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input id="btnGO" type="submit" value="確定送出" class="btn btn-primary" />
+                <img id="imgLOADING" src="~/Images/opc-ajax-loader.gif" style="display: none" />
+            </div>
+        </div>
+    </div>
+
+</form>
+
+

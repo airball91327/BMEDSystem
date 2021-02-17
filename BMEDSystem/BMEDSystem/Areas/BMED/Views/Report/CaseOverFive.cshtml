@@ -1,0 +1,99 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.CaseOverFiveVModel>
+
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
+
+@{
+    Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+}
+<p>
+    <a class="btn btn-default" href="@Url.Action("ExcelCaseOverFiveList", qry)">匯出Excel</a>
+</p>
+
+<table class="table" id="tbToExcel">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDpt)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().AccDptName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().TroubleDes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealState)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().SDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EDate)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().EngName)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Days)
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DocId)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AssetNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccDpt)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.AccDptName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TroubleDes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DealState)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.DealDes)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.SDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EDate)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.EngName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Days)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

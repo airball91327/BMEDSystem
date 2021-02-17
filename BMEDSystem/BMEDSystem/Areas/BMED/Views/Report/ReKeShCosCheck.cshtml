@@ -1,0 +1,80 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.ReKeShCosCheckVModel>
+
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
+@{
+    Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+}
+    <p>
+        <a class="btn btn-default" href="@Url.Action("ExcelReKeShCosCheckList", qry)">匯出Excel</a>
+    </p>
+
+<table class="table" id="tbToExcel">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AccDpt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustNam)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepAmt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Keepcost)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Partexp)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepAmt)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Sum)
+        </th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.AccDpt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.CustNam)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RepAmt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Keepcost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Partexp)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RepAmt)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sum)
+            </td>
+
+        </tr>
+    }
+
+
+
+
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

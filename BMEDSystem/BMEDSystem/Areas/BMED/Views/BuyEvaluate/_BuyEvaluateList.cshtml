@@ -5,6 +5,8 @@
 @inject CustomRoleManager RoleManager
 
 <script src="~/js/BMED/AssetFileUpload.js" asp-append-version="true"></script>
+<script src="~/js/Rel.js"></script>
+
 
 @{
     int i = 0;
@@ -62,7 +64,7 @@
                 <td>
                     @if (item.Flg == "?" && UserManager.GetCurrentUserId(User) == item.FlowUid)
                     {
-                        @Html.ActionLink("編輯", "Edit", "BuyEvaluate", new { id = item.DocId, sid = item.DocSid}, new { target = "_blank" })
+                        @Html.ActionLink("編輯", "Edit", "BuyEvaluate", new { id = item.DocId, sid = item.DocSid }, new { target = "_blank" })
                         if (UserManager.IsInRole(User, "BuyerMgr"))
                         {
                             @Html.Raw("| ")
@@ -80,6 +82,17 @@
                             @Html.Raw("| ")
                             @Html.ActionLink("驗收", "Create", "Delivery", new { id = item.DocId }, null)
                         }
+                    }
+                    @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedToDo"))))
+                    {
+                        @Html.Raw("| ")
+                        <a asp-action="FlowRecovery" asp-controller="BuyFlow" asp-area="BMED" asp-route-DocId="@item.DocId"
+                           data-ajax="true" class="btn btn-danger btn-sm"
+                           data-ajax-method="POST" id="btnRecovery"
+                           data-ajax-failure="RecoveryFailed"
+                           data-ajax-success="RecoverySuccess()">
+                            恢復流程
+                        </a>
                     }
                 </td>
                 <td>
@@ -113,7 +126,7 @@
             </tr>
             if (item.Flg == "2")
             {
-                <tr @*style="background-color: @s"*@ >
+                <tr @*style="background-color: @s"*@>
                     <td colspan="5" style="padding-left: 30px; color: lightblue">
                         @await Component.InvokeAsync("BuyEvaluateAssetListItem", new { id = item.DocId, upload = "採購人員" })
                     </td>
@@ -123,3 +136,30 @@
 
     </table>
 }
+
+
+<script>
+
+
+    $('#recovery').click(function (e) {
+        if (confirm("確定流程恢復嗎?")) {
+            return true;
+        }
+        else {
+            //$("#recovery").unbind('submit').submit();
+            return false;
+        }
+    });
+
+    function RecoverySuccess() {
+        alert("流程已恢復");
+        var strArray = window.location.href.split("/");
+        var strArray2 = strArray[strArray.length - 1].split("#");
+        var page = strArray2[strArray2.length - 1];
+        fetchPage(page);
+    }
+    var RecoveryFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>

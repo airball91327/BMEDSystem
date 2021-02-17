@@ -1,5 +1,7 @@
-﻿@model IEnumerable<EDIS.Models.MonthKeepVModel>
-@using Newtonsoft.Json
+﻿@model X.PagedList.IPagedList<EDIS.Models.MonthKeepVModel>
+@using Newtonsoft.Json;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @{
     Layout = null;
     var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
@@ -8,38 +10,48 @@
 <p>
     <a class="btn btn-default" href="@Url.Action("ExcelMK", qry)">匯出Excel</a>
 </p>
-<h3>*[申請(出單)日]為條件</h3>
+@*<h3>*[申請(出單)日]為條件</h3>*@
 <table class="table">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.DocId)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DocId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.SentDate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().SentDate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EndDate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EndDate)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AssetNo)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo) /
+            <br />
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AccDpt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AccDpt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DealDes)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DealDes)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.InOut)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().InOut) /
+            <br />
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Result)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Cycle)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EngNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Cost)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Cycle)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EngNam)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Hours)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Cost)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Shares)
         </th>
     </tr>
 
@@ -53,32 +65,92 @@
                 @item.SentDate.ToString("yyyy/MM/dd")
             </td>
             <td>
-                @item.EndDate.ToString("yyyy/MM/dd")
+                @if (@item.EndDate != null)
+                {
+                    @item.EndDate.Value.ToString("yyyy/MM/dd")
+                }
             </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.AssetNo)<br />
+            <td style="max-width: 150px;">
+                @Html.DisplayFor(modelItem => item.AssetNo)
+                <br />
                 @Html.DisplayFor(modelItem => item.AssetNam)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.AccDpt)<br />
+                @Html.DisplayFor(modelItem => item.AccDpt)
+                <br />
                 @Html.DisplayFor(modelItem => item.AccDptNam)
             </td>
-            <td>
+            <td style="max-width: 200px;">
                 @Html.DisplayFor(modelItem => item.DealDes)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.InOut)
+                <br />
+                @Html.DisplayFor(modelItem => item.Result)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EngNam)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Cycle)
             </td>
             <td>
+                @Html.DisplayFor(modelItem => item.Hours)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.Cost)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.EngNam)
+                @Html.DisplayFor(modelItem => item.Shares)
             </td>
         </tr>
     }
 
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page, ReportClass = "月保養清單" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+
+<script>
+    // Use ajax to fetch page.
+    var fetchPage = function (page) {
+        var pagedPartialUrl = '@Url.Action("Index", "Report", new { Area = "BMED" })';
+        var s = $('#BMEReportForm').serialize();
+        $.Toast.showToast({
+            'title': '查詢中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url: pagedPartialUrl,
+            type: "POST",
+            data: s + "&page=" + page + "&ReportClass=月保養清單",
+            success: function (data) {
+
+                window.location.hash = page;
+
+                $('#pnlREPORT').html(data);
+
+                $('#pnlREPORT .pagination li a').each(function (i, item) {
+                    var hyperLinkUrl = $(item).attr('href');
+                    if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                        $(item).attr('href', '#').click(function (event) {
+                            event.preventDefault();
+                            $(event.target).attr('href');
+                            fetchPage(pageNumber);
+                        });
+                    }
+                });
+                $.Toast.hideToast();
+            },
+            error: function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
+            }
+        });
+    };
+</script>

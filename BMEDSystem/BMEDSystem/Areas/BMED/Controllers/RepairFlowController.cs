@@ -149,16 +149,6 @@ namespace EDIS.Areas.BMED.Controllers
                     rf.Rtp = ur.Id;
                     _context.Entry(rf).State = EntityState.Modified;
                     _context.Entry(rd).State = EntityState.Modified;
-
-                    //sync to oracleBatch
-                    var rep = _context.BMEDRepairs.Find(assign.DocId);
-                    if (rep.Loc == "總院" || rep.Loc == "K")
-                    {
-                        string smsg = SyncToOracleBatch(assign.DocId);
-                        //if (smsg == "1")
-                        //    throw new Exception("同步OracleBatch失敗!");
-                    }
-
                     // Save stock to ERP system.
                     if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
                     {
@@ -169,7 +159,16 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                     _context.SaveChanges();
+                    //sync to oracleBatch
+                    var rep = _context.BMEDRepairs.Find(assign.DocId);
+                    if (rep.Loc == "總院" || rep.Loc == "K")
+                    {
+                        string smsg = SyncToOracleBatch(assign.DocId);
+                        //if (smsg == "1")
+                        //    throw new Exception("同步OracleBatch失敗!");
+                    }
 
+                   
                     //Send Mail
                     //To all users in this repair's flow.
                     Tmail mail = new Tmail();
@@ -436,6 +435,7 @@ namespace EDIS.Areas.BMED.Controllers
                             })
                             .Where(d => locList.Contains(d.dpt.Loc))
                             .Where(ur => ur.appuser.UserName == l && ur.appuser.Status == "Y").Select(ur => ur.appuser).FirstOrDefault();
+                            
                             if (u != null)
                             {
                                 li = new SelectListItem();
@@ -447,10 +447,23 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     else
                     {
+                        list = new List<SelectListItem>();
                         li = new SelectListItem();
                         li.Text = "請選擇";
                         li.Value = "請選擇";
                         list.Add(li);
+                        //
+
+                        _context.AppUsers.Where(ur => !string.IsNullOrEmpty(ur.DptId))
+                        .Where(ur => ur.DptId == r.DptId)
+                        .Where(ur => ur.Status == "Y")
+                        .ToList()
+                        .ForEach(ur => {
+                            li = new SelectListItem();
+                            li.Text = ur.FullName + "(" + ur.UserName + ")";
+                            li.Value = ur.Id.ToString();
+                            list.Add(li);
+                        });
                     }
                     break;
                 case "單位主任":  //Not Used
@@ -661,7 +674,7 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var repair = _context.BMEDRepairs.Find(docId);
             ERPRepHead hd = new ERPRepHead();
-            hd.ZHANG_ID = "3";
+            hd.ZHANG_ID = "2";
             hd.ADD = 0;
             hd.BIL_NO = docId;
             hd.PS_DD = DateTime.Now.Date;
@@ -743,7 +756,7 @@ namespace EDIS.Areas.BMED.Controllers
                             QTY = Convert.ToDecimal(stock.Qty),
                             UP = Convert.ToDecimal(stock.Price),
                             AMT = Convert.ToDecimal(stock.TotalCost),
-                            INV_CUS_NO = stock.VendorId == null ? null : ERPvendor.CUS_NO,
+                            INV_CUS_NO = stock.VendorId == null || stock.StockType == "0" ? null : ERPvendor.CUS_NO,
                             ISPAY = isPay,
                             TAX_ID = stock.TaxClass
                         });
