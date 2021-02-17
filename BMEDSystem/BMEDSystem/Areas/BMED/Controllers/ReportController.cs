@@ -1302,15 +1302,18 @@ namespace EDIS.Areas.BMED.Controllers
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
             double faildays = 0;
             double dd = 0;
-            int cnt = 0;
+            //int cnt = 0;
             List<ProperRate> sv = new List<ProperRate>();
             ProperRate pr;
             //依照院區區分設備
             var bmedAssets = GetAssetsByLoc(urLocation);
             //
-            var test = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
-                     .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
-                     (r, d) => new { repair = r, d.EndDate }).ToList();
+            var test = _context.BMEDRepairs
+                 .Where(r => r.ApplyDate >=  v.Sdate && r.ApplyDate <= v.Edate)
+                 .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), 
+                         r => r.DocId, 
+                         d => d.DocId,
+                         (r, d) => new { repair = r, d.EndDate });
 
             
             var assets = bmedAssets
@@ -1318,15 +1321,12 @@ namespace EDIS.Areas.BMED.Controllers
              .Where(a => a.DisposeKind == "正常")
              .GroupJoin(test, d => d.AssetNo, b => b.repair.AssetNo,
              (assetD, repairA) => new { assetD = assetD, repairA = repairA })
-             .ToList()
              .GroupJoin(_context.Departments, d => d.assetD.AccDpt, b => b.DptId,
              (assetM, depart) => new { assetM = assetM, depart = depart })
              .SelectMany(x => x.depart.DefaultIfEmpty(), (o, g) =>
-                      new { _assetM = o.assetM, _depart = g })
-             .ToList();
+                      new { _assetM = o.assetM, _depart = g });
 
            
-
 
          //var t = assets
          //   .GroupJoin(test, d => d._assetM.AssetNo, b => b.repair.AssetNo,
@@ -1354,22 +1354,25 @@ namespace EDIS.Areas.BMED.Controllers
                //         cnt++;
                //});
             
+            
 
 
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                assets = assets.Where(a => a._assetM.assetD.AccDpt == v.AccDpt).ToList();
+                assets = assets.Where(a => a._assetM.assetD.AccDpt == v.AccDpt);
             }
             if (!string.IsNullOrEmpty(v.AssetNo))
             {
-                assets = assets.Where(a => a._assetM.assetD.AssetNo == v.AssetNo)
-                    .ToList();
+                assets = assets.Where(a => a._assetM.assetD.AssetNo == v.AssetNo);
             }
+
+            var cnt = test
+                .GroupBy(x => x.repair.AssetNo)
+                .ToDictionary(x => x.Key, x => x.Count());
 
             foreach (var asset in assets)
             {
-                
                 pr = new ProperRate();
                 pr.AssetNo = asset._assetM.assetD.AssetNo;
                 pr.AssetName = asset._assetM.assetD.Cname;
@@ -1380,7 +1383,7 @@ namespace EDIS.Areas.BMED.Controllers
                 pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
                 faildays = 0;
                 dd = 0;
-                cnt = 0;
+               // cnt = 0;
                 var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
                 var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
                 //_context.BMEDRepairs.Where(r => r.AssetNo == asset._assetM.assetD.AssetNo)
@@ -1406,11 +1409,11 @@ namespace EDIS.Areas.BMED.Controllers
                                 faildays += dd;
                         }
                     }
-                    cnt++;
+                    //cnt++;
                 }
                 //    });
 
-                pr.RepairCnts = cnt;
+                pr.RepairCnts = cnt.ContainsKey(pr.AssetNo) == false ? 0 : cnt[pr.AssetNo];
                 pr.RepairDays = faildays;
                 pr.AssetProperRate = decimal.Round(100m -
                         Convert.ToDecimal(faildays / days) * 100m, 2);
