@@ -28,7 +28,7 @@ namespace EDIS.Models
         [DataType(DataType.Date)]
         [Column(TypeName = "Date")]
         public string TF_DATE_From { get; set; }
-        [DataType(DataType.Date)]
+        [DataType(DataType.Date)]   
         [Column(TypeName = "Date")]
         public string TF_DATE_To { get; set; }
     }
