@@ -774,15 +774,23 @@ namespace EDIS.Areas.BMED.Controllers
                     ViewData["Analysis"] = ay;
                     return PartialView("RpKpHistory", rk);
                 case "設備妥善率統計表":
-                    if (v.Edate == null)
+                    if (v.Sdate == null)
                     {
-                        if (v.Sdate == null)
+                        if (v.Edate == null)
                         {
-                            v.Sdate = DateTime.Now.AddYears(-1);
+                            v.Edate = DateTime.Now
+                            .AddHours(23)
+                            .AddMinutes(59)
+                            .AddSeconds(59);
                         }
-                        v.Edate = DateTime.Now.AddHours(23)
-                        .AddMinutes(59)
-                        .AddSeconds(59);
+                        v.Sdate =  new DateTime();
+                    }
+                    else if (v.Edate == null)
+                    {
+                        v.Edate = DateTime.Now
+                            .AddHours(23)
+                            .AddMinutes(59)
+                            .AddSeconds(59);
                     }
                     return PartialView("AssetProperRate", AssetProperRate(v,page));
                 case "重複故障清單":
@@ -986,6 +994,8 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("廠牌");
             dt.Columns.Add("型號");
             dt.Columns.Add("成本中心");
+            dt.Columns.Add("機齡");
+            dt.Columns.Add("處分性質");
             dt.Columns.Add("維修日數");
             dt.Columns.Add("維修次數");
             dt.Columns.Add("妥善率");
@@ -999,9 +1009,11 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[2] = m.Brand;
                 dw[3] = m.Type;
                 dw[4] = m.AccDpt + m.AccDptNam;
-                dw[5] = m.RepairDays;
-                dw[6] = m.RepairCnts;
-                dw[7] = m.AssetProperRate;
+                dw[5] = m.AircraftY;
+                dw[6] = m.DisposeKind;
+                dw[7] = m.RepairDays;
+                dw[8] = m.RepairCnts;
+                dw[9] = m.AssetProperRate;
 
                 dt.Rows.Add(dw);
             });
@@ -1018,11 +1030,12 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return NotFound();
             }
+            
 
             return File(
                 fileContents: fileContents,
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: "MonthKeep.xlsx"
+                fileDownloadName: "AssetProperRate.xlsx"
             );
         }
 
@@ -1300,9 +1313,9 @@ namespace EDIS.Areas.BMED.Controllers
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
-            double faildays = 0;
-            double dd = 0;
-           // int cnt = 0;
+            //double faildays = 0;
+            //double dd = 0;
+            // int cnt = 0;
             List<ProperRate> sv = new List<ProperRate>();
             ProperRate pr;
             //依照院區區分設備
@@ -1310,13 +1323,20 @@ namespace EDIS.Areas.BMED.Controllers
             //
             var test = _context.BMEDRepairs
                      .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
-                     .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), 
-                     r => r.DocId, 
+                     .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
+                     r => r.DocId,
                      d => d.DocId,
-                     (r, d) => new { repair = r, d.EndDate })
-                     .ToList();
+                     (r, d) => new { repair = r, d.EndDate });
 
-            
+            var cnt = test
+                .Select(x => new { AssetNo = x.repair.AssetNo,
+                                   AccDpt = x.repair.AccDpt })
+                .ToList()
+                .GroupBy(x => x.AssetNo)
+                .ToDictionary(x => x.Key, x => x.Count());
+
+
+
             var assets = bmedAssets
              .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
              .Where(a => a.DisposeKind == "正常")
@@ -1368,9 +1388,23 @@ namespace EDIS.Areas.BMED.Controllers
                 assets = assets.Where(a => a._assetM.assetD.AssetNo == v.AssetNo);
             }
 
-            var cnt = test
-                .GroupBy(x => x.repair.AssetNo)
-                .ToDictionary(x => x.Key, x => x.Count());
+            //var failday = assets
+            //    .Select(x => new { eday = x._assetM.repairA.Where(r => r.EndDate != null).Select(re => re.EndDate),
+            //                       aday = x._assetM.repairA.Select(re => re.repair.ApplyDate),
+            //                       AssetNo = x._assetM.assetD.AssetNo
+            //                     }
+            //    )
+            //    .ToList();
+
+            var failday = test
+                .Where(t => t.EndDate != null)
+                .Select(x => new {
+                    AssetNo = x.repair.AssetNo,
+                    fday = x.EndDate.Value.Subtract(x.repair.ApplyDate).TotalDays,
+                    })
+                .ToList()
+                .GroupBy(x => x.AssetNo)
+                .ToDictionary(x => x.Key, x => x.Select(f => f.fday).Sum());
 
             foreach (var asset in assets)
             {
@@ -1382,11 +1416,11 @@ namespace EDIS.Areas.BMED.Controllers
                 pr.AccDpt = asset._assetM.assetD.AccDpt;
                 //var dpt = _context.Departments.Find(asset.AccDpt);
                 pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
-                faildays = 0;
-                dd = 0;
+                //faildays = 0;
+                //dd = 0;
                 //cnt = 0;
-                var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
-                var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
+                //var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
+                //var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
                 //_context.BMEDRepairs.Where(r => r.AssetNo == asset._assetM.assetD.AssetNo)
                 //    .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
                 //    .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
@@ -1394,30 +1428,30 @@ namespace EDIS.Areas.BMED.Controllers
                 //    .ToList()
                 //    .ForEach(r =>
                 //    {
-                if (de != null) { 
-                    if (de.Value.CompareTo(v.Edate.Value) > 0)
-                    {
-                        faildays += v.Edate.Value.Subtract(ra).TotalDays;
-                    }
-                    else
-                    {
-                        dd = de.Value.Subtract(ra).TotalDays;
-                        if (dd > 0)
-                        {
-                            if (dd <= 1d)
-                                faildays += 1d;
-                            else
-                                faildays += dd;
-                        }
-                    }
-                    //cnt++;
-                }
+                //if (de != null) { 
+                //    if (de.Value.CompareTo(v.Edate.Value) > 0)
+                //    {
+                //        faildays += v.Edate.Value.Subtract(ra).TotalDays;
+                //    }
+                //    else
+                //    {
+                //        dd = de.Value.Subtract(ra).TotalDays;
+                //        if (dd > 0)
+                //        {
+                //            if (dd <= 1d)
+                //                faildays += 1d;
+                //            else
+                //                faildays += dd;
+                //        }
+                //    }
+                //    //cnt++;
+                //}
                 //    });
 
                 pr.RepairCnts = cnt.ContainsKey(pr.AssetNo) == false ? 0 : cnt[pr.AssetNo];
-                pr.RepairDays = faildays;
+                pr.RepairDays = failday.ContainsKey(pr.AssetNo) == false ? 0 : failday[pr.AssetNo];
                 pr.AssetProperRate = decimal.Round(100m -
-                        Convert.ToDecimal(faildays / days) * 100m, 2);
+                        Convert.ToDecimal(pr.RepairDays / days) * 100m, 2);
                 sv.Add(pr);
             }
 
@@ -1441,9 +1475,10 @@ namespace EDIS.Areas.BMED.Controllers
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
-            double faildays = 0;
-            double dd = 0;
+            //double faildays = 0;
+            //double dd = 0;
             //int cnt = 0;
+            DateTime ago = new DateTime();
             List<ProperRate> sv = new List<ProperRate>();
             ProperRate pr;
             //依照院區區分設備
@@ -1452,10 +1487,20 @@ namespace EDIS.Areas.BMED.Controllers
             var test = _context.BMEDRepairs.Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
                      .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null), r => r.DocId, d => d.DocId,
                      (r, d) => new { repair = r, d.EndDate }).ToList();
+
             var cnt = test
                .GroupBy(x => x.repair.AssetNo)
                .ToDictionary(x => x.Key, x => x.Count());
 
+            var failday = test
+               .Where(t => t.EndDate != null)
+               .Select(x => new {
+                   AssetNo = x.repair.AssetNo,
+                   fday = x.EndDate.Value.Subtract(x.repair.ApplyDate).TotalDays,
+               })
+               .ToList()
+               .GroupBy(x => x.AssetNo)
+               .ToDictionary(x => x.Key, x => x.Select(f => f.fday).Sum());
 
             var assets = bmedAssets
              .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
@@ -1489,39 +1534,21 @@ namespace EDIS.Areas.BMED.Controllers
                 pr.Brand = asset._assetM.assetD.Brand;
                 pr.Type = asset._assetM.assetD.Type;
                 pr.AccDpt = asset._assetM.assetD.AccDpt;
-                //var dpt = _context.Departments.Find(asset.AccDpt);
                 pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
-                faildays = 0;
-                dd = 0;
-                //cnt = 0;
-                var de = asset._assetM.repairA.Select(re => re.EndDate).FirstOrDefault();
-                var ra = asset._assetM.repairA.Select(re => re.repair.ApplyDate).FirstOrDefault();
-                
-                if (de != null)
-                {
-                    if (de.Value.CompareTo(v.Edate.Value) > 0)
-                    {
-                        faildays += v.Edate.Value.Subtract(ra).TotalDays;
-                    }
-                    else
-                    {
-                        dd = de.Value.Subtract(ra).TotalDays;
-                        if (dd > 0)
-                        {
-                            if (dd <= 1d)
-                                faildays += 1d;
-                            else
-                                faildays += dd;
-                        }
-                    }
-                   // cnt++;
-                }
-                //    });
-
                 pr.RepairCnts = cnt.ContainsKey(pr.AssetNo) == false ? 0 :cnt[pr.AssetNo];
-                pr.RepairDays = faildays;
+                pr.RepairDays = failday.ContainsKey(pr.AssetNo) == false ? 0 : failday[pr.AssetNo];
                 pr.AssetProperRate = decimal.Round(100m -
-                        Convert.ToDecimal(faildays / days) * 100m, 2);
+                        Convert.ToDecimal(pr.RepairDays / days) * 100m, 2);
+                pr.DisposeKind = asset._assetM.assetD.DisposeKind;
+                //if (!String.IsNullOrEmpty(asset._assetM.assetD.AccDate.))
+                //{
+
+                //}
+                //ago = 
+                if (!string.IsNullOrEmpty(asset._assetM.assetD.AccDate.ToString()))
+                    pr.AircraftY = (DateTime.Now.Year - asset._assetM.assetD.AccDate.Value.Year).ToString();
+                else
+                    pr.AircraftY = "";
                 sv.Add(pr);
             }
             return sv;
@@ -1587,7 +1614,7 @@ namespace EDIS.Areas.BMED.Controllers
             return File(
                 fileContents: fileContents,
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: "AssetKeepList.xlsx"
+                fileDownloadName: "AssetKeepList.pdf"
             );
         }
         public List<AssetKeepListVModel> AssetKeepList(ReportQryVModel v)

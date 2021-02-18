@@ -786,8 +786,10 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("類別");
             dt.Columns.Add("財產編號");
             dt.Columns.Add("設備名稱");
-            dt.Columns.Add("成本中心");
-            dt.Columns.Add("保管部門");
+            dt.Columns.Add("成本中心代碼");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("保管部門代碼");
+            dt.Columns.Add("保管部門名稱");
             dt.Columns.Add("保管人員");
             dt.Columns.Add("工程師名稱");
             dt.Columns.Add("廠牌");
@@ -842,28 +844,26 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[0] = m.asset.AssetClass;
                 dw[1] = m.asset.AssetNo;
                 dw[2] = m.asset.Cname;
-                dw[3] = m.asset.AccDptName;
-                dw[4] = m.asset.DelivDptName;
-                dw[5] = m.asset.DelivEmp;
-                dw[6] = m.user.FullName;
-                dw[7] = m.asset.Brand;
-                dw[8] = m.asset.Standard;
-                dw[9] = m.asset.Type;
-                dw[10] = m.vendor == null ? "" : m.vendor.VendorName;
-                dw[11] = m.vendor == null ? "" : m.vendor.UniteNo;
-                dw[12] = m.asset.MakeNo;
-                dw[13] = m.asset.DisposeKind;
-                dw[14] = m.asset.Cost;
-                dw[15] = m.assetkeep == null ? null : m.assetkeep.Cycle;
-                dw[16] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
-                dw[17] = m.assetkeep == null ? "" : 
-                         m.assetkeep.InOut == "0" ? "自行" :
-                         m.assetkeep.InOut == "1" ? "委外" :
-                         m.assetkeep.InOut == "2" ? "租賃" :
-                         m.assetkeep.InOut == "3" ? "保固" : "";
-                dw[18] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
-                dw[19] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
-                dw[20] = m.asset.Location;
+                dw[3] = m.asset.AccDpt;
+                dw[4] = m.asset.AccDptName;
+                dw[5] = m.asset.DelivDpt;
+                dw[6] = m.asset.DelivDptName;
+                dw[7] = m.asset.DelivEmp;
+                dw[8] = m.user.FullName;
+                dw[9] = m.asset.Brand;
+                dw[10] = m.asset.Standard;
+                dw[11] = m.asset.Type;
+                dw[12] = m.vendor == null ? "" : m.vendor.VendorName;
+                dw[13] = m.vendor == null ? "" : m.vendor.UniteNo;
+                dw[14] = m.asset.MakeNo;
+                dw[15] = m.asset.DisposeKind;
+                dw[16] = m.asset.Cost;
+                dw[17] = m.assetkeep == null ? null : m.assetkeep.Cycle;
+                dw[18] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
+                dw[19] = m.assetkeep == null ? "" :  m.assetkeep.InOut;
+                dw[20] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
+                dw[21] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
+                dw[22] = m.asset.Location;
                 dt.Rows.Add(dw);
             });
             //

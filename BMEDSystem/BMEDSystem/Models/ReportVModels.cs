@@ -142,6 +142,10 @@ namespace EDIS.Models
         public int RepairCnts { get; set; }
         [Display(Name = "妥善率")]
         public decimal AssetProperRate { get; set; }
+        [Display(Name = "處分性質")]
+        public string DisposeKind { get; set; }
+        [Display(Name = "機齡")]
+        public string AircraftY { get; set; }
     }
     //
     public class UserAsset
