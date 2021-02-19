@@ -1622,7 +1622,7 @@ namespace EDIS.Areas.BMED.Controllers
             return File(
                 fileContents: fileContents,
                 contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                fileDownloadName: "AssetKeepList.pdf"
+                fileDownloadName: "AssetKeepList.xlsx"
             );
         }
         public List<AssetKeepListVModel> AssetKeepList(ReportQryVModel v)

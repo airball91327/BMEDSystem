@@ -14,8 +14,9 @@
     <p>
         <a asp-action="Create" class="btn btn-primary">新增</a>
     </p>
-    <input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
-           onclick="javascript:exportExcel('tbToExcel')" />
+    <p>
+        <a class="btn btn-default" href="@Url.Action("ExcelIndex")">匯出Excel</a>
+    </p>
 </div>
 
 <table class="table" id="tbToExcel">

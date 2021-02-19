@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using EDIS.Models;
 using EDIS.Models.Identity;
 using Microsoft.AspNetCore.Authorization;
+using EDIS.Repositories;
+using System.Data;
+using OfficeOpenXml;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -17,20 +20,32 @@ namespace EDIS.Areas.BMED.Controllers
     {
         private readonly ApplicationDbContext _context;
         private readonly CustomRoleManager roleManager;
+        private readonly IRepository<AppUserModel, int> _userRepo;
+
 
         public EngsInDptsController(ApplicationDbContext context,
-                                    CustomRoleManager customRoleManager)
+                                    CustomRoleManager customRoleManager,
+                                     IRepository<AppUserModel, int> userRepo
+                                   )
         {
             _context = context;
             roleManager = customRoleManager;
+            _userRepo = userRepo;
         }
 
         // GET: BMED/EngsInDpts
         public async Task<IActionResult> Index()
         {
             List<EngsInDptsViewModel> vmodel = new List<EngsInDptsViewModel>();
-           _context.EngsInDpts.Include(e => e.AppUsers)
-                                .Join(_context.Departments, e => e.AccDptId, d => d.DptId,
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+
+            var dpt = GetDepartmentsByLoc(urLocation);
+
+            _context.EngsInDpts.Include(e => e.AppUsers)
+                                .Join(dpt, e => e.AccDptId, d => d.DptId,
                                 (e, d) => new 
                                 { 
                                     engsInDpts = e,
@@ -48,6 +63,82 @@ namespace EDIS.Areas.BMED.Controllers
                                     AppUsers = e.engsInDpts.AppUsers
                                 }));
             return View(vmodel);
+        }
+
+        public List<EngsInDptsViewModel> IndexValue()
+        {
+            List<EngsInDptsViewModel> vmodel = new List<EngsInDptsViewModel>();
+            /* Get login user. */
+            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+            /* Get login user's location. */
+            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+
+            var dpt = GetDepartmentsByLoc(urLocation);
+
+            _context.EngsInDpts.Include(e => e.AppUsers)
+                                .Join(dpt, e => e.AccDptId, d => d.DptId,
+                                (e, d) => new
+                                {
+                                    engsInDpts = e,
+                                    department = d
+                                }).ToList()
+                                .ForEach(e => vmodel.Add(new EngsInDptsViewModel()
+                                {
+                                    DptName = e.department.Name_C,
+                                    DptId = e.department.DptId,
+                                    EngId = e.engsInDpts.EngId,
+                                    EngName = e.engsInDpts.AppUsers.FullName,
+                                    EngUserName = e.engsInDpts.UserName,
+                                    RtpName = e.engsInDpts.Rtp == null ? "" : _context.AppUsers.Find(e.engsInDpts.Rtp).FullName,
+                                    Rtt = e.engsInDpts.Rtt,
+                                    AppUsers = e.engsInDpts.AppUsers
+                                }));
+            return vmodel;
+        }
+
+        public IActionResult ExcelIndex()
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("部門代號");
+            dt.Columns.Add("部門名稱");
+            dt.Columns.Add("負責工程師");
+            dt.Columns.Add("工程師代號");
+            dt.Columns.Add("異動人員");
+            dt.Columns.Add("異動時間");
+            
+
+            List<EngsInDptsViewModel>  mv = IndexValue();
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.DptId;
+                dw[1] = m.DptName;
+                dw[2] = m.EngName;
+                dw[3] = m.EngUserName;
+                dw[4] = m.RtpName;
+                dw[5] = m.Rtt;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("部門對應工程師");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "Excel.xlsx"
+            );
         }
 
         // GET: BMED/EngsInDpts/Details/5
@@ -323,6 +414,25 @@ namespace EDIS.Areas.BMED.Controllers
             _context.EngsInDpts.Remove(engsInDptsModel);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+        }
+
+        /// <summary>
+        /// Get Departments by location.
+        /// </summary>
+        /// <param name="location"></param>
+        /// <returns></returns>
+        public List<DepartmentModel> GetDepartmentsByLoc(string location)
+        {
+            List<DepartmentModel> departments = null;
+            if (location == "總院")
+            {
+                departments = _context.Departments.Where(d => d.Loc == "C" || d.Loc == "P" || d.Loc == "K").ToList();
+            }
+            else
+            {
+                departments = _context.Departments.Where(d => d.Loc == location).ToList();
+            }
+            return departments;
         }
 
         private bool EngsInDptsModelExists(string id)
