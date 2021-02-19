@@ -58,6 +58,8 @@ namespace EDIS.Models
         [Required(ErrorMessage = "必填寫項目")]
         [Display(Name = "處分性質")]
         public string DisposeKind { get; set; }
+        [Display(Name = "處分性質名稱")]
+        public string DisposeKindC { get; set; }
         [Required(ErrorMessage = "必填寫項目")]
         [Display(Name = "保管部門")]
         public string DelivDpt { get; set; }

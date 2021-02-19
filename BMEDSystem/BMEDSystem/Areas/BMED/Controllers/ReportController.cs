@@ -1324,9 +1324,10 @@ namespace EDIS.Areas.BMED.Controllers
             var test = _context.BMEDRepairs
                      .Where(r => r.ApplyDate >= v.Sdate && r.ApplyDate <= v.Edate)
                      .Join(_context.BMEDRepairDtls.Where(d => d.EndDate != null),
-                     r => r.DocId,
-                     d => d.DocId,
-                     (r, d) => new { repair = r, d.EndDate });
+                             r => r.DocId,
+                             d => d.DocId,
+                             (r, d) => new { repair = r, d.EndDate }
+                          );
 
             var cnt = test
                 .Select(x => new { AssetNo = x.repair.AssetNo,
@@ -1340,12 +1341,19 @@ namespace EDIS.Areas.BMED.Controllers
             var assets = bmedAssets
              .Where(r => r.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
              .Where(a => a.DisposeKind == "正常")
-             .GroupJoin(test, d => d.AssetNo, b => b.repair.AssetNo,
-             (assetD, repairA) => new { assetD = assetD, repairA = repairA })
-             .GroupJoin(_context.Departments, d => d.assetD.AccDpt, b => b.DptId,
-             (assetM, depart) => new { assetM = assetM, depart = depart })
-             .SelectMany(x => x.depart.DefaultIfEmpty(), (o, g) =>
-                      new { _assetM = o.assetM, _depart = g });
+             .GroupJoin( test, 
+                         d => d.AssetNo,
+                         b => b.repair.AssetNo,
+                         (assetD, repairA) => new { assetD = assetD, repairA = repairA }
+                         )
+             .GroupJoin(_context.Departments, 
+                         d => d.assetD.AccDpt, 
+                         b => b.DptId,
+                         (assetM, depart) => new { assetM = assetM, depart = depart }
+                         )
+             .SelectMany(x => x.depart.DefaultIfEmpty(), 
+                              (o, g) => new { assetM = o.assetM.assetD ,depart = g})
+             .ToList();
 
            
 
@@ -1381,11 +1389,11 @@ namespace EDIS.Areas.BMED.Controllers
             //
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                assets = assets.Where(a => a._assetM.assetD.AccDpt == v.AccDpt);
+                assets = assets.Where(a => a.assetM.AccDpt == v.AccDpt).ToList();
             }
             if (!string.IsNullOrEmpty(v.AssetNo))
             {
-                assets = assets.Where(a => a._assetM.assetD.AssetNo == v.AssetNo);
+                assets = assets.Where(a => a.assetM.AssetNo == v.AssetNo).ToList();
             }
 
             //var failday = assets
@@ -1409,13 +1417,13 @@ namespace EDIS.Areas.BMED.Controllers
             foreach (var asset in assets)
             {
                 pr = new ProperRate();
-                pr.AssetNo = asset._assetM.assetD.AssetNo;
-                pr.AssetName = asset._assetM.assetD.Cname;
-                pr.Brand = asset._assetM.assetD.Brand;
-                pr.Type = asset._assetM.assetD.Type;
-                pr.AccDpt = asset._assetM.assetD.AccDpt;
+                pr.AssetNo = asset.assetM.AssetNo;
+                pr.AssetName = asset.assetM.Cname;
+                pr.Brand = asset.assetM.Brand;
+                pr.Type = asset.assetM.Type;
+                pr.AccDpt = asset.assetM.AccDpt;
                 //var dpt = _context.Departments.Find(asset.AccDpt);
-                pr.AccDptNam = asset._depart == null ? "" : asset._depart.Name_C;
+                pr.AccDptNam = asset.depart == null ? "" : asset.depart.Name_C;
                 //faildays = 0;
                 //dd = 0;
                 //cnt = 0;
@@ -1539,7 +1547,7 @@ namespace EDIS.Areas.BMED.Controllers
                 pr.RepairDays = failday.ContainsKey(pr.AssetNo) == false ? 0 : failday[pr.AssetNo];
                 pr.AssetProperRate = decimal.Round(100m -
                         Convert.ToDecimal(pr.RepairDays / days) * 100m, 2);
-                pr.DisposeKind = asset._assetM.assetD.DisposeKind;
+                pr.DisposeKind = asset._assetM.assetD.DisposeKindC;
                 //if (!String.IsNullOrEmpty(asset._assetM.assetD.AccDate.))
                 //{
 
