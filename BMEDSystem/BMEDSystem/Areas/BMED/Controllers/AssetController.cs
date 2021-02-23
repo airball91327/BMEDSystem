@@ -860,7 +860,7 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[16] = m.asset.Cost;
                 dw[17] = m.assetkeep == null ? null : m.assetkeep.Cycle;
                 dw[18] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
-                dw[19] = m.assetkeep == null ? "" :  m.assetkeep.InOut;
+                dw[19] = m.assetkeep == null ? "" : m.assetkeep.InOut;
                 dw[20] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
                 dw[21] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
                 dw[22] = m.asset.Location;
