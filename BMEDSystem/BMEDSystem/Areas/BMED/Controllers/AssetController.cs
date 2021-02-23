@@ -808,34 +808,41 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("院區");
 
             List<AssetModel> mv = QryAsset(v);
+
             mv.Join(_context.AppUsers, a => a.AssetEngId, u => u.Id,
                 (a, u) => new {
                     asset = a,
                     user = u
                 })
-                .GroupJoin(_context.BMEDAssetKeeps, a => a.asset.AssetNo, k => k.AssetNo,
-                (a, k) => new {
-                    asset = a.asset,
-                    user = a.user,
-                    assetkeep = k
-                }).SelectMany(a => a.assetkeep.DefaultIfEmpty(),
-                (a, s) => new {
-                    asset = a.asset,
-                    user = a.user,
-                    assetkeep = s
+                .GroupJoin(_context.BMEDAssetKeeps, 
+                            a => a.asset.AssetNo, 
+                            k => k.AssetNo,
+                            (a, k) => new {
+                                asset = a.asset,
+                                user = a.user,
+                                assetkeep = k
                 })
-                .GroupJoin(_context.BMEDVendors, a => a.asset.VendorId, vd => vd.VendorId,
-                (a, vd) => new {
-                    asset = a.asset,
-                    user = a.user,
-                    assetkeep = a.assetkeep,
-                    vendor = vd
-                }).SelectMany(a => a.vendor.DefaultIfEmpty(),
-                (a, s) => new {
-                    asset = a.asset,
-                    user = a.user,
-                    assetkeep = a.assetkeep,
-                    vendor = s
+                .SelectMany(a => a.assetkeep.DefaultIfEmpty(),
+                            (a, s) => new {
+                                asset = a.asset,
+                                user = a.user,
+                                assetkeep = s
+                })
+                .GroupJoin(_context.BMEDVendors, 
+                            a => a.asset.VendorId,
+                            vd => vd.VendorId,
+                            (a, vd) => new {
+                                asset = a.asset,
+                                user = a.user,
+                                assetkeep = a.assetkeep,
+                                vendor = vd
+                })
+                .SelectMany(a => a.vendor.DefaultIfEmpty(),
+                            (a, s) => new {
+                                asset = a.asset,
+                                user = a.user,
+                                assetkeep = a.assetkeep,
+                                vendor = s
                 })
                 .ToList()
             .ForEach(m =>
