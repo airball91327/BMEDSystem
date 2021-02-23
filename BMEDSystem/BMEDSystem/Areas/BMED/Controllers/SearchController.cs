@@ -1275,8 +1275,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 var resultDocIds = _context.BMEDKeepCosts.Include(kc => kc.TicketDtl)
                                                          .Where(kc => kc.VendorName.Contains(qtyVendor))
-                                                         .Select(kc => kc.DocId)
-                                                         .Distinct()
+                                                         .Select(kc => kc.DocId).Distinct()
                                                          .ToList();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
