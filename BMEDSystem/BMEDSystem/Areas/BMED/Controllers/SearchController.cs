@@ -17,6 +17,7 @@ using System.Text;
 using X.PagedList;
 using System.Data;
 using OfficeOpenXml;
+using EDIS.Fliters;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -1171,8 +1172,10 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         // POST: BMED/Search/GetKeepQryList
         [HttpPost]
+        //[MyErrorHandlerFilter]
         public IActionResult GetKeepQryList(QryKeepListData qdata, int page = 1)
         {
+            TempData["qry"] = JsonConvert.SerializeObject(qdata);
             string docid = qdata.BMEDKqtyDOCID;
             string ano = qdata.BMEDKqtyASSETNO;
             string acc = qdata.BMEDKqtyACCDPT;
@@ -1190,7 +1193,6 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
             string qtyInOut = qdata.BMEDKInOut;
-            TempData["qry"] = qdata;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -1434,9 +1436,13 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
+
             //
-            if (kv.ToPagedList(page, pageSize).Count <= 0)
-                return PartialView("KeepQryList", kv.ToPagedList(1, pageSize));
+            var pageCount = kv.ToPagedList(page, pageSize).PageCount;
+            pageCount = pageCount == 0 ? 1 : pageCount; // If no page.
+
+            if (kv.ToPagedList(page, pageSize).Count <= 0)//If the page has no items.
+                return PartialView("KeepQryList", kv.ToPagedList(pageCount, pageSize));
             return PartialView("KeepQryList", kv.ToPagedList(page, pageSize));
             //return View("KeepQryList", kv);
         }
@@ -1958,6 +1964,8 @@ namespace EDIS.Areas.BMED.Controllers
             //
             return dv;
         }
+
+        
 
     }
 }

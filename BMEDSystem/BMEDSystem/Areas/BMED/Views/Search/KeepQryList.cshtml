@@ -5,20 +5,23 @@
 @using System.Security.Claims
 @using Microsoft.AspNetCore.Identity
 @using EDIS.Models.Identity
-
+@using Newtonsoft.Json
 @inject CustomUserManager UserManager
+
 @{
     Layout = null;
+    var qry = JsonConvert.DeserializeObject<QryRepListData>(TempData["qry"].ToString());
+
 }
 
 @if (Model.Count() <= 0)
 {
     <p class="text-danger">無任何資料!</p>
-
 }
+
 else
 {
-    <a class="btn btn-default mb-3" href="@Url.Action("QryKeepListExcel", TempData["qry"])">匯出Excel</a>
+    <a class="btn btn-default mb-3" href="@Url.Action("QryKeepListExcel", qry)">匯出Excel</a>
     <table class="table" style="width: 100%">
         <tr>
             <th></th>
@@ -142,16 +145,14 @@ else
         }
 
     </table>
+
+
+    <div>
+        @Html.PagedListPager(Model,
+        page => Url.Action("GetKeepQryList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+    </div>
 }
-
-<div>
-    @Html.PagedListPager(Model,
-    page => Url.Action("GetKeepQryList", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
-</div>
-
 <script>
-
-
     $('#recovery').click(function (e) {
         if (confirm("確定流程恢復嗎?")) {
             return true;
@@ -169,8 +170,5 @@ else
         var page = strArray2[strArray2.length - 1];
         fetchPage(page);
     }
-    var RecoveryFailed = function (data) {
-        alert(data.responseText);
-        $.Toast.hideToast();
-    };
+
 </script>
