@@ -43,14 +43,14 @@ namespace EDIS.Components.BMEDRepair
             //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
             var departments = _context.Departments.ToList();
             List<SelectListItem> listItem = new List<SelectListItem>();
-            foreach (var item in departments)
-            {
-                listItem.Add(new SelectListItem
-                {
-                    Text = item.Name_C + "(" + item.DptId + ")",    //show DptName(DptId)
-                    Value = item.DptId
-                });
-            }
+            //foreach (var item in departments)
+            //{
+            //    listItem.Add(new SelectListItem
+            //    {
+            //        Text = item.Name_C + "(" + item.DptId + ")",    //show DptName(DptId)
+            //        Value = item.DptId
+            //    });
+            //}
             ViewData["BMEDAccDpt"] = new SelectList(listItem, "Value", "Text");
             ViewData["BMEDApplyDpt"] = new SelectList(listItem, "Value", "Text");
 
@@ -83,18 +83,18 @@ namespace EDIS.Components.BMEDRepair
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
             List<SelectListItem> listItem5 = new List<SelectListItem>();
-            foreach (string l in engs)
-            {
-                var u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
-                if (u != null)
-                {
-                    listItem5.Add(new SelectListItem
-                    {
-                        Text = u.FullName + "(" + u.UserName + ")",
-                        Value = u.Id.ToString()
-                    });
-                }
-            }
+            //foreach (string l in engs)
+            //{
+            //    var u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+            //    if (u != null)
+            //    {
+            //        listItem5.Add(new SelectListItem
+            //        {
+            //            Text = u.FullName + "(" + u.UserName + ")",
+            //            Value = u.Id.ToString()
+            //        });
+            //    }
+            //}
             ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
             /* 擷取該使用者單位底下所有人員 */
             var dptUsers = _context.AppUsers

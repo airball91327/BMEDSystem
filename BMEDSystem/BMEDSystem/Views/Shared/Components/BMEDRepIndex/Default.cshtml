@@ -9,6 +9,7 @@
 }
 <link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
 <script src="~/js/bootstrap-combobox.js"></script>
+<script src="~/js/FindInkey.js" asp-append-version="true"></script>
 
 <style>
     /* Style the scale of radio. */
@@ -30,6 +31,43 @@
 <script type="text/javascript">
     $(document).ready(function () {
         $('.BMEDcombobox').combobox();
+        @*$('#ACCDPT').autocomplete({
+                minLength: 1,
+                source: function (request, response) {
+                    $.ajax({
+                        url: '@Url.Action("SearchAccountContact","FindInKey")', //
+                        type: "Get",
+                        dataType: "json",
+                        data: {
+                            key: request.term    //Name欄位輸入的資訊傳給後端
+                        },
+                        //成功取得資料後用Map來整理回傳的資料
+                        success: function (data) {
+                            response($.map(data, function (item) {
+                                console.log(item); //練習時印出來方便觀看資料的長相
+                                return {
+                                    // label和value是基本參數
+                                    label: item.text,  //列表所顯示的文字
+                                    value: item.value, 	//列表選項的值
+                                };
+                            }));
+                        }
+                    });
+                },
+    	        //focus參數事件介紹 : 在下拉選單匹配時如果滑鼠有焦點到會觸發事件
+    	        //下方是指當使用者只是焦點到某個選項就將名子帶#name輸入框中
+                focus: function (event, ui) {
+                    $(this).val(ui.item.label);
+                    return false;
+                },
+    	        //select參數事件介紹 : 使用者選擇下拉式某項目後觸發事件
+    	        //當使用者選擇某項目後自動將所有的值帶進輸入框中
+                select: function (event, ui) {
+                    $(this).val(ui.item.label);
+                    return false;
+                }
+        });*@
+
         $("#BMEDrepSearchForm").submit();
         /* Only first visit the page, will submit the form. */
         var count = 0;
@@ -164,6 +202,7 @@
     };
 </script>
 
+
 <form asp-controller="Repair" asp-action="Index" asp-area="BMED" data-ajax="true"
       data-ajax-update="#BMEDpnlREPLIST" data-ajax-method="POST" id="BMEDrepSearchForm"
       data-ajax-begin="$.Toast.showToast({
@@ -172,7 +211,7 @@
       'duration':0
       })"
       data-ajax-complete="$.Toast.hideToast()"
-      data-ajax-failure="onFailed">
+      data-ajax-failure="onFailed" class="overfind">
 
     <h4>查詢條件 - 個人案件</h4>
 
@@ -189,9 +228,17 @@
                 </div>
                 <div class="form-group">
                     <label for="BMEDqtyACCDPT" class="control-title">成本中心</label>
-                    <select asp-for="BMEDqtyACCDPT" asp-items="@ViewData["BMEDAccDpt"] as SelectList" class="form-control BMEDcombobox">
-                        <option value="">請選擇</option>
+                    @*<select asp-for="BMEDqtyACCDPT" asp-items="@ViewData["BMEDAccDpt"] as SelectList" class="form-control BMEDcombobox">
+                            <option value="">請選擇</option>
+                        </select>*@
+                    @*<input asp-for="BMEDqtyACCDPT" id="ACCDPT" class="form-control"  type="text">*@
+
+                    <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" />
+                    <button type="button" class="btn btn-default" id="AssetQryBtn">查詢</button>
+                    <select asp-for="BMEDqtyACCDPT" asp-items="@ViewData["DefaultAssets"] as SelectList"  class="form-control" id="AssetNo">
+                        <option disabled selected>請選擇</option>
                     </select>
+                    <span style="color:red" id="AssetNoErrorMsg"></span>
                 </div>
             </div>
         </div>
@@ -207,9 +254,15 @@
                 </div>
                 <div class="form-group">
                     <label for="BMEDqtyDPTID" class="control-title">申請部門</label>
-                    <select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList" class="form-control BMEDcombobox">
+                    @*<select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList" class="form-control BMEDcombobox">
                         <option value="">請選擇</option>
+                    </select>*@
+                    <input type="text" placeholder="輸入部門代號查詢" class="form-control" id="ApplyDptQry" />
+                    <button type="button" class="btn btn-default" id="ApplyDptQryBtn">查詢</button>
+                    <select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList"  class="form-control" id="ApplyDpt">
+                        <option disabled selected>請選擇</option>
                     </select>
+                    <span style="color:red" id="ApplyDptErrorMsg"></span>
                 </div>
             </div>
         </div>
@@ -227,9 +280,15 @@
                 </select>
                 <div class="form-group">
                     <label for="BMEDqtyEngCode" class="control-title">負責工程師</label>
-                    <select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList" class="form-control BMEDcombobox">
+                    @*<select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList" class="form-control BMEDcombobox">
                         <option value="">請選擇</option>
+                    </select>*@
+                    <input type="text" placeholder="輸入工程師代號查詢" class="form-control" id="EngCodeQry" />
+                    <button type="button" class="btn btn-default" id="EngCodeQryBtn">查詢</button>
+                    <select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList"  class="form-control" id="EngCode">
+                        <option disabled selected>請選擇</option>
                     </select>
+                    <span style="color:red" id="EngCodeErrorMsg"></span>
                 </div>
             </div>
         </div>
@@ -245,14 +304,20 @@
                 </div>
                 <div class="form-group">
                     <label for="BMEDqtyClsUser" class="control-title">目前關卡人員</label>
-                    <select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList" class="form-control BMEDcombobox">
+                    @*<select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList" class="form-control BMEDcombobox">
                         <option value="">請選擇</option>
+                    </select>*@
+                    <input type="text" placeholder="輸入員工代號查詢" class="form-control" id="ClsUserDptQry" />
+                    <button type="button" class="btn btn-default" id="ClsUserQryBtn">查詢</button>
+                    <select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList"  class="form-control" id="ClsUsers">
+                        <option disabled selected>請選擇</option>
                     </select>
+                    <span style="color:red" id="ClsUserNoErrorMsg"></span>
                 </div>
             </div>
         </div>
         @if (user.DptId == "8420" || user.DptId == "7084" ||
-            UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
+           UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
         {
             <div class="row">
                 <div class=form-inline>
@@ -297,29 +362,29 @@
 
 
 @*@if (UserManager.IsInRole(User, "MedAssetMgr"))
-{
-    <hr />
-    <h4>未分派案件</h4>
-    <br />
-    <div id="unsignListDiv">
-        @await Component.InvokeAsync("BMEDRepResign", new { role = "MedAssetMgr" })
-    </div>
-}
-else if (UserManager.IsInRole(User, "MedBranchMgr"))
-{
-    <hr />
-    <h4>未分派案件</h4>
-    <br />
-    <div id="unsignListDiv">
-        @await Component.InvokeAsync("BMEDRepResign", new { role = "MedBranchMgr" })
-    </div>
-}
-else if (UserManager.IsInRole(User, "Admin"))
-{
-    <hr />
-    <h4>未分派案件</h4>
-    <br />
-    <div id="unsignListDiv">
-        @await Component.InvokeAsync("BMEDRepResign", new { role = "Admin" })
-    </div>
-}*@
+    {
+        <hr />
+        <h4>未分派案件</h4>
+        <br />
+        <div id="unsignListDiv">
+            @await Component.InvokeAsync("BMEDRepResign", new { role = "MedAssetMgr" })
+        </div>
+    }
+    else if (UserManager.IsInRole(User, "MedBranchMgr"))
+    {
+        <hr />
+        <h4>未分派案件</h4>
+        <br />
+        <div id="unsignListDiv">
+            @await Component.InvokeAsync("BMEDRepResign", new { role = "MedBranchMgr" })
+        </div>
+    }
+    else if (UserManager.IsInRole(User, "Admin"))
+    {
+        <hr />
+        <h4>未分派案件</h4>
+        <br />
+        <div id="unsignListDiv">
+            @await Component.InvokeAsync("BMEDRepResign", new { role = "Admin" })
+        </div>
+    }*@

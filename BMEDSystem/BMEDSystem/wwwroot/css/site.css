@@ -100,3 +100,8 @@ textarea {
 }
 
 
+.overfind {
+    overflow: scroll;
+    overflow-y: hidden;
+}
+

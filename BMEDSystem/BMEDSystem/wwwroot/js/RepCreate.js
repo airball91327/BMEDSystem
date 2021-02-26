@@ -296,6 +296,7 @@ $(function () {
             }
         });
     });
+    
     $('#modalFILES').on('hidden.bs.modal', function () {
         var docid = $("#DocId").val();
         $.ajax({
