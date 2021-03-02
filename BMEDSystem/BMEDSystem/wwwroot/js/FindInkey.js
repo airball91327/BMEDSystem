@@ -2,8 +2,10 @@
     $("#AssetQryBtn").click(function () {
         //Build the new URL
         var queryStr = $("#AssetAccDptQry").val();
+        //var ul = '../ FindInKey / QueryAssets';
+        var ul = $(this).data('request-url');
         $.ajax({
-            url: '../FindInKey/QueryAssets',
+            url: ul,
             type: "GET",
             data: { key: queryStr },
             success: function (data) {
@@ -29,8 +31,9 @@
     $("#ApplyDptQryBtn").click(function () {
         //Build the new URL
         var queryStr = $("#ApplyDptQry").val();
+        var ul = $(this).data('request-url');
         $.ajax({
-            url: '../FindInKey/QueryAssets',
+            url: ul,
             type: "GET",
             data: { key: queryStr },
             success: function (data) {
@@ -56,8 +59,9 @@
     $("#EngCodeQryBtn").click(function () {
         //Build the new URL
         var queryStr = $("#EngCodeQry").val();
+        var ul = $(this).data('request-url');
         $.ajax({
-            url: '../FindInKey/QueryEngCode',
+            url: ul,
             type: "GET",
             data: { key: queryStr },
             success: function (data) {
@@ -83,8 +87,9 @@
     $("#ClsUserQryBtn").click(function () {
         //Build the new URL
         var queryStr = $("#ClsUserDptQry").val();
+        var ul = $(this).data('request-url');
         $.ajax({
-            url: '../FindInKey/QueryClsUser',
+            url: ul,
             type: "GET",
             data: { key: queryStr },
             success: function (data) {
