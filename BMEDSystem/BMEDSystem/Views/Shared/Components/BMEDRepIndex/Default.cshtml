@@ -7,6 +7,7 @@
 @{
     var user = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
 }
+
 <link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
 <script src="~/js/bootstrap-combobox.js"></script>
 <script src="~/js/FindInkey.js" asp-append-version="true"></script>
@@ -26,17 +27,31 @@
         -webkit-transform: scale(2); /* Safari and Chrome */
         -o-transform: scale(2); /* Opera */
     }
+    .ui-autocomplete {
+        margin: 0;
+        padding: 0;
+        list-style-type: none;
+        border: solid 1px #ccc;
+        background-color: #fff;
+        width: auto;
+        overflow:scroll;
+        overflow-x:hidden;
+        height:100px;
+    }
+    
+
+    
 </style>
 
 <script type="text/javascript">
     $(document).ready(function () {
-        $('.BMEDcombobox').combobox();
-        @*$('#ACCDPT').autocomplete({
+        //$('.BMEDcombobox').combobox();
+        @*$('#BMEDqtyDateType').autocomplete({
                 minLength: 1,
                 source: function (request, response) {
                     $.ajax({
-                        url: '@Url.Action("SearchAccountContact","FindInKey")', //
-                        type: "Get",
+                        url: '@Url.Action("QueryAssets","FindInKey")', 
+                        type: "POST",
                         dataType: "json",
                         data: {
                             key: request.term    //Name欄位輸入的資訊傳給後端
@@ -44,7 +59,7 @@
                         //成功取得資料後用Map來整理回傳的資料
                         success: function (data) {
                             response($.map(data, function (item) {
-                                console.log(item); //練習時印出來方便觀看資料的長相
+                                console.log(item); //印出來方便觀看資料的長相
                                 return {
                                     // label和value是基本參數
                                     label: item.text,  //列表所顯示的文字
@@ -55,7 +70,7 @@
                     });
                 },
     	        //focus參數事件介紹 : 在下拉選單匹配時如果滑鼠有焦點到會觸發事件
-    	        //下方是指當使用者只是焦點到某個選項就將名子帶#name輸入框中
+    	        //下方是指當使用者只是焦點到某個選項就將名子帶輸入框中
                 focus: function (event, ui) {
                     $(this).val(ui.item.label);
                     return false;
@@ -63,9 +78,10 @@
     	        //select參數事件介紹 : 使用者選擇下拉式某項目後觸發事件
     	        //當使用者選擇某項目後自動將所有的值帶進輸入框中
                 select: function (event, ui) {
-                    $(this).val(ui.item.label);
+                    $(this).val(ui.item.val);
                     return false;
-                }
+                },
+                delay: 1000
         });*@
 
         $("#BMEDrepSearchForm").submit();
@@ -258,6 +274,7 @@
                         <option value="">請選擇</option>
                     </select>*@
                     <input type="text" placeholder="輸入部門代號查詢" class="form-control" id="ApplyDptQry" />
+                    @*@Html.TextBoxFor(model => model.BMEDqtyDateType,htmlAttributes: new { @class="form-control",@placeholder="輸入部門代號查詢"})*@
                     <button type="button"  class="btn btn-default" id="ApplyDptQryBtn" data-request-url="@Url.Action("QueryAssets", "FindInKey")">查詢</button>
                     <select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList"  class="form-control" id="ApplyDpt">
                         <option disabled selected>請選擇</option>

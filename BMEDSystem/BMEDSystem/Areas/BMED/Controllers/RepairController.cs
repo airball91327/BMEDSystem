@@ -1151,20 +1151,45 @@ namespace EDIS.Areas.BMED.Controllers
                                        urs => urs.UserName,
                                        (a, urs) => urs
                                      )
-                                .Join(_context.Departments,
+                                .Join(_context.Departments.Where(d => d.Loc == dpt),
                                         a => a.DptId,
                                         d => d.DptId,
                                         (a, d) => new { Id = a.Id,
                                                         FullName = a.FullName, 
                                                         UserName = a.UserName, 
                                                         del = d.Loc }
+                                     ).OrderBy(x => x.UserName);
+                var UserListOther = s.Join(_context.AppUsers,
+                                       a => a,
+                                       urs => urs.UserName,
+                                       (a, urs) => urs
                                      )
-                                .ToList();
+                                .Join(_context.Departments.Where(d => d.Loc != dpt),
+                                        a => a.DptId,
+                                        d => d.DptId,
+                                        (a, d) => new {
+                                            Id = a.Id,
+                                            FullName = a.FullName,
+                                            UserName = a.UserName,
+                                            del = d.Loc
+                                        }
+                                     ).OrderBy(x => x.del);
 
                 //預設用登入者的院區，排最前面
-                UserList.Sort((emp1, emp2) => emp1.del == dpt ? 0 : emp1.del.CompareTo(emp2.del));
+                //UserList.Sort((emp1, emp2) => emp1.del == dpt ? -1 : 1);
 
                 foreach (var l in UserList)
+                {
+                    if (l.UserName != null)
+                    {
+                        li = new SelectListItem();
+                        li.Text = l.FullName + "(" + l.UserName + ")";
+                        li.Value = l.Id.ToString();
+                        list.Add(li);
+                    }
+                }
+
+                foreach (var l in UserListOther)
                 {
                     if (l.UserName != null)
                     {

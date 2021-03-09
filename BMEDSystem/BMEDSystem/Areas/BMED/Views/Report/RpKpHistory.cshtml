@@ -78,11 +78,11 @@
             <td>
                 @if (item.DocType == "請修")
                 {
-                    @Html.ActionLink(item.DocId, "Views", "Repairs", new { id = item.DocId }, new { target = "_blank" })
+                    @Html.ActionLink(item.DocId, "Views", "Repair", new { id = item.DocId }, new { target = "_blank" })
                 }
                 else
                 {
-                    @Html.ActionLink(item.DocId, "Views", "Keeps", new { id = item.DocId }, new { target = "_blank" })
+                    @Html.ActionLink(item.DocId, "Views", "Keep", new { id = item.DocId }, new { target = "_blank" })
                 }
             </td>
             @*<td>

@@ -30,6 +30,7 @@ namespace EDIS.Models
         public string BMEDKqtyVendor { get; set; }
         public string BMEDKqtyClsUser { get; set; }
         public string BMEDKInOut { get; set; }
+        public string BMEDqtyLoc { get; set; }
     }
 
     public class QryRepListData

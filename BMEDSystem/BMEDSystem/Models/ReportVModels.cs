@@ -288,33 +288,64 @@ namespace EDIS.Models
         public string EngName { get; set; }
         [Display(Name = "一月")]
         public string Jan { get; set; }
+        public string JanDocId { get; set; }
+
+        public string JanEDate { get; set; }
         [Display(Name = "二月")]
         public string Feb { get; set; }
+        public string FebDocId { get; set; }
+
+        public string FebEDate { get; set; }
         [Display(Name = "三月")]
         public string Mar { get; set; }
+        public string MarDocId { get; set; }
+
+        public string MarEDate { get; set; }
         [Display(Name = "四月")]
         public string Apr { get; set; }
+        public string AprDocId { get; set; }
+
+        public string AprEDate { get; set; }
         [Display(Name = "五月")]
         public string May { get; set; }
+        public string MayDocId { get; set; }
+
+        public string MayEDate { get; set; }
         [Display(Name = "六月")]
         public string Jun { get; set; }
+        public string JunDocId { get; set; }
+
+        public string JunEDate { get; set; }
         [Display(Name = "七月")]
         public string Jul { get; set; }
+        public string JulDocId { get; set; }
+
+        public string JulEDate { get; set; }
         [Display(Name = "八月")]
         public string Aug { get; set; }
+        public string AugDocId { get; set; }
+
+        public string AugEDate { get; set; }
         [Display(Name = "九月")]
         public string Sep { get; set; }
+        public string SepDocId { get; set; }
+
+        public string SepEDate { get; set; }
         [Display(Name = "十月")]
         public string Oct { get; set; }
+        public string OctDocId { get; set; }
+
+        public string OctEDate { get; set; }
         [Display(Name = "十一月")]
         public string Nov { get; set; }
+        public string NovDocId { get; set; }
+
+        public string NovEDate { get; set; }
         [Display(Name = "十二月")]
         public string Dec { get; set; }
-        [Display(Name = "表單單號")]
-        public string DocId { get; set; }
+        public string DecDocId { get; set; }
         
-        [Display(Name = "完修日期")]
-        public string EDate { get; set; }
+        public string DecEDate { get; set; }
 
     }
 

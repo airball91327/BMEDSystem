@@ -130,10 +130,12 @@ $(function () {
     /* Auto calculate total price when input price or qty. */
     $('#Price').change(function () {
         var s = $('input:radio[name="TaxClass"]:checked').val();
+        var v = $('input:radio[name="StockType"]:checked').val();
+
         var v1 = $(this).val();
         var v2 = $('#Qty').val();
         if (v1 !== null && v2 !== null) {
-            if (s == "3") //三聯式發票
+            if (s == "3" && v == "2") //三聯式發票
             {
                 $('#TotalCost').val(Math.round(v1 * v2 * 1.05));
             }
@@ -144,10 +146,11 @@ $(function () {
     });
     $('#Qty').change(function () {
         var s = $('input:radio[name="TaxClass"]:checked').val();
+        var v = $('input:radio[name="StockType"]:checked').val();
         var v1 = $(this).val();
         var v2 = $('#Price').val();
         if (v1 !== null && v2 !== null) {
-            if (s == "3") //三聯式發票
+            if (s == "3" && v == "2") //三聯式發票
             {
                 $('#TotalCost').val(Math.round(v1 * v2 * 1.05));
             }

@@ -113,98 +113,63 @@
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Jan)</p>
-                @if(!string.IsNullOrEmpty(item.Jan)){
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }           
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JanDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JanDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JanEDate)</p>           
             </td>
-            <td >
+            <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Feb)</p>
-                @if (!string.IsNullOrEmpty(item.Feb))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.FebDocId })" target="_blank">@Html.DisplayFor(modelItem => item.FebDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.FebEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Mar)</p>
-                @if (!string.IsNullOrEmpty(item.Mar))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MarDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MarDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.MarEDate)</p>
             </td>
             <td>
                 <p class="Sche"> @Html.DisplayFor(modelItem => item.Apr)</p>
-                @if (!string.IsNullOrEmpty(item.Apr))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AprDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AprDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AprEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.May)</p>
-                @if (!string.IsNullOrEmpty(item.May))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MayDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MayDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.MayEDate)</p>
             </td>
             <td>
                 <p class="Sche"> @Html.DisplayFor(modelItem => item.Jun)</p>
-                @if (!string.IsNullOrEmpty(item.Jun))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JunDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JunDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JunEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Jul)</p>
-                @if (!string.IsNullOrEmpty(item.Jul))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JulDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JulDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JulEDate)</p>
             </td>
             <td>
                 <p class="Sche"> @Html.DisplayFor(modelItem => item.Aug)</p>
-                @if (!string.IsNullOrEmpty(item.Aug))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AugDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AugDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AugEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Sep)</p>
-                @if (!string.IsNullOrEmpty(item.Sep))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.SepDocId })" target="_blank">@Html.DisplayFor(modelItem => item.SepDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.SepEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Oct)</p>
-                @if (!string.IsNullOrEmpty(item.Oct))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.OctDocId })" target="_blank">@Html.DisplayFor(modelItem => item.OctDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.OctEDate)</p>
             </td>
             <td>
                 <p class="Sche"> @Html.DisplayFor(modelItem => item.Nov)</p>
-                @if (!string.IsNullOrEmpty(item.Nov))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.NovDocId })" target="_blank">@Html.DisplayFor(modelItem => item.NovDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.NovEDate)</p>
             </td>
             <td>
                 <p class="Sche">@Html.DisplayFor(modelItem => item.Dec)</p>
-                @if (!string.IsNullOrEmpty(item.Dec))
-                {
-                    <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DocId })" target="_blank">@Html.DisplayFor(modelItem => item.DocId)</a>
-                    <p class="hdtitle">@Html.DisplayFor(modelItem => item.EDate)</p>
-                }
+                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DecDocId })" target="_blank">@Html.DisplayFor(modelItem => item.DecDocId)</a>
+                <p class="hdtitle">@Html.DisplayFor(modelItem => item.DecEDate)</p>
             </td>
         </tr>
     }

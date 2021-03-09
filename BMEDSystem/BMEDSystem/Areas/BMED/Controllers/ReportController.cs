@@ -1,20 +1,17 @@
 ﻿using EDIS.Models;
+using EDIS.Models.Identity;
+using EDIS.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
+using OfficeOpenXml;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using EDIS.Models.Identity;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Http;
-using EDIS.Repositories;
-using OfficeOpenXml;
-using System.IO;
 using System.Data;
 using System.Data.SqlClient;
-using Newtonsoft.Json;
+using System.Linq;
 using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
@@ -309,9 +306,11 @@ namespace EDIS.Areas.BMED.Controllers
             //
             TempData["qry2"] = JsonConvert.SerializeObject(v);
             List<AssetKpScheVModel> sv = new List<AssetKpScheVModel>();
-            var assetK = _context.BMEDAssetKeeps.Where(x => x.Cycle > 0);
+            var assetK = _context.BMEDAssetKeeps.Where(x => x.Cycle > 0 );
             //完成保養
             var dtls = _context.BMEDKeepDtls.Where(d => d.Result == 1);
+            
+            //登入者部門
             var depar = _context.Departments.AsQueryable();
             if (urLocation == "總院")
             {
@@ -322,23 +321,34 @@ namespace EDIS.Areas.BMED.Controllers
                 depar = _context.Departments.Where(r => r.Loc == urLocation);
             }
 
-            var data = _context.BMEDAssets
-                .Join(assetK, a => a.AssetNo, k => k.AssetNo,
-                (a, k) => new
-                {
-                    asset = a,
-                    assetkeep = k
-                })
-                .Join(depar, a => a.asset.DelivDpt, d => d.DptId,
-                (a, d) => new
-                {
-                    asset = a.asset,
-                    assetkeep = a.assetkeep,
-                    dept = d
-                })
-                .GroupJoin(_context.BMEDKeeps,
-                        a => a.asset.AssetNo,
+            var datas = _context.BMEDAssets
+                .Join(assetK,
+                        a => a.AssetNo,
                         k => k.AssetNo,
+                        (a, k) => new
+                        {
+                            asset = a,
+                            assetkeep = k
+                        }
+                )
+                .Join(depar,
+                    a => a.asset.DelivDpt,
+                    d => d.DptId,
+                    (a, d) => new
+                    {
+                        asset = a.asset,
+                        assetkeep = a.assetkeep,
+                        dept = d
+                    })
+                .GroupJoin(_context.BMEDKeeps,
+                        a => new
+                        {
+                            assetNo = a.assetkeep.AssetNo,
+                        },
+                        k => new
+                        {
+                            assetNo = k.AssetNo,
+                        },
                         (a, k) => new
                         {
                             asset = a.asset,
@@ -346,31 +356,55 @@ namespace EDIS.Areas.BMED.Controllers
                             dept = a.dept,
                             keep = k
                         })
-                .SelectMany( x => x.keep.DefaultIfEmpty() ,
+                .SelectMany(x => x.keep.DefaultIfEmpty(),
                          (a, k) => new
                          {
+                             assetNo = a.asset.AssetNo,
                              asset = a.asset,
                              assetkeep = a.assetkeep,
                              dept = a.dept,
-                             DocId = k.DocId
+                             DocId = k.DocId,
+                             Sdate = k.SentDate
                          }
                 )
-                .GroupJoin( dtls.Where(kd => kd.Result == 1),
-                            a => a.DocId,
-                            k => k.DocId,
-                            (a, k) => new
-                            {
-                                asset = a,
-                                dtls = k
-                            })
-                .SelectMany(x => x.dtls.DefaultIfEmpty(),
-                            (a, k) => new
-                            {
-                                asset = a.asset.asset,
-                                assetkeep = a.asset.assetkeep,
-                                dept = a.asset.dept,
-                                dtls = k
-                            });
+                .Select( s => new
+                {
+                    AssetNo = s.asset.AssetNo,
+                    AssetName = s.asset.Cname,
+                    DelivDptName = s.dept.Name_C,
+                    Brand = s.asset.Brand,
+                    Type = s.asset.Type,
+                    //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                    //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
+                    KeepYm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value,
+                    Cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value,
+                    AssetClass = s.asset.AssetClass,
+                    Cname = s.asset.Cname,
+                    AccDpt = s.asset.AccDpt,
+                    DelivDpt = s.asset.DelivDpt,
+                    KeepEngId = s.assetkeep.KeepEngId,
+                    Sdate = s.Sdate.Value.Year,
+                    Name_C = s.dept.Name_C,
+                    DocId = s.DocId
+                })
+                //.GroupJoin( dtls,
+                //            a => a.DocId,
+                //            k => k.DocId,
+                //            (a, k) => new
+                //            {
+                //                asset = a,
+                //                dtls = k
+                //            })
+                //.SelectMany(x => x.dtls.DefaultIfEmpty(),
+                //            (a, k) => new
+                //            {
+                //                asset = a.asset.asset,
+                //                assetkeep = a.asset.assetkeep,
+                //                dept = a.asset.dept,
+                //                sdate = a.asset.Sdate,
+                //                dtls = k
+                //            })
+                ;
             //var data = _context.BMEDAssets
             //   .Join(_context.BMEDAssetKeeps.Where(x => x.Cycle > 0), a => a.AssetNo, k => k.AssetNo,
             //   (a, k) => new
@@ -385,28 +419,83 @@ namespace EDIS.Areas.BMED.Controllers
             //       dept = d
             //   });
 
-            data = data.Where(r => r.asset.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
+            datas = datas.Where(r => r.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
 
             
             if (!string.IsNullOrEmpty(v.AssetName))
             {
-                data = data.Where(r => r.asset.Cname.Contains(v.AssetName));
+                datas = datas.Where(r => r.Cname.Contains(v.AssetName));
             }
             string acc = v.AccDpt;
             string deliv = v.DelivDpt;
             string ano = v.AssetNo;
             int engid;
+            int j = 0;
+            int count = 0;
+            //DateTime? EDate = null;
             if (!string.IsNullOrEmpty(acc))
-                data = data.Where(x => x.asset.AccDpt == acc);
+                datas = datas.Where(x => x.AccDpt == acc);
             if (!string.IsNullOrEmpty(deliv))
-                data = data.Where(x => x.asset.DelivDpt == deliv);
+                datas = datas.Where(x => x.DelivDpt == deliv);
             if (!string.IsNullOrEmpty(ano))
-                data = data.Where(x => x.asset.AssetNo == ano);
+                datas = datas.Where(x => x.AssetNo == ano);
             if (!string.IsNullOrEmpty(v.EngId))
             {
                 engid = Convert.ToInt32(v.EngId);
-                data = data.Where(x => x.assetkeep.KeepEngId == engid);
+                datas = datas.Where(x => x.KeepEngId == engid);
             }
+            datas = datas.Where(k => k.Sdate == v.KeepYm);
+
+            //完工保養單
+            var del = datas
+                .GroupJoin( dtls,
+                            a => a.DocId,
+                            k => k.DocId,
+                            (a, k) => new
+                            {
+                                asset = a,
+                                dtls = k
+                            })
+                .SelectMany(x => x.dtls.DefaultIfEmpty(),
+                            (a, k) => new
+                            {
+                                assetNo = a.asset.AssetNo,
+                                DocId = k.DocId,
+                                EndDate = k.EndDate
+                            })
+                .OrderBy(x => x.assetNo)
+                .ThenBy( e => e.EndDate)
+                .GroupBy(x => x.assetNo)
+                .ToDictionary(x => x.Key,
+                        x => x.Select(k =>new {
+                            DocId = k.DocId,
+                            EndDate = k.EndDate,
+                            Day = count++
+                }));
+
+            //重複資料篩選
+            var data = datas
+                .Select(s => new
+                {
+                    AssetNo = s.AssetNo,
+                    AssetName = s.Cname,
+                    DelivDptName = s.Name_C,
+                    Brand = s.Brand,
+                    Type = s.Type,
+                    //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                    //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
+                    KeepYm = s.KeepYm ,
+                    Cycle = s.Cycle,
+                    AssetClass = s.AssetClass,
+                    Cname = s.Cname,
+                    AccDpt = s.AccDpt,
+                    DelivDpt = s.DelivDpt,
+                    KeepEngId = s.KeepEngId,
+                    Sdate = s.Sdate,
+                    Name_C = s.Name_C
+                })
+                .Distinct()
+                .OrderBy(x => x.AssetNo);
 
             AssetKpScheVModel aks;
             int year = DateTime.Now.Year - 1911 ;
@@ -415,72 +504,182 @@ namespace EDIS.Areas.BMED.Controllers
             int y1 = 0;
             int m1 = 0;
             int i = 0;
+            count = 0;
             foreach (var s in data.ToList())
             {
                 aks = new AssetKpScheVModel();
-                aks.AssetNo = s.asset.AssetNo;
-                aks.AssetName = s.asset.Cname;
-                aks.DelivDptName = s.dept.Name_C;
-                aks.Brand = s.asset.Brand;
-                aks.Type = s.asset.Type;
-                aks.DocId = s.dtls == null ? null : s.dtls.DocId;
-                aks.EDate = s.dtls == null ? null : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
-                yyymm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value;
-                cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value;
+                aks.AssetNo = s.AssetNo;
+                aks.AssetName = s.Cname;
+                aks.DelivDptName = s.Name_C;
+                aks.Brand = s.Brand;
+                aks.Type = s.Type;
+                count = 0;
+                //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
+                yyymm = s.KeepYm ;
+                cycle = s.Cycle;
                 y1 = yyymm / 100;
                 m1 = yyymm % 100;
                 if (yyymm > 0 && cycle > 0)
                 {
+                    j = 0;
                     for (i = 1; i <= 12; i++)
                     {
-                        if (((year - y1) * 12 + (i - m1)) % cycle == 0)
-                        {//哪一天保養
-                            
+                        if (((year - y1) * 12 + (i - m1)) % cycle == 0)//哪一月保養
+                        {
                             switch (i)
                             {
                                 case 1:
                                     aks.Jan = "*" ;
+                                    var EDate1 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if(EDate1 != null) { 
+                                        aks.JanDocId = EDate1.DocId;
+                                        aks.JanEDate = EDate1.EndDate == null ? "" :  EDate1.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 2:
                                     aks.Feb = "*";
+                                    var EDate2 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate2 != null)
+                                    {
+                                        aks.FebDocId = EDate2.DocId;
+                                        aks.FebEDate = EDate2.EndDate == null ? "" : EDate2.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 3:
                                     aks.Mar = "*" ;
+                                    var EDate3 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate3 != null)
+                                    {
+                                        aks.MarDocId = EDate3.DocId;
+                                        aks.MarEDate = EDate3.EndDate == null ? "" :  EDate3.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 4:
                                     aks.Apr = "*";
+                                    var EDate4 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate4 != null)
+                                    {
+                                        aks.AprDocId = EDate4.DocId;
+                                        aks.AprEDate = EDate4.EndDate == null ? "" : EDate4.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 5:
                                     aks.May = "*";
+                                    var EDate5 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate5 != null)
+                                    {
+                                        aks.MayDocId = EDate5.DocId;
+                                        aks.MayEDate = EDate5.EndDate == null ? "" : EDate5.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 6:
                                     aks.Jun = "*" ;
+                                    var EDate6 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate6 != null)
+                                    {
+                                        aks.JunDocId = EDate6.DocId;
+                                        aks.JunEDate = EDate6.EndDate == null ? "" : EDate6.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 7:
                                     aks.Jul = "*";
+                                    var EDate7 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate7 != null)
+                                    {
+                                        aks.JulDocId = EDate7.DocId;
+                                        aks.JulEDate = EDate7.EndDate == null ? "" : EDate7.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 8:
                                     aks.Aug = "*" ;
+                                    var EDate8 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate8 != null)
+                                    {
+                                        aks.AugDocId = EDate8.DocId;
+                                        aks.AugEDate = EDate8.EndDate == null ? "" :  EDate8.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 9:
                                     aks.Sep = "*" ;
+                                    var EDate9 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate9 != null)
+                                    {
+                                        aks.SepDocId = EDate9.DocId;
+                                        aks.SepEDate = EDate9.EndDate == null ? "" :  EDate9.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 10:
                                     aks.Oct = "*";
+                                    var EDate10 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate10 != null)
+                                    {
+                                        aks.OctDocId = EDate10.DocId;
+                                        aks.OctEDate = EDate10.EndDate == null ? "" : EDate10.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 11:
                                     aks.Nov = "*";
+                                    var EDate11 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate11 != null)
+                                    {
+                                        aks.NovDocId = EDate11.DocId;
+                                        aks.NovEDate = EDate11.EndDate == null ? "" :  EDate11.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                                 case 12:
                                     aks.Dec = "*" ;
+                                    var EDate12 = del.ContainsKey(aks.AssetNo) == false ? null : del[aks.AssetNo].Where(x => x.Day == j).FirstOrDefault();
+                                    if (EDate12 != null)
+                                    {
+                                        aks.DecDocId = EDate12.DocId;
+                                        aks.DecEDate = EDate12.EndDate == null ? "" : EDate12.EndDate.Value.ToString("yyyy/MM/dd");
+                                        j++;
+                                        count = 0;
+
+                                    }
                                     break;
                             }
+                            
                         }
                     }
                 }
                 sv.Add(aks);
             }
-
+            
             return sv;
         }
 
@@ -724,6 +923,9 @@ namespace EDIS.Areas.BMED.Controllers
                         {
                             if (r.EndDate == null)
                             {
+                                if (v.Edate == null)
+                                    v.Edate = DateTime.Now.AddHours(23).AddMinutes(59).AddSeconds(59);
+
                                 faildays += v.Edate.Value.Subtract(r.ApplyDate).TotalDays;
                             }
                             else if (v.Edate != null)
@@ -1844,6 +2046,10 @@ namespace EDIS.Areas.BMED.Controllers
                 case "儀器設備保養清單":
                     return PartialView("AssetKeepList", AssetKeepList(v));
                 case "設備保養排程年報":
+                    if (String.IsNullOrEmpty(v.KeepYm.ToString()))
+                    {
+                        v.KeepYm = DateTime.Now.Year;
+                    }
                     return PartialView("AssetKpSche", AssetKpSche(v));
 
             }
@@ -2155,22 +2361,25 @@ namespace EDIS.Areas.BMED.Controllers
                           Cost = d.Cost
                         }
                      )
-                .Join(  repairE,
+                .GroupJoin(  repairE,
                         d => d.DocId, e => e.DocId,
-                        (d, e) => new RpKpHistoryVModel
-                        {
-                            DocType = "請修",
-                            DocId = d.DocId,
-                            AssetNo = d.AssetNo,
-                            AssetName = d.AssetName,
-                            ApplyDate = d.ApplyDate,
-                            TroubleDes = d.TroubleDes,
-                            DealDes = d.DealDes,
-                            EndDate = d.EndDate,
-                            Hours = d.Hours,
-                            Cost = d.Cost,
-                            EngName = e.UserName
-                        }).ToList();
+                        (d, e) => new { bemd = d , repaire = e})
+                .SelectMany( x => x.repaire.DefaultIfEmpty(),
+                            (d, e) => new RpKpHistoryVModel
+                            {
+                                DocType = "請修",
+                                DocId = d.bemd.DocId,
+                                AssetNo = d.bemd.AssetNo,
+                                AssetName = d.bemd.AssetName,
+                                ApplyDate = d.bemd.ApplyDate,
+                                TroubleDes = d.bemd.TroubleDes,
+                                DealDes = d.bemd.DealDes,
+                                EndDate = d.bemd.EndDate,
+                                Hours = d.bemd.Hours,
+                                Cost = d.bemd.Cost,
+                                EngName = e.UserName
+                            })
+                .ToList();
 
             //保養工程師
             var keepE = _context.BMEDKeepEmps
@@ -2180,11 +2389,12 @@ namespace EDIS.Areas.BMED.Controllers
                                 (r, a) => new
                                 {
                                     DocId = r.DocId,
-                                    UserName = a.FullName
+                                    UserName = "(" + a.UserName + ")" + a.FullName
                                 }
                              );
 
-            sv2 = _context.BMEDKeeps.Where(a => a.AssetNo == v.AssetNo)
+            sv2 = _context.BMEDKeeps
+                .Where(a => a.AssetNo == v.AssetNo)
                 .Join(  _context.BMEDKeepFlows.Where(f => ss.Contains(f.Status)), 
                         r => r.DocId, 
                         f => f.DocId,
@@ -2206,25 +2416,28 @@ namespace EDIS.Areas.BMED.Controllers
                             Cost = d.Cost
                         }
                      )
-                .Join(  keepE, 
-                        d => d.DocId, 
-                        e => e.DocId,
-                        (d, e) => new RpKpHistoryVModel
-                        {
-                            DocType = d.DocType,
-                            DocId = d.DocId,
-                            AssetNo = d.AssetNo,
-                            AssetName = d.AssetName,
-                            ApplyDate = d.ApplyDate.Value,
-                            TroubleDes = d.TroubleDes,
-                            DealDes = Convert.ToString(d.DealDes),
-                            EndDate = d.EndDate,
-                            Hours = d.Hours,
-                            Cost = d.Cost,
-                            EngName = e.UserName
-                        })
+                 .GroupJoin(keepE,
+                        d => d.DocId, e => e.DocId,
+                        (d, e) => new { keep = d, repaire = e })
+                 .SelectMany(x => x.repaire.DefaultIfEmpty(),
+                            (d, e) => new RpKpHistoryVModel
+                            {
+                                DocType = d.keep.DocType,
+                                DocId = d.keep.DocId,
+                                AssetNo = d.keep.AssetNo,
+                                AssetName = d.keep.AssetName,
+                                ApplyDate = d.keep.ApplyDate.Value,
+                                TroubleDes = d.keep.TroubleDes,
+                                DealDes = Convert.ToString(d.keep.DealDes),
+                                EndDate = d.keep.EndDate,
+                                Hours = d.keep.Hours,
+                                Cost = d.keep.Cost,
+                                EngName = e.UserName
+                            })
                 .ToList();
 
+            sv.OrderBy(s => s.DocId);
+            sv2.OrderBy(s => s.DocId);
             sv.AddRange(sv2);
 
             if (v.Sdate != null)
@@ -2254,7 +2467,7 @@ namespace EDIS.Areas.BMED.Controllers
             TempData["qry"] = JsonConvert.SerializeObject(v); ;
 
             _context.BMEDRepairFlows.Where(f => f.Status == "?")
-            .Join(_context.BMEDRepairDtls, f => f.DocId, rd => rd.DocId,
+            .Join(_context.BMEDRepairDtls.Where(d => d.CloseDate == null), f => f.DocId, rd => rd.DocId,
             (f, rd) => new
             {
                 f.DocId,
@@ -2632,11 +2845,13 @@ namespace EDIS.Areas.BMED.Controllers
                                  .Where(x => x.asset.HighRisk == "Y");
             var assetHigh1 = asset
                                  .Where(g1 => g1.que.EndDate.Subtract(Convert.ToDateTime(g1.que.ApplyDate)).Days < 5)
-                                 .GroupBy(x => x.que.Uid)
+                                 .Select(x => x.que.Uid)
+                                 .GroupBy(x => x)
                                  .ToDictionary(x => x.Key, x => x.Count());
             var assetHigh5 = asset
                                  .Where(g1 => g1.que.EndDate.Subtract(Convert.ToDateTime(g1.que.ApplyDate)).Days >= 5)
-                                 .GroupBy(x => x.que.Uid)
+                                 .Select(x => x.que.Uid)
+                                 .GroupBy(x => x)
                                  .ToDictionary(x => x.Key, x => x.Count());
             //Keep Over 5 Day Case
             var keepOver5 = queryK
@@ -2672,22 +2887,76 @@ namespace EDIS.Areas.BMED.Controllers
                         .Join(_context.BMEDRepairEmps,
                                 rd => rd.DocId,
                                 re => re.DocId,
-                                (rd, re) => new
-                                {
-                                    re.UserId
-                                });
+                                (rd, re) => re.UserId
+                                );
 
 
             //重複故障率
             var case3M = repairD.Join(rt,
-                                        c => c.UserId,
+                                        c => c,
                                         g => g.Key,
-                                        (c, g) => new { caseM = c, gk = g }
+                                        (c, g) => g.Key
                                      )
-                                .GroupBy(x => x.gk.Key)
+                                .GroupBy(x => x)
                                 .ToDictionary(x => x.Key, x => x.Count());
 
-            
+            //dv.Fail3MRate
+            var obs = _context.BMEDRepairDtls
+                 .Where(d => d.EndDate >= sd)
+                 .Where(d => d.EndDate <= v.Edate)
+                 .Join(_context.BMEDRepairs
+                     .Where(r => r.Loc == urLocation),
+                     rd => rd.DocId, r => r.DocId,
+                     (rd, r) => new
+                     {
+                         rd.DocId,
+                         r.AssetNo
+                     })
+             .Join(_context.BMEDRepairEmps,
+                     rd => rd.DocId,
+                     re => re.DocId,
+                     (rd, re) => new UserAsset
+                     {
+                         Uid = re.UserId,
+                         AssetNo = rd.AssetNo
+                     })
+             .Join(rt,
+                     u => u.Uid,
+                     g => g.Key,
+                     (u, g) => new
+                     {
+                         AssetNo = u.AssetNo,
+                         Key = g.Key
+                     })
+             .GroupBy(j => j.Key)
+             .ToDictionary(x => x.Key, x=> x.GroupBy(j => j.AssetNo));
+
+            var obss = _context.BMEDRepairDtls
+                .Where(d => d.EndDate >= v.Sdate)
+                .Where(d => d.EndDate <= v.Edate)
+                .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                (rd, r) => new
+                {
+                    rd.DocId,
+                    r.AssetNo
+                })
+                .Join(_context.BMEDRepairEmps, rd => rd.DocId, re => re.DocId,
+                (rd, re) => new UserAsset
+                {
+                    Uid = re.UserId,
+                    AssetNo = rd.AssetNo
+                })
+                .Join(rt,
+                     u => u.Uid,
+                     g => g.Key,
+                     (u, g) => new
+                     {
+                         AssetNo = u.AssetNo,
+                         Key = g.Key
+                     })
+             .GroupBy(j => j.Key)
+             .ToDictionary(x => x.Key, x => x.GroupBy(j => j.AssetNo));
+
 
 
 
@@ -2696,10 +2965,10 @@ namespace EDIS.Areas.BMED.Controllers
                 case1 = 0;
                 case5 = 0;
                 dv = new DoHrSumMonVModel();
-                dv.FullName = fullName[g.Key].FirstOrDefault();
+                dv.FullName = fullName.ContainsKey(g.Key) == false ? "" : fullName[g.Key].FirstOrDefault();
                 dv.UserNam = (ur = _context.AppUsers.Find(g.Key)) == null ? "" : ur.FullName;
                 dv.Cases = g.Count();
-                dv.RCases = cases[g.Key];
+                dv.RCases = cases.ContainsKey(g.Key) == false ? 0 : cases[g.Key];
                 dv.KCases = dv.Cases - dv.RCases;
                 dv.Hours = g.Sum(s => s.Hour);
                 dv.HoursR = hourR.ContainsKey(g.Key) == false ? 0 : hourR[g.Key];
@@ -2748,55 +3017,85 @@ namespace EDIS.Areas.BMED.Controllers
 
                 dv.Case3M = case3M.ContainsKey(g.Key) == false ? 0 : case3M[g.Key];
 
-                
 
-               
                 //dv.Fail3MRate
-                IEnumerable <IGrouping<string, UserAsset>> ob = _context.BMEDRepairDtls.Where(d => d.EndDate >= sd)
-                .Where(d => d.EndDate <= v.Edate)
-                .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, r => r.DocId,
-                (rd, r) => new
-                {
-                    rd.DocId,
-                    r.AssetNo
-                })
-                .Join(_context.BMEDRepairEmps, rd => rd.DocId, re => re.DocId,
-                (rd, re) => new UserAsset
-                {
-                    Uid = re.UserId,
-                    AssetNo = rd.AssetNo
-                }).Where(re => re.Uid == g.Key).GroupBy(j => j.AssetNo);
+                //IEnumerable<IGrouping<string, UserAsset>> ob = _context.BMEDRepairDtls
+                //    .Where(d => d.EndDate >= sd)
+                //    .Where(d => d.EndDate <= v.Edate)
+                //    .Join(_context.BMEDRepairs
+                //        .Where(r => r.Loc == urLocation),
+                //        rd => rd.DocId, r => r.DocId,
+                //        (rd, r) => new
+                //        {
+                //            rd.DocId,
+                //            r.AssetNo
+                //        })
+                //.Join(_context.BMEDRepairEmps,
+                //        rd => rd.DocId,
+                //        re => re.DocId,
+                //        (rd, re) => new UserAsset
+                //        {
+                //            Uid = re.UserId,
+                //            AssetNo = rd.AssetNo
+                //        })
+                //.Where(re => re.Uid == g.Key)
+                //.GroupBy(j => j.AssetNo);
+
+
+                //abc = 0;
+                //foreach (var q in ob)
+                //{
+                //    if (q.Count() >= 2)
+                //        abc += q.Count();
+                //}
+                var oob = obs.ContainsKey(g.Key) == false ? null : obs[g.Key];
                 abc = 0;
-                foreach (var q in ob)
-                {
-                    if (q.Count() >= 2)
-                        abc += q.Count();
+                if (oob != null) { 
+                    foreach (var q in oob)
+                    {
+                        if (q.Count() >= 2)
+                            abc += q.Count();
+                    }
                 }
+
                 if (dv.Case3M > 0)
                     dv.Fail3MRate = Decimal.Round(Convert.ToDecimal(abc) / Convert.ToDecimal(dv.Case3M), 2);
                 else
                     dv.Fail3MRate = 0m;
 
-                ob = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate)
-                .Where(d => d.EndDate <= v.Edate)
-                .Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
-                (rd, r) => new
-                {
-                    rd.DocId,
-                    r.AssetNo
-                })
-                .Join(_context.BMEDRepairEmps, rd => rd.DocId, re => re.DocId,
-                (rd, re) => new UserAsset
-                {
-                    Uid = re.UserId,
-                    AssetNo = rd.AssetNo
-                }).Where(re => re.Uid == g.Key).GroupBy(re => re.AssetNo);
+                //ob = _context.BMEDRepairDtls
+                //.Where(d => d.EndDate >= v.Sdate)
+                //.Where(d => d.EndDate <= v.Edate)
+                //.Join(_context.BMEDRepairs, rd => rd.DocId, r => r.DocId,
+                //(rd, r) => new
+                //{
+                //    rd.DocId,
+                //    r.AssetNo
+                //})
+                //.Join(_context.BMEDRepairEmps, rd => rd.DocId, re => re.DocId,
+                //(rd, re) => new UserAsset
+                //{
+                //    Uid = re.UserId,
+                //    AssetNo = rd.AssetNo
+                //}).Where(re => re.Uid == g.Key).GroupBy(re => re.AssetNo);
+                //abc = 0;
+                //foreach (var q in ob)
+                //{
+                //    if (q.Count() >= 2)
+                //        abc += q.Count();
+                //}
+
+                oob = obss.ContainsKey(g.Key) == false ? null : obss[g.Key];
                 abc = 0;
-                foreach (var q in ob)
-                {
-                    if (q.Count() >= 2)
-                        abc += q.Count();
+                if(oob != null) { 
+                    foreach (var q in oob)
+                    {
+                        if (q.Count() >= 2)
+                            abc += q.Count();
+                    }
                 }
+
+
                 if (dv.Case3M > 0)
                     dv.Fail1MRate = Decimal.Round(Convert.ToDecimal(abc) / Convert.ToDecimal(dv.Case3M), 2);
                 else
@@ -6038,11 +6337,18 @@ namespace EDIS.Areas.BMED.Controllers
             List<CaseOverFiveVModel> mv = new List<CaseOverFiveVModel>();
             CaseOverFiveVModel dv;
             TempData["qry"] = JsonConvert.SerializeObject(v);
-
-            var repairs = _context.BMEDRepairs
-                .Where(r => r.Loc == v.Location)
-                .Where(r => r.ApplyDate >= v.Sdate);
-
+            var repairs = _context.BMEDRepairs.AsQueryable();
+            if (v.Location == "總院") { 
+                repairs = _context.BMEDRepairs
+                    .Where(r => r.Loc == v.Location)
+                    .Where(r => r.ApplyDate >= v.Sdate);
+            }
+            else
+            {
+                repairs = _context.BMEDRepairs
+                    .Where(r => r.Loc != "總院")
+                    .Where(r => r.ApplyDate >= v.Sdate);
+            }
             var query = _context.BMEDRepairDtls
                  .Where(d => d.EndDate <= v.Edate)
                  .Join(repairs,
@@ -6400,5 +6706,6 @@ namespace EDIS.Areas.BMED.Controllers
             return departments;
         }
 
+        
     }
 }

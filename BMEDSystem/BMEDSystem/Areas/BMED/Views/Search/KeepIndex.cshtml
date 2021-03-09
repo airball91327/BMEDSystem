@@ -1,5 +1,8 @@
 ﻿@model EDIS.Models.QryKeepListData
 
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
 @{
     Layout = "~/Views/Shared/_PassedLayout.cshtml";
     ViewData["Title"] = "保養單查詢";
@@ -159,6 +162,15 @@
                         <option value="">請選擇</option>
                     </select>
                 </div>
+                @if (UserManager.IsInRole(User, "MedAssetMgr"))
+                {
+                    <div class="form-group">
+                        <label for="BMEDqtyLoc" class="control-title">院區</label>
+                        <select asp-for="BMEDqtyLoc" asp-items="@ViewData["BMEDLoc"] as SelectList" class="form-control-s">
+                            <option value="">請選擇</option>
+                        </select>
+                    </div>
+                }
             </div>
         </div>
         <div class="row">

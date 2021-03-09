@@ -274,10 +274,134 @@ namespace EDIS.Areas.BMED.Controllers
             }
             ViewData["BMEDUsers"] = new SelectList(userList, "Value", "Text");
 
+            //院區選擇
+            List<SelectListItem> LoclistItem = new List<SelectListItem>();
+
+            LoclistItem.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            LoclistItem.Add(new SelectListItem { Text = "二林", Value = "L" });
+            LoclistItem.Add(new SelectListItem { Text = "員林", Value = "B" });
+            LoclistItem.Add(new SelectListItem { Text = "南投", Value = "N" });
+            LoclistItem.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            LoclistItem.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["BMEDLoc"] = new SelectList(LoclistItem, "Value", "Text");
+
+
             QryKeepListData data = new QryKeepListData();
 
             return View(data);
         }
+
+        ///// <summary>
+        ///// The Index of searching all repair docs.
+        ///// </summary>
+        ///// <returns></returns>
+        //// GET: BMED/Search/RepIndex
+        //public IActionResult RepKeepIndex()
+        //{
+        //    List<SelectListItem> FlowlistItem = new List<SelectListItem>();
+        //    FlowlistItem.Add(new SelectListItem { Text = "未結案", Value = "未結案" });
+        //    FlowlistItem.Add(new SelectListItem { Text = "已結案", Value = "已結案" });
+        //    ViewData["FLOWTYPE"] = new SelectList(FlowlistItem, "Value", "Text");
+
+        //    /* 成本中心 & 申請部門的下拉選單資料 */
+        //    var dptList = new[] { "K", "P", "C" };  //本院部門
+        //    //var departments = _context.Departments.Where(d => dptList.Contains(d.Loc)).ToList();
+        //    var departments = _context.Departments.ToList();
+        //    List<SelectListItem> listItem = new List<SelectListItem>();
+        //    foreach (var item in departments)
+        //    {
+        //        listItem.Add(new SelectListItem
+        //        {
+        //            Text = item.Name_C + "(" + item.DptId + ")",    //show DptName(DptId)
+        //            Value = item.DptId
+        //        });
+        //    }
+
+        //    ViewData["ACCDPT"] = new SelectList(listItem, "Value", "Text");
+        //    ViewData["APPLYDPT"] = new SelectList(listItem, "Value", "Text");
+
+        //    /* 處理狀態的下拉選單 */
+        //    var dealStatuses = _context.BMEDDealStatuses.ToList();
+        //    List<SelectListItem> listItem2 = new List<SelectListItem>();
+        //    foreach (var item in dealStatuses)
+        //    {
+        //        listItem2.Add(new SelectListItem
+        //        {
+        //            Text = item.Title,
+        //            Value = item.Title
+        //        });
+        //    }
+        //    ViewData["DealStatus"] = new SelectList(listItem2, "Value", "Text");
+
+        //    /* 處理有無費用的下拉選單 */
+        //    List<SelectListItem> listItem3 = new List<SelectListItem>();
+        //    listItem3.Add(new SelectListItem { Text = "有", Value = "Y" });
+        //    listItem3.Add(new SelectListItem { Text = "無", Value = "N" });
+        //    ViewData["IsCharged"] = new SelectList(listItem3, "Value", "Text");
+
+        //    /* 處理日期查詢的下拉選單 */
+        //    List<SelectListItem> listItem4 = new List<SelectListItem>();
+        //    listItem4.Add(new SelectListItem { Text = "申請日", Value = "申請日" });
+        //    listItem4.Add(new SelectListItem { Text = "完工日", Value = "完工日" });
+        //    listItem4.Add(new SelectListItem { Text = "結案日", Value = "結案日" });
+        //    ViewData["DateType"] = new SelectList(listItem4, "Value", "Text", "申請日");
+
+        //    /* 處理工程師查詢的下拉選單 */
+        //    var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
+        //    List<SelectListItem> listItem5 = new List<SelectListItem>();
+        //    foreach (string l in engs)
+        //    {
+        //        var u = _context.AppUsers.Where(r => r.UserName == l).FirstOrDefault();
+        //        if (u != null)
+        //        {
+        //            listItem5.Add(new SelectListItem
+        //            {
+        //                Text = u.FullName + "(" + u.UserName + ")",
+        //                Value = u.Id.ToString()
+        //            });
+        //        }
+        //    }
+        //    ViewData["BMEDEngs"] = new SelectList(listItem5, "Value", "Text");
+        //    /* 擷取該使用者單位底下所有人員 */
+        //    var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+        //    var dptUsers = _context.AppUsers.Where(a => a.DptId == ur.DptId && a.Status == "Y").ToList();
+        //    List<SelectListItem> dptMemberList = new List<SelectListItem>();
+        //    foreach (var item in dptUsers)
+        //    {
+        //        dptMemberList.Add(new SelectListItem
+        //        {
+        //            Text = item.FullName + "(" + item.UserName + ")",
+        //            Value = item.Id.ToString()
+        //        });
+        //    }
+        //    ViewData["DptMembers"] = new SelectList(dptMemberList, "Value", "Text");
+        //    /* 擷取所有人員 */
+        //    List<SelectListItem> userList = new List<SelectListItem>();
+        //    foreach (var item in _context.AppUsers.Where(a => a.Status == "Y").ToList())
+        //    {
+        //        userList.Add(new SelectListItem
+        //        {
+        //            Text = item.FullName + "(" + item.UserName + ")",
+        //            Value = item.Id.ToString()
+        //        });
+        //    }
+        //    ViewData["BMEDUsers"] = new SelectList(userList, "Value", "Text");
+
+        //    //院區選擇
+        //    List<SelectListItem> LoclistItem = new List<SelectListItem>();
+
+        //    LoclistItem.Add(new SelectListItem { Text = "總院", Value = "總院" });
+        //    LoclistItem.Add(new SelectListItem { Text = "二林", Value = "L" });
+        //    LoclistItem.Add(new SelectListItem { Text = "員林", Value = "B" });
+        //    LoclistItem.Add(new SelectListItem { Text = "南投", Value = "N" });
+        //    LoclistItem.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+        //    LoclistItem.Add(new SelectListItem { Text = "雲基", Value = "T" });
+        //    ViewData["BMEDLoc"] = new SelectList(LoclistItem, "Value", "Text");
+
+        //    QryRepListData data = new QryRepListData();
+
+        //    return View(data);
+        //}
 
         /// <summary>
         /// The Index of searching all delivery docs.
@@ -1193,6 +1317,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
             string qtyInOut = qdata.BMEDKInOut;
+            string qtyLoc = qdata.BMEDqtyLoc;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -1235,6 +1360,13 @@ namespace EDIS.Areas.BMED.Controllers
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
+
+            //賀康主管可選擇
+            if (userManager.IsInRole(User, "MedAssetMgr") && !string.IsNullOrEmpty(qtyLoc))
+            {
+                urLocation = qtyLoc;
+            }
+
             // 依照院區搜尋Keep主檔
             var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
             var keepFlows = _context.BMEDKeepFlows.AsQueryable();
@@ -1314,8 +1446,11 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
-                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
-                                     .Select(group => group.Last());
+                //keepFlows = keepFlows
+                //    .GroupBy(f => f.DocId)
+                //    .Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
+                //    .Select(group => group.Last());
+                keepFlows = keepFlows.Where(g => g.UserId == Convert.ToInt32(qtyClsUser));
             }
 
             /* If no search result. */
