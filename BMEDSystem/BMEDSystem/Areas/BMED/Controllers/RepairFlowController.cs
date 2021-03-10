@@ -123,7 +123,45 @@ namespace EDIS.Areas.BMED.Controllers
                         throw new Exception("送至驗收人處理狀態只可為【已完成】、【報廢】、【退件】!!");
                     }
                 }
-                if (assign.FlowCls == "結案" && assign.Cls != "設備主管")
+                if (assign.FlowCls == "結案" && rf.Cls == "設備主管" && repairDtl.IsCharged == "Y" && repairDtl.IsInstrument == "Y")
+                {
+                    if (assign.Cls == "驗收人" && repairDtl != null)
+                    {
+                        if (repairDtl.IsCharged == "Y")
+                        {
+                            throw new Exception("有費用之案件不可由驗收人直接結案!");
+                        }
+                    }
+                    if (assign.Cls == "驗收人" && repairDtl != null)
+                    {
+                        if (repairDtl.DealState == 4)
+                        {
+                            throw new Exception("報廢之案件不可由驗收人直接結案!");
+                        }
+                    }
+                    RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
+                    rd.CloseDate = DateTime.Now;
+                    //轉送賀康主管關卡
+                    rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                    rf.Status = "1";
+                    rf.Rtt = DateTime.Now;
+                    rf.Rtp = ur.Id;
+                    _context.Entry(rf).State = EntityState.Modified;
+                    _context.Entry(rd).State = EntityState.Modified;
+                    _context.SaveChanges();
+                    //
+                    RepairFlowModel flow = new RepairFlowModel();
+                    flow.DocId = assign.DocId;
+                    flow.StepId = rf.StepId + 1;
+                    flow.UserId = 1129;
+                    flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
+                    flow.Status = "?";
+                    flow.Cls = "賀康主管";
+                    flow.Rtt = DateTime.Now;
+                    _context.BMEDRepairFlows.Add(flow);
+                    _context.SaveChanges();
+                }
+                else if (assign.FlowCls == "結案" )
                 {
                     if (assign.Cls == "驗收人" && repairDtl != null)
                     {
@@ -204,44 +242,6 @@ namespace EDIS.Areas.BMED.Controllers
                     mail.message.Body = body;
                     mail.message.IsBodyHtml = true;
                     mail.SendMail();
-                }
-                else if (assign.FlowCls == "結案" && assign.Cls == "設備主管")
-                {
-                    if (assign.Cls == "驗收人" && repairDtl != null)
-                    {
-                        if (repairDtl.IsCharged == "Y")
-                        {
-                            throw new Exception("有費用之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    if (assign.Cls == "驗收人" && repairDtl != null)
-                    {
-                        if (repairDtl.DealState == 4)
-                        {
-                            throw new Exception("報廢之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
-                    rd.CloseDate = DateTime.Now;
-                    //轉送賀康主管關卡
-                    rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
-                    rf.Status = "1";
-                    rf.Rtt = DateTime.Now;
-                    rf.Rtp = ur.Id;
-                    _context.Entry(rf).State = EntityState.Modified;
-                    _context.Entry(rd).State = EntityState.Modified;
-                    _context.SaveChanges();
-                    //
-                    RepairFlowModel flow = new RepairFlowModel();
-                    flow.DocId = assign.DocId;
-                    flow.StepId = rf.StepId + 1;
-                    flow.UserId = 1129;
-                    flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
-                    flow.Status = "?";
-                    flow.Cls = "賀康主管";
-                    flow.Rtt = DateTime.Now;
-                    _context.BMEDRepairFlows.Add(flow);
-                    _context.SaveChanges();
                 }
                 else if (assign.FlowCls == "廢除")
                 {

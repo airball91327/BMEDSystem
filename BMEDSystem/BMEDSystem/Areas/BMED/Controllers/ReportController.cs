@@ -105,6 +105,12 @@ namespace EDIS.Areas.BMED.Controllers
             var isProgress = v.IsProgress;
             //
             int? sendYm = v.SendYm;
+            var Medusrs = _context.AppUsers
+                .Join(_context.UsersInRoles.Where(r => r.RoleId == 13),
+                        u => u.Id,
+                        r => r.UserId,
+                        (u,r) => u
+                );
             var qryFlowEng = _context.BMEDKeepFlows.Where(kf => kf.Status == "?" || kf.Status == "2").Select(kf => kf.DocId)
                                                    .Join(_context.BMEDKeepFlows, id => id, kf => kf.DocId,
                                                    (id, kf) => kf)
@@ -170,7 +176,7 @@ namespace EDIS.Areas.BMED.Controllers
                                     asset = a.asset,
                                     assetkeep = a.assetkeep
                                 })
-                                .Join(_context.AppUsers, k => k.engflow.UserId, u => u.Id,
+                                .Join(Medusrs, k => k.engflow.UserId, u => u.Id,
                                 (k, u) => new
                                 {
                                     keep = k.keep,
@@ -6337,6 +6343,7 @@ namespace EDIS.Areas.BMED.Controllers
             List<CaseOverFiveVModel> mv = new List<CaseOverFiveVModel>();
             CaseOverFiveVModel dv;
             TempData["qry"] = JsonConvert.SerializeObject(v);
+
             var repairs = _context.BMEDRepairs.AsQueryable();
             if (v.Location == "總院") { 
                 repairs = _context.BMEDRepairs
@@ -6434,6 +6441,8 @@ namespace EDIS.Areas.BMED.Controllers
                      dl.Title
                  })
                  .Where(g1 => g1.EndDate.Subtract(Convert.ToDateTime(g1.ApplyDate)).Days > 5);
+           // query = qu.Where(r => r.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
+
 
             //
             if (!string.IsNullOrEmpty(v.AccDpt))

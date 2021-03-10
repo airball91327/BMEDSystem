@@ -52,6 +52,8 @@ namespace EDIS.Models
         [Required(ErrorMessage = "必填寫欄位")]
         [Display(Name = "狀態")]
         public string Status { get; set; }
+        [Display(Name = "離職日")]
+        public System.DateTime? LeaveDate { get; set; }
         [NotMapped]
         public List<UserInRolesViewModel> InRoles { get; set; }
 
