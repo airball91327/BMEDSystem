@@ -66,7 +66,11 @@ namespace EDIS.Areas.BMED.Controllers
 
             listItem2.Add( new SelectListItem{ Text = "請選擇", Value = "" });
             listItem2.Add(new SelectListItem { Text = "總院", Value = "總院" });
-            listItem2.Add(new SelectListItem { Text = "分院", Value = "分院" });
+            listItem2.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem2.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem2.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem2.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem2.Add(new SelectListItem { Text = "雲基", Value = "T" });
             ViewData["Location"] = new SelectList(listItem2, "Value", "Text");
 
             return View(pv);
@@ -450,7 +454,7 @@ namespace EDIS.Areas.BMED.Controllers
                 engid = Convert.ToInt32(v.EngId);
                 datas = datas.Where(x => x.KeepEngId == engid);
             }
-            datas = datas.Where(k => k.Sdate == v.KeepYm);
+            datas = datas.Where(k => k.Sdate == v.KeepY);
 
             //完工保養單
             var del = datas
@@ -2052,9 +2056,9 @@ namespace EDIS.Areas.BMED.Controllers
                 case "儀器設備保養清單":
                     return PartialView("AssetKeepList", AssetKeepList(v));
                 case "設備保養排程年報":
-                    if (String.IsNullOrEmpty(v.KeepYm.ToString()))
+                    if (String.IsNullOrEmpty(v.KeepY.ToString()))
                     {
-                        v.KeepYm = DateTime.Now.Year;
+                        v.KeepY = DateTime.Now.Year;
                     }
                     return PartialView("AssetKpSche", AssetKpSche(v));
 
@@ -6344,18 +6348,11 @@ namespace EDIS.Areas.BMED.Controllers
             CaseOverFiveVModel dv;
             TempData["qry"] = JsonConvert.SerializeObject(v);
 
-            var repairs = _context.BMEDRepairs.AsQueryable();
-            if (v.Location == "總院") { 
-                repairs = _context.BMEDRepairs
-                    .Where(r => r.Loc == v.Location)
-                    .Where(r => r.ApplyDate >= v.Sdate);
-            }
-            else
-            {
-                repairs = _context.BMEDRepairs
-                    .Where(r => r.Loc != "總院")
-                    .Where(r => r.ApplyDate >= v.Sdate);
-            }
+            //院區維修單
+            var repairs = _context.BMEDRepairs
+                        .Where(r => r.Loc == v.Location)
+                        .Where(r => r.ApplyDate >= v.Sdate);
+            
             var query = _context.BMEDRepairDtls
                  .Where(d => d.EndDate <= v.Edate)
                  .Join(repairs,

@@ -86,6 +86,9 @@
                     <li class="@Html.IsSelected(controller: "Search", area: "BMED")">
                         <a href="#"><i class="fa fa-list-alt"></i><span class="nav-label">全院案件查詢</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "Search", area: "BMED", cssClass: "in")">
+                            <li class="@Html.IsSelected(controller: "Search", action: "RepKeepIndex", area: "BMED")">
+                                <a href="@Url.Action("RepKeepIndex", "Search", new { Area = "BMED" })">全院保修單查詢</a>
+                            </li>
                             <li class="@Html.IsSelected(controller: "Search", action: "RepIndex", area: "BMED")">
                                 <a href="@Url.Action("RepIndex", "Search", new { Area = "BMED" })">全院請修單查詢</a>
                             </li>

@@ -386,7 +386,6 @@ namespace EDIS.Areas.BMED.Controllers
                         repair = r,
                         flow = f
                     });
-
                     if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
                         userManager.IsInRole(User, "MedEngineer"))
                     {
@@ -409,6 +408,7 @@ namespace EDIS.Areas.BMED.Controllers
 
                             /* 個人案件 */
                             repairFlows = repairFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id));
+                            
                         }
                     }
                     else
@@ -420,6 +420,7 @@ namespace EDIS.Areas.BMED.Controllers
 
                         /* 個人案件 */
                         repairFlows = repairFlows.Where(f => (f.flow.Status == "?" && f.flow.UserId == ur.Id));
+                       
                     }
 
                     repairFlows.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,

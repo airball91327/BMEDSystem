@@ -21,7 +21,7 @@ namespace EDIS.Models
         public string AssetName { get; set; }
         [Display(Name = "廠牌")]
         public string Brand { get; set; }
-        [Display(Name = "請修地點")]
+        [Display(Name = "放置地點")]
         public string PlaceLoc { get; set; }
         [Display(Name = "型號")]
         public string Type { get; set; }
@@ -48,9 +48,9 @@ namespace EDIS.Models
         public string FlowUidName { get; set; }
         [Display(Name = "關卡")]
         public string FlowCls { get; set; }
-        [Display(Name = "維修申請日期")]
+        [Display(Name = "申請日期")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
-        public DateTime ApplyDate { get; set; }
+        public DateTime? ApplyDate { get; set; }
         [Display(Name = "完工日期")]
         [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         public DateTime? EndDate { get; set; }
@@ -67,12 +67,8 @@ namespace EDIS.Models
         public string InOut { get; set; }
         [Display(Name = "保養結果")]
         public string Result { get; set; }
-        [Display(Name = "保養描述")]
-        public string Memo { get; set; }
+        
         public string Src { get; set; }
-        [Display(Name = "保養申請日期")]
-        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
-        public DateTime? SentDate { get; set; }
         public KeepModel keepdata { get; set; }
     }
 }

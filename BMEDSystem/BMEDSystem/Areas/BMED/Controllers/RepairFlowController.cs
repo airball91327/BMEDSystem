@@ -55,7 +55,10 @@ namespace EDIS.Areas.BMED.Controllers
         {
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             var repairDtl = _context.BMEDRepairDtls.Find(assign.DocId);
-
+            var dpt = _context.BMEDRepairs.Find(assign.DocId).DptId;
+            string[] loc = { "K", "P", "C" };
+            var applyloc = _context.Departments.Where(d => d.DptId == dpt).Where(d => !loc.Contains(d.Loc)).Select(l => l.Loc).FirstOrDefault();
+            
             /* 工程師的流程控管 */
             if (assign.Cls == "設備工程師")
             {
@@ -123,7 +126,7 @@ namespace EDIS.Areas.BMED.Controllers
                         throw new Exception("送至驗收人處理狀態只可為【已完成】、【報廢】、【退件】!!");
                     }
                 }
-                if (assign.FlowCls == "結案" && rf.Cls == "設備主管" && repairDtl.IsCharged == "Y" && repairDtl.IsInstrument == "Y")
+                if (assign.FlowCls == "結案" && rf.Cls == "設備主管" && repairDtl.IsCharged == "Y" && repairDtl.IsInstrument == "Y" && !String.IsNullOrEmpty(applyloc))
                 {
                     if (assign.Cls == "驗收人" && repairDtl != null)
                     {
@@ -150,10 +153,17 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.Entry(rd).State = EntityState.Modified;
                     _context.SaveChanges();
                     //
+                    var role = roleManager.GetUsersInRole("MedAssetMgr");
                     RepairFlowModel flow = new RepairFlowModel();
                     flow.DocId = assign.DocId;
                     flow.StepId = rf.StepId + 1;
-                    flow.UserId = 1129;
+                    flow.UserId = _context.AppUsers
+                        .Where(u => role.Contains(u.UserName))
+                        .Join(_context.Departments.Where(d => !loc.Contains(d.Loc)),
+                                u => u.DptId,
+                                d => d.DptId,
+                                (u,d) => new { Id = u.Id}
+                        ).Select(x => x.Id).FirstOrDefault();
                     flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
                     flow.Status = "?";
                     flow.Cls = "賀康主管";

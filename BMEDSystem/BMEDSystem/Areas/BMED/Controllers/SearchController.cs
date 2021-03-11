@@ -443,7 +443,7 @@ namespace EDIS.Areas.BMED.Controllers
                 rv = GetQryRepData(qdata);
                 kv = GetQryDataKeep(qdata);
             }
-            else if (qdata.BMEDqtyType == "維修")
+            else if (qdata.BMEDqtyType == "請修")
             {
                 rv = GetQryRepData(qdata);
             }
@@ -456,6 +456,26 @@ namespace EDIS.Areas.BMED.Controllers
             if (rv.ToPagedList(page, pageSize).Count <= 0)
                 return PartialView("RepKeepQryList", rv.ToPagedList(1, pageSize));
             return PartialView("RepKeepQryList", rv.ToPagedList(page, pageSize));
+        }
+        public List<RepKeepSearchListViewModel> GetRepKeepQryData(QryRepKeepListData qdata)
+        {
+            List<RepKeepSearchListViewModel> rv = new List<RepKeepSearchListViewModel>();
+            List<RepKeepSearchListViewModel> kv = new List<RepKeepSearchListViewModel>();
+            if (qdata.BMEDqtyType == "保修")
+            {
+                rv = GetQryRepData(qdata);
+                kv = GetQryDataKeep(qdata);
+            }
+            else if (qdata.BMEDqtyType == "請修")
+            {
+                rv = GetQryRepData(qdata);
+            }
+            else if (qdata.BMEDqtyType == "保養")
+            {
+                kv = GetQryDataKeep(qdata);
+            }
+            rv.AddRange(kv);
+            return rv;
         }
 
         public List<RepKeepSearchListViewModel> GetQryRepData(QryRepKeepListData qdata)
@@ -597,8 +617,7 @@ namespace EDIS.Areas.BMED.Controllers
                     rps = rps.Where(v => v.ApplyDate >= applyDateFrom && v.ApplyDate <= applyDateTo);
                 }
             }
-            if (!string.IsNullOrEmpty(ftype))   //流程狀態
-            {
+            
                 switch (ftype)
                 {
                     case "未結案":
@@ -696,8 +715,101 @@ namespace EDIS.Areas.BMED.Controllers
                         repdata = j.repair
                     }));
                         break;
+                    default:
+                        var repairFlows3 = rps.Join(_context.BMEDRepairFlows.Where(f => f.Status == "?"), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+                        repairFlows3.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                      .ForEach(j => rv.Add(new RepKeepSearchListViewModel
+                      {
+                          DocType = "請修",
+                          RepType = j.repair.RepType,
+                          DocId = j.repair.DocId,
+                          ApplyDate = j.repair.ApplyDate,
+                          PlaceLoc = j.repair.PlaceLoc,
+                          ApplyDpt = j.repair.DptId,
+                          AccDpt = j.repair.AccDpt,
+                          AccDptName = j.dpt.Name_C,
+                          TroubleDes = j.repair.TroubleDes,
+                          DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                          DealDes = j.repdtl.DealDes,
+                          Cost = j.repdtl.Cost,
+                          Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                          Flg = j.flow.Status,
+                          FlowUid = j.flow.UserId,
+                          FlowCls = j.flow.Cls,
+                          FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
+                          EndDate = j.repdtl.EndDate,
+                          CloseDate = j.repdtl.CloseDate,
+                          IsCharged = j.repdtl.IsCharged,
+                          IsPurchase = j.repair.IsPurchased,
+                          repdata = j.repair
+                      }));
+                        var repairFlows4 = rps.Join(_context.BMEDRepairFlows.Where(f => f.Status == "2"), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+                        repairFlows4.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    }).ToList()
+                    .ForEach(j => rv.Add(new RepKeepSearchListViewModel
+                    {
+                        DocType = "請修",
+                        RepType = j.repair.RepType,
+                        DocId = j.repair.DocId,
+                        ApplyDate = j.repair.ApplyDate,
+                        PlaceLoc = j.repair.PlaceLoc,
+                        ApplyDpt = j.repair.DptId,
+                        AccDpt = j.repair.AccDpt,
+                        AccDptName = j.dpt.Name_C,
+                        TroubleDes = j.repair.TroubleDes,
+                        DealState = _context.BMEDDealStatuses.Find(j.repdtl.DealState).Title,
+                        DealDes = j.repdtl.DealDes,
+                        Cost = j.repdtl.Cost,
+                        Days = DateTime.Now.Subtract(j.repair.ApplyDate).Days,
+                        Flg = j.flow.Status,
+                        FlowUid = j.flow.UserId,
+                        FlowCls = j.flow.Cls,
+                        FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
+                        EndDate = j.repdtl.EndDate,
+                        CloseDate = j.repdtl.CloseDate,
+                        IsCharged = j.repdtl.IsCharged,
+                        IsPurchase = j.repair.IsPurchased,
+                        repdata = j.repair
+                    }));
+                        break;
                 }
-            }
+
             if (!string.IsNullOrEmpty(qtyDealStatus))   //處理狀態
             {
                 rv = rv.Where(r => r.DealState == qtyDealStatus).ToList();
@@ -822,6 +934,7 @@ namespace EDIS.Areas.BMED.Controllers
                 applyDateTo = DateTime.Parse(qtyDate1);
             }
 
+
             List<RepKeepSearchListViewModel> kv = new List<RepKeepSearchListViewModel>();
             /* Get login user. */
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
@@ -877,8 +990,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 var resultDocIds = _context.BMEDKeepCosts.Include(kc => kc.TicketDtl)
                                                          .Where(kc => kc.VendorName.Contains(qtyVendor))
-                                                         .Select(kc => kc.DocId)
-                                                         .Distinct()
+                                                         .Select(kc => kc.DocId).Distinct()
                                                          .ToList();
                 kps = (from k in kps
                        where resultDocIds.Any(val => k.DocId.Contains(val))
@@ -891,7 +1003,7 @@ namespace EDIS.Areas.BMED.Controllers
             /* Search date by DateType.(ApplyDate) */
             if (string.IsNullOrEmpty(qtyDate1) == false || string.IsNullOrEmpty(qtyDate2) == false) //送單日
             {
-                if (qtyDateType == "送單日")
+                if (qtyDateType == "申請日")
                 {
                     kps = kps.Where(v => v.SentDate >= applyDateFrom && v.SentDate <= applyDateTo);
                 }
@@ -915,14 +1027,17 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
-                keepFlows = keepFlows.GroupBy(f => f.DocId).Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
-                                     .Select(group => group.Last());
+                //keepFlows = keepFlows
+                //    .GroupBy(f => f.DocId)
+                //    .Where(group => group.OrderBy(g => g.StepId).Last().UserId == Convert.ToInt32(qtyClsUser))
+                //    .Select(group => group.Last());
+                keepFlows = keepFlows.Where(g => g.UserId == Convert.ToInt32(qtyClsUser));
             }
 
             /* If no search result. */
             if (kps.Count() == 0)
             {
-                return kv;
+                return  kv;
             }
 
             kps.Join(keepFlows, k => k.DocId, f => f.DocId,
@@ -963,7 +1078,7 @@ namespace EDIS.Areas.BMED.Controllers
                     j.keepdtl.InOut == "1" ? "委外" :
                     j.keepdtl.InOut == "2" ? "租賃" :
                     j.keepdtl.InOut == "3" ? "保固" : "",
-                    Memo = j.keepdtl.Memo,
+                    DealDes = j.keepdtl.Memo,
                     Cost = j.keepdtl.Cost,
                     Days = DateTime.Now.Subtract(j.keep.SentDate.GetValueOrDefault()).Days,
                     Flg = j.flow.Status,
@@ -971,7 +1086,7 @@ namespace EDIS.Areas.BMED.Controllers
                     FlowCls = j.flow.Cls,
                     FlowUidName = _context.AppUsers.Find(j.flow.UserId).FullName,
                     Src = j.keep.Src,
-                    SentDate = j.keep.SentDate,
+                    ApplyDate = j.keep.SentDate,
                     EndDate = j.keepdtl.EndDate,
                     CloseDate = j.keepdtl.CloseDate,
                     IsCharged = j.keepdtl.IsCharged,
@@ -1018,7 +1133,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 else
                 {
-                    kv = kv.OrderByDescending(r => r.SentDate).ThenByDescending(r => r.DocId).ToList();
+                    kv = kv.OrderByDescending(r => r.ApplyDate).ThenByDescending(r => r.DocId).ToList();
                 }
             }
 
@@ -1037,10 +1152,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 kv = kv.Where(r => r.IsCharged == qtyIsCharged).ToList();
             }
-            //
-
             return kv;
-            //return View("KeepQryList", kv);
         }
 
         /// <summary>
@@ -1929,6 +2041,71 @@ namespace EDIS.Areas.BMED.Controllers
                 fileDownloadName: "QryRepairData.xlsx"
             );
         }
+        public IActionResult ExcelQryRepairKeep(QryRepKeepListData v)
+        {
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("類別");
+            dt.Columns.Add("請修類別");
+            dt.Columns.Add("表單編號");
+            dt.Columns.Add("申請日期");
+            dt.Columns.Add("成本中心名稱");
+            dt.Columns.Add("財產編號");
+            dt.Columns.Add("儀器名稱");
+            dt.Columns.Add("放置地點");
+            dt.Columns.Add("保養方式");
+            dt.Columns.Add("保養結果");
+            dt.Columns.Add("故障描述");
+            dt.Columns.Add("處理狀態");
+            dt.Columns.Add("處理描述");
+            dt.Columns.Add("天數");
+            dt.Columns.Add("完工日期");
+            dt.Columns.Add("文件狀態");
+            dt.Columns.Add("關卡人員");
+            List<RepKeepSearchListViewModel> mv = GetRepKeepQryData(v);
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.DocType;
+                dw[1] = m.RepType;
+                dw[2] = m.DocId;
+                dw[3] = m.ApplyDate;
+                dw[4] = m.AccDptName;
+                dw[5] = m.AssetNo;
+                dw[6] = m.AssetName;
+                dw[7] = m.PlaceLoc;
+                dw[8] = m.InOut;
+                dw[9] = m.Result;
+                dw[10] = m.TroubleDes;
+                dw[11] = m.DealState;
+                dw[12] = m.DealDes;
+                dw[13] = m.Days;
+                dw[14] = m.EndDate;
+                dw[15] = m.Flg == "2" ? "已結案" : "未結案";
+                dw[16] = m.FlowUidName;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("全院查詢保修清單");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "QryRepairKeepData.xlsx"
+            );
+        }
+
         /// <summary>
         /// Get the query result list of keep docs.
         /// </summary>

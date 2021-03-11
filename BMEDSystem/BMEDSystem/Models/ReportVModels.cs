@@ -50,6 +50,8 @@ namespace EDIS.Models
         [Display(Name = "保養起始年月")]
         public int? SendYm { get; set; }
         public int? KeepYm { get; set; }
+        [Display(Name = "保養起始年(西元年)")]
+        public int? KeepY { get; set; }
         [Display(Name = "大樓")]
         public string Building { get; set; }
         [Display(Name = "是否累進")]
