@@ -1,0 +1,76 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.NewsViewModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+@using System.Security.Claims
+
+@{
+    ViewBag.Title = "列表/最新消息";
+}
+
+<h2>最新消息列表</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().NewsTitle)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().NewsContent)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Sdate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Edate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().UserName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Status)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RTT)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsTitle)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.NewsContent)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Sdate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Edate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UserName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RTT)
+            </td>
+            <td>
+                @Html.ActionLink("編輯", "Edit", new { id = item.NewsId }, new { target = "_blank" }) |
+                @Html.ActionLink("預覽", "Details", new { id = item.NewsId }, new { target = "_blank" }) |
+                @Html.ActionLink("刪除", "Delete", new { id = item.NewsId }@*, new { target = "_blank" }*@)
+            </td>
+        </tr>
+    }
+
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

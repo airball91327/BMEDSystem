@@ -1,0 +1,102 @@
+﻿@model EDIS.Models.News
+
+@{
+    ViewBag.Title = "刪除/最新消息";
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+}
+<script src="~/js/NewsCreate.js" asp-append-version="true"></script>
+
+<script>
+    function onSuccess(data) {
+        if (data.success === false) {
+            alert(data.error);
+        }
+        else {
+            $.Toast.hideToast();
+            alert("已刪除");
+            location.href = "@Url.Action("Index","News",new { Area=""})"
+        }
+    }
+
+</script>
+<h2>刪除</h2>
+
+<h3>您確定要刪除此資料?</h3>
+
+<form asp-action="Delete" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="onSuccess">
+    <h4>最新消息</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.UserName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.UserName)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NewsTitle)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NewsTitle)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.NewsContent)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.NewsContent)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Sdate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Sdate)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Edate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Edate)
+        </dd>
+
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.RTT)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.RTT)
+        </dd>
+
+    </dl>
+
+    <div class="form-actions no-color">
+        <input type="submit" value="確定刪除" class="btn btn-default" /> |
+        @Html.ActionLink("回到最新消息列表", "Index")
+    </div>
+</form>

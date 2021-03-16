@@ -1,0 +1,155 @@
+﻿@model EDIS.Models.NewsViewModel
+
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+}
+
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+<script src="~/js/BMED/Datepicker.js"></script>
+
+
+
+<script>
+    $(document).ready(function () {
+         $("#NewsForm").submit();
+    })
+   
+    function BMEDRepAsSubmit() {
+            /* Refresh repair form. */
+            var strArray = window.location.href.split("/");
+            var strArray2 = strArray[strArray.length - 1].split("#");
+            var page = strArray2[strArray2.length - 1];
+
+            fetchPageRATE(page);
+            
+    };
+
+    function smgREPORT(data)
+    {
+        if (data.success === false) {
+            alert(data.error);
+        }
+    }
+
+
+        // Use ajax to fetch page.
+        var fetchPageRATE = function (page) {
+            var pagedPartialUrl = '@Url.Action("QryList", "News", new { Area = "" })';
+            var s = $('#NewsForm').serialize();
+            $.Toast.showToast({
+                'title': '作業進行中，請稍待...',
+                'icon': 'loading',
+                'duration': 0
+            })
+            $.ajax({
+                url: pagedPartialUrl,
+                type: "POST",
+                data: s + "&page=" + page,
+                success: function (data) {
+                    if (data.success === false)
+                    {
+                        alert(data.error);
+                    }
+
+                    window.location.hash = page;
+
+                    $('#pnlREPORT').html(data);
+
+                    $('#pnlREPORT .pagination li a').each(function (i, item) {
+                        var hyperLinkUrl = $(item).attr('href');
+                        if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                            var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                            $(item).attr('href', '#').click(function (event) {
+                                event.preventDefault();
+                                $(event.target).attr('href');
+                                fetchPageRATE(pageNumber);
+                            });
+                        }
+                    });
+                    $.Toast.hideToast();
+                },
+                error: function (data) {
+                    alert(data.responseText);
+                    $.Toast.hideToast();
+                }
+            });
+
+    };
+
+
+
+</script>
+
+<h2>最新消息</h2>
+
+<form asp-action="QryList" asp-controller="News" data-ajax="true" id="NewsForm"
+      data-ajax-update="#pnlREPORT" data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'查詢中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-success="smgREPORT"
+      data-ajax-failure="onFailed"
+      data-ajax-complete="$.Toast.hideToast()">
+
+    @Html.AntiForgeryToken()
+
+    <div class="form-horizontal">
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.NewsId, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.NewsId, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.NewsId, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Sdate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @*<input asp-for="Sdate" type="date" class="form-control" />*@
+                @Html.TextBoxFor(model => model.Sdate, new { @class = "form-control", @id = "datepicker1" })
+                @Html.ValidationMessageFor(model => model.Sdate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Edate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @*<input asp-for="Edate" type="date" class="form-control" />*@
+                @Html.TextBoxFor(model => model.Edate, new { @class = "form-control", @id = "datepicker2" })
+                @Html.ValidationMessageFor(model => model.Edate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @if (UserManager.IsInRole(User, "MedAssetMgr"))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Loc, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    @Html.DropDownListFor(model => model.Loc, ViewData["NewsLoc"] as SelectList,"請選擇", new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Loc, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageRATE(1)" />
+            </div>
+        </div>
+    </div>
+
+
+</form>
+
+<hr />
+<div id="pnlREPORT">
+
+</div>

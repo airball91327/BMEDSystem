@@ -313,6 +313,47 @@ namespace EDIS.Areas.BMED.Controllers
             return did;
         }
 
+        public string GetID2()
+        {
+            string did = "";
+            try
+            {
+                DocIdStore ds = new DocIdStore();
+                ds.DocType = "醫工保養";
+                string s = _dsRepo.Find(x => x.DocType == "醫工保養").Select(x => x.DocId).Max();
+                int yymmdd = (System.DateTime.Now.Year - 1911) * 100 + (System.DateTime.Now.Month) * 100 + System.DateTime.Now.Day;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    did = s;
+                }
+                if (did != "")
+                {
+                    if (Convert.ToInt64(did) / 100000 == yymmdd)
+                        did = Convert.ToString(Convert.ToInt64(did) + 1);
+                    else
+                        did = Convert.ToString(yymmdd * 100000 + 1);
+                    ds.DocId = did;
+                    _dsRepo.Update(ds);
+                }
+                else
+                {
+                    did = GetID() ;
+                    ds.DocId = did;
+                    // 二次確認資料庫內沒該資料才新增。
+                    var dataIsExist = _dsRepo.Find(x => x.DocType == "醫工保養");
+                    if (dataIsExist.Count() == 0)
+                    {
+                        _dsRepo.Create(ds);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                RedirectToAction("Create", "Keep", new { Area = "BMED" });
+            }
+            return did;
+        }
+
         // POST: BMED/Keep/Index
         [HttpPost]
         public IActionResult Index(QryKeepListData qdata, int page = 1)

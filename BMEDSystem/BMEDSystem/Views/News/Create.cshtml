@@ -1,0 +1,127 @@
+﻿@model EDIS.Models.News
+
+@{
+    ViewBag.Title = "新增/最新消息";
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+}
+
+
+<script src="~/js/BMED/Datepicker.js" asp-append-version="true"></script>
+<script src="~/js/NewsCreate.js" asp-append-version="true"></script>
+
+<style>
+    /* Style the scale of checkbox. */
+    input[type=checkbox] {
+        -ms-transform: scale(1.5); /* IE */
+        -moz-transform: scale(1.5); /* FireFox */
+        -webkit-transform: scale(1.5); /* Safari and Chrome */
+        -o-transform: scale(1.5); /* Opera */
+    }
+
+    .requiredTag {
+        color: red;
+    }
+</style>
+
+<script>
+    function onSuccess(data) {
+    if (data.success === false) {
+        alert(data.error);
+    }
+    else {
+        $.Toast.hideToast();
+        alert("已送出");
+        location.href = "@Url.Action("Index","News",new { Area=""})"
+    }
+}
+
+</script>
+
+<h2>新增</h2>
+
+<form asp-action="Create" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="onSuccess">
+    <div class="container">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @Html.HiddenFor(model => model.UserId)
+        <div class="row">
+            <div class=form-inline>
+                <div class=form-group>
+                    <label asp-for="UserName" class="control-title"></label>
+                    <input asp-for="UserName" class="form-control" readonly />
+                    <span asp-validation-for="UserId" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class=form-group>
+                    <label asp-for="NewsTitle" class="control-title"></label>
+                    <input asp-for="NewsTitle" class="form-control" />
+                    <span asp-validation-for="NewsTitle" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <label asp-for="NewsContent" class="control-title"></label>
+                <div class="form-group">
+                    <textarea asp-for="NewsContent" cols="50" rows="5"></textarea>
+                    <span asp-validation-for="NewsContent" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label asp-for="Sdate" class="control-title"></label>
+                    @Html.TextBoxFor(model => model.Sdate, new { @class = "form-control", @id = "datepicker1" })
+                    @Html.ValidationMessageFor(model => model.Sdate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label asp-for="Edate" class="control-title"></label>
+                    @Html.TextBoxFor(model => model.Edate, new { @class = "form-control", @id = "datepicker2" })
+                    @Html.ValidationMessageFor(model => model.Edate, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label class="control-title">狀態</label>
+                    <input type="radio" value="Y" name="Status" style="margin: 7px 0px 0px 7px;" checked><span>開啟</span>
+                    <input type="radio" value="N" name="Status" style="margin: 7px 0px 0px 7px;"><span>關閉</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div style="padding-left: 115px">
+                <input type="submit" value="確定送出" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div>
+    <a asp-action="Index" asp-controller="News" asp-area="">回到列表</a>
+</div>
+
+<div>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    }
+</div>

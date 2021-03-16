@@ -57,8 +57,8 @@ namespace EDIS.Areas.BMED.Controllers
             var repairDtl = _context.BMEDRepairDtls.Find(assign.DocId);
             var dpt = _context.BMEDRepairs.Find(assign.DocId).DptId;
             string[] loc = { "K", "P", "C" };
-            var applyloc = _context.Departments.Where(d => d.DptId == dpt).Where(d => !loc.Contains(d.Loc)).Select(l => l.Loc).FirstOrDefault();
-            
+            var applyloc = _context.Departments.Where(d => d.DptId == dpt).Where(d => loc.Contains(d.Loc)).Select(l => l.Loc).FirstOrDefault();
+            applyloc = String.IsNullOrEmpty(applyloc) == false ? "總院" : "分院";
             /* 工程師的流程控管 */
             if (assign.Cls == "設備工程師")
             {
@@ -126,197 +126,386 @@ namespace EDIS.Areas.BMED.Controllers
                         throw new Exception("送至驗收人處理狀態只可為【已完成】、【報廢】、【退件】!!");
                     }
                 }
-                if (assign.FlowCls == "結案" && rf.Cls == "設備主管" && repairDtl.IsCharged == "Y" && repairDtl.IsInstrument == "Y" && !String.IsNullOrEmpty(applyloc))
+                if (applyloc == "總院")
                 {
-                    if (assign.Cls == "驗收人" && repairDtl != null)
+                    if (rf.Cls == "設備工程師" &&
+                        (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "Y") &&
+                        (assign.FlowCls == "賀康主管" && assign.AssignCls == "同意"))
                     {
-                        if (repairDtl.IsCharged == "Y")
+                        RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
+                        rd.CloseDate = DateTime.Now;
+                        //轉送賀康主管關卡
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "1";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.Entry(rd).State = EntityState.Modified;
+                        _context.SaveChanges();
+                        //
+                        var role = roleManager.GetUsersInRole("MedAssetMgr");
+                        RepairFlowModel flow = new RepairFlowModel();
+                        flow.DocId = assign.DocId;
+                        flow.StepId = rf.StepId + 1;
+                        flow.UserId = _context.AppUsers
+                            .Where(u => role.Contains(u.UserName))
+                            .Join(_context.Departments.Where(d => loc.Contains(d.Loc)),
+                                    u => u.DptId,
+                                    d => d.DptId,
+                                    (u, d) => new { Id = u.Id }
+                            ).Select(x => x.Id).FirstOrDefault();
+                        flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
+                        flow.Status = "?";
+                        flow.Cls = "賀康主管";
+                        flow.Rtt = DateTime.Now;
+                        _context.BMEDRepairFlows.Add(flow);
+                        _context.SaveChanges();
+                    }
+                    else if (assign.FlowCls == "結案")
+                    {
+                        if (assign.Cls == "驗收人" && repairDtl != null)
                         {
-                            throw new Exception("有費用之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    if (assign.Cls == "驗收人" && repairDtl != null)
-                    {
-                        if (repairDtl.DealState == 4)
-                        {
-                            throw new Exception("報廢之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
-                    rd.CloseDate = DateTime.Now;
-                    //轉送賀康主管關卡
-                    rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
-                    rf.Status = "1";
-                    rf.Rtt = DateTime.Now;
-                    rf.Rtp = ur.Id;
-                    _context.Entry(rf).State = EntityState.Modified;
-                    _context.Entry(rd).State = EntityState.Modified;
-                    _context.SaveChanges();
-                    //
-                    var role = roleManager.GetUsersInRole("MedAssetMgr");
-                    RepairFlowModel flow = new RepairFlowModel();
-                    flow.DocId = assign.DocId;
-                    flow.StepId = rf.StepId + 1;
-                    flow.UserId = _context.AppUsers
-                        .Where(u => role.Contains(u.UserName))
-                        .Join(_context.Departments.Where(d => !loc.Contains(d.Loc)),
-                                u => u.DptId,
-                                d => d.DptId,
-                                (u,d) => new { Id = u.Id}
-                        ).Select(x => x.Id).FirstOrDefault();
-                    flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
-                    flow.Status = "?";
-                    flow.Cls = "賀康主管";
-                    flow.Rtt = DateTime.Now;
-                    _context.BMEDRepairFlows.Add(flow);
-                    _context.SaveChanges();
-                }
-                else if (assign.FlowCls == "結案" )
-                {
-                    if (assign.Cls == "驗收人" && repairDtl != null)
-                    {
-                        if (repairDtl.IsCharged == "Y")
-                        {
-                            throw new Exception("有費用之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    if (assign.Cls == "驗收人" && repairDtl != null)
-                    {
-                        if (repairDtl.DealState == 4)
-                        {
-                            throw new Exception("報廢之案件不可由驗收人直接結案!");
-                        }
-                    }
-                    RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
-                    rd.CloseDate = DateTime.Now;
-                    rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
-                    rf.Status = "2";
-                    rf.UserId = ur.Id;
-                    rf.UserName = _context.AppUsers.Find(ur.Id).FullName;
-                    rf.Rtt = DateTime.Now;
-                    rf.Rtp = ur.Id;
-                    _context.Entry(rf).State = EntityState.Modified;
-                    _context.Entry(rd).State = EntityState.Modified;
-                    // Save stock to ERP system.
-                    if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
-                    {
-                        var ERPreponse = await SaveToERPAsync(assign.DocId);
-                        if (!ERPreponse.Contains("成功"))
-                        {
-                            throw new Exception(ERPreponse);
-                        }
-                    }
-                    _context.SaveChanges();
-                    //sync to oracleBatch
-                    var rep = _context.BMEDRepairs.Find(assign.DocId);
-                    if (rep.Loc == "總院" || rep.Loc == "K")
-                    {
-                        string smsg = SyncToOracleBatch(assign.DocId);
-                        //if (smsg == "1")
-                        //    throw new Exception("同步OracleBatch失敗!");
-                    }
-
-                   
-                    //Send Mail
-                    //To all users in this repair's flow.
-                    Tmail mail = new Tmail();
-                    string body = "";
-                    string sto = "";
-                    AppUserModel u;
-                    RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
-                    mail.from = new System.Net.Mail.MailAddress(ur.Email); //u.Email
-                    _context.BMEDRepairFlows.Where(f => f.DocId == assign.DocId)
-                            .ToList()
-                            .ForEach(f =>
+                            if (repairDtl.IsCharged == "Y")
                             {
-                                u = _context.AppUsers.Find(f.UserId);
-                                sto += u.Email + ",";
-                            });
-                    mail.sto = sto.TrimEnd(new char[] { ',' });
+                                throw new Exception("有費用之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        if (assign.Cls == "驗收人" && repairDtl != null)
+                        {
+                            if (repairDtl.DealState == 4)
+                            {
+                                throw new Exception("報廢之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
+                        rd.CloseDate = DateTime.Now;
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "2";
+                        rf.UserId = ur.Id;
+                        rf.UserName = _context.AppUsers.Find(ur.Id).FullName;
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.Entry(rd).State = EntityState.Modified;
+                        // Save stock to ERP system.
+                        if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
+                        {
+                            var ERPreponse = await SaveToERPAsync(assign.DocId);
+                            if (!ERPreponse.Contains("成功"))
+                            {
+                                throw new Exception(ERPreponse);
+                            }
+                        }
+                        _context.SaveChanges();
+                        //sync to oracleBatch
+                        var rep = _context.BMEDRepairs.Find(assign.DocId);
+                        if (rep.Loc == "總院" || rep.Loc == "K")
+                        {
+                            string smsg = SyncToOracleBatch(assign.DocId);
+                            //if (smsg == "1")
+                            //    throw new Exception("同步OracleBatch失敗!");
+                        }
 
-                    mail.message.Subject = "醫工智能保修系統[請修案-結案通知]：設備名稱： " + repair.AssetName;
-                    body += "<p>表單編號：" + repair.DocId + "</p>";
-                    body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
-                    body += "<p>申請人：" + repair.UserName + "</p>";
-                    body += "<p>財產編號：" + repair.AssetNo + "</p>";
-                    body += "<p>設備名稱：" + repair.AssetName + "</p>";
-                    //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
-                    body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
-                    body += "<p>故障描述：" + repair.TroubleDes + "</p>";
-                    body += "<p>處理描述：" + rd.DealDes + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?DocId=" + repair.DocId + "&dealType=BMEDRepViews" + ">檢視案件</a></p>";
-                    body += "<br/>";
-                    body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
-                    body += "<br/>";
-                    //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
-                    mail.message.Body = body;
-                    mail.message.IsBodyHtml = true;
-                    mail.SendMail();
-                }
-                else if (assign.FlowCls == "廢除")
-                {
-                    rf.Opinions = "[廢除]" + Environment.NewLine + assign.AssignOpn;
-                    rf.Status = "3";
-                    rf.Rtt = DateTime.Now;
-                    rf.Rtp = ur.Id;
-                    _context.Entry(rf).State = EntityState.Modified;
-                    _context.SaveChanges();
-                }
-                else
-                {
-                    //轉送下一關卡
-                    rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
-                    rf.Status = "1";
-                    rf.Rtt = DateTime.Now;
-                    rf.Rtp = ur.Id;
-                    _context.Entry(rf).State = EntityState.Modified;
-                    _context.SaveChanges();
-                    //
-                    RepairFlowModel flow = new RepairFlowModel();
-                    flow.DocId = assign.DocId;
-                    flow.StepId = rf.StepId + 1;
-                    flow.UserId = assign.FlowUid.Value;
-                    flow.UserName = _context.AppUsers.Find(assign.FlowUid.Value).FullName;
-                    flow.Status = "?";
-                    flow.Cls = assign.FlowCls;
-                    flow.Rtt = DateTime.Now;
-                    _context.BMEDRepairFlows.Add(flow);
-                    _context.SaveChanges();
 
-                    //Send Mail
-                    //To user and the next flow user.
-                    Tmail mail = new Tmail();
-                    string body = "";
-                    AppUserModel u;
-                    RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
-                    mail.from = new System.Net.Mail.MailAddress(ur.Email); //ur.Email
-                    u = _context.AppUsers.Find(flow.UserId);
-                    mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
-                                                                        //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
-                    mail.message.Subject = "醫工智能保修系統[請修案]：設備名稱： " + repair.AssetName;
-                    body += "<p>表單編號：" + repair.DocId + "</p>";
-                    body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
-                    body += "<p>申請人：" + repair.UserName + "</p>";
-                    body += "<p>財產編號：" + repair.AssetNo + "</p>";
-                    body += "<p>設備名稱：" + repair.AssetName + "</p>";
-                    body += "<p>故障描述：" + repair.TroubleDes + "</p>";
-                    //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
-                    body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
-                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?docId=" + repair.DocId + "&dealType=BMEDRepEdit" + ">處理案件</a></p>";
-                    body += "<br/>";
-                    body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
-                    body += "<br/>";
-                    //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
-                    mail.message.Body = body;
-                    mail.message.IsBodyHtml = true;
-                    // 寄信人員控管
-                    if (flow.Cls.Contains("工程師") || flow.Cls == "賀康主管" || flow.Cls == "醫工主管")
+                        //Send Mail
+                        //To all users in this repair's flow.
+                        Tmail mail = new Tmail();
+                        string body = "";
+                        string sto = "";
+                        AppUserModel u;
+                        RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
+                        mail.from = new System.Net.Mail.MailAddress(ur.Email); //u.Email
+                        _context.BMEDRepairFlows.Where(f => f.DocId == assign.DocId)
+                                .ToList()
+                                .ForEach(f =>
+                                {
+                                    u = _context.AppUsers.Find(f.UserId);
+                                    sto += u.Email + ",";
+                                });
+                        mail.sto = sto.TrimEnd(new char[] { ',' });
+
+                        mail.message.Subject = "醫工智能保修系統[請修案-結案通知]：設備名稱： " + repair.AssetName;
+                        body += "<p>表單編號：" + repair.DocId + "</p>";
+                        body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
+                        body += "<p>申請人：" + repair.UserName + "</p>";
+                        body += "<p>財產編號：" + repair.AssetNo + "</p>";
+                        body += "<p>設備名稱：" + repair.AssetName + "</p>";
+                        //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
+                        body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
+                        body += "<p>故障描述：" + repair.TroubleDes + "</p>";
+                        body += "<p>處理描述：" + rd.DealDes + "</p>";
+                        body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?DocId=" + repair.DocId + "&dealType=BMEDRepViews" + ">檢視案件</a></p>";
+                        body += "<br/>";
+                        body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
+                        body += "<br/>";
+                        //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
+                        mail.message.Body = body;
+                        mail.message.IsBodyHtml = true;
+                        mail.SendMail();
+                    }
+                    else if (assign.FlowCls == "廢除")
                     {
-                        // 工程師、主管不寄信
+                        rf.Opinions = "[廢除]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "3";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.SaveChanges();
                     }
                     else
                     {
+                        //轉送下一關卡
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "1";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.SaveChanges();
+                        //
+                        RepairFlowModel flow = new RepairFlowModel();
+                        flow.DocId = assign.DocId;
+                        flow.StepId = rf.StepId + 1;
+                        flow.UserId = assign.FlowUid.Value;
+                        flow.UserName = _context.AppUsers.Find(assign.FlowUid.Value).FullName;
+                        flow.Status = "?";
+                        flow.Cls = assign.FlowCls;
+                        flow.Rtt = DateTime.Now;
+                        _context.BMEDRepairFlows.Add(flow);
+                        _context.SaveChanges();
+
+                        //Send Mail
+                        //To user and the next flow user.
+                        Tmail mail = new Tmail();
+                        string body = "";
+                        AppUserModel u;
+                        RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
+                        mail.from = new System.Net.Mail.MailAddress(ur.Email); //ur.Email
+                        u = _context.AppUsers.Find(flow.UserId);
+                        mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
+                                                                            //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
+                        mail.message.Subject = "醫工智能保修系統[請修案]：設備名稱： " + repair.AssetName;
+                        body += "<p>表單編號：" + repair.DocId + "</p>";
+                        body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
+                        body += "<p>申請人：" + repair.UserName + "</p>";
+                        body += "<p>財產編號：" + repair.AssetNo + "</p>";
+                        body += "<p>設備名稱：" + repair.AssetName + "</p>";
+                        body += "<p>故障描述：" + repair.TroubleDes + "</p>";
+                        //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
+                        body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
+                        body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?docId=" + repair.DocId + "&dealType=BMEDRepEdit" + ">處理案件</a></p>";
+                        body += "<br/>";
+                        body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
+                        body += "<br/>";
+                        //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
+                        mail.message.Body = body;
+                        mail.message.IsBodyHtml = true;
+                        // 寄信人員控管
+                        if (flow.Cls.Contains("工程師") || flow.Cls == "賀康主管" || flow.Cls == "醫工主管")
+                        {
+                            // 工程師、主管不寄信
+                        }
+                        else
+                        {
+                            mail.SendMail();
+                        }
+                    }
+                }
+                else
+                {
+                    if (rf.Cls == "設備主管" &&
+                        (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "Y") &&
+                        (assign.FlowCls == "結案" || (assign.FlowCls == "賀康主管" && assign.AssignCls == "同意")))
+                    {
+                        if (assign.Cls == "驗收人" && repairDtl != null)
+                        {
+                            if (repairDtl.IsCharged == "Y")
+                            {
+                                throw new Exception("有費用之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        if (assign.Cls == "驗收人" && repairDtl != null)
+                        {
+                            if (repairDtl.DealState == 4)
+                            {
+                                throw new Exception("報廢之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
+                        rd.CloseDate = DateTime.Now;
+                        //轉送賀康主管關卡
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "1";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.Entry(rd).State = EntityState.Modified;
+                        _context.SaveChanges();
+                        //
+                        var role = roleManager.GetUsersInRole("MedAssetMgr");
+                        RepairFlowModel flow = new RepairFlowModel();
+                        flow.DocId = assign.DocId;
+                        flow.StepId = rf.StepId + 1;
+                        flow.UserId = _context.AppUsers
+                            .Where(u => role.Contains(u.UserName))
+                            .Join(_context.Departments.Where(d => !loc.Contains(d.Loc)),
+                                    u => u.DptId,
+                                    d => d.DptId,
+                                    (u, d) => new { Id = u.Id }
+                            ).Select(x => x.Id).FirstOrDefault();
+                        flow.UserName = _context.AppUsers.Find(flow.UserId).FullName;
+                        flow.Status = "?";
+                        flow.Cls = "賀康主管";
+                        flow.Rtt = DateTime.Now;
+                        _context.BMEDRepairFlows.Add(flow);
+                        _context.SaveChanges();
+                    }
+                    else if (assign.FlowCls == "結案")
+                    {
+                        if (assign.Cls == "驗收人" && repairDtl != null)
+                        {
+                            if (repairDtl.IsCharged == "Y")
+                            {
+                                throw new Exception("有費用之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        if (assign.Cls == "驗收人" && repairDtl != null)
+                        {
+                            if (repairDtl.DealState == 4)
+                            {
+                                throw new Exception("報廢之案件不可由驗收人直接結案!");
+                            }
+                        }
+                        RepairDtlModel rd = _context.BMEDRepairDtls.Find(assign.DocId);
+                        rd.CloseDate = DateTime.Now;
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "2";
+                        rf.UserId = ur.Id;
+                        rf.UserName = _context.AppUsers.Find(ur.Id).FullName;
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.Entry(rd).State = EntityState.Modified;
+                        // Save stock to ERP system.
+                        if (repairDtl.NotInExceptDevice == "Y" && repairDtl.IsCharged == "Y") //該案件為統包 & 有費用
+                        {
+                            var ERPreponse = await SaveToERPAsync(assign.DocId);
+                            if (!ERPreponse.Contains("成功"))
+                            {
+                                throw new Exception(ERPreponse);
+                            }
+                        }
+                        _context.SaveChanges();
+                        //sync to oracleBatch
+                        var rep = _context.BMEDRepairs.Find(assign.DocId);
+                        if (rep.Loc == "總院" || rep.Loc == "K")
+                        {
+                            string smsg = SyncToOracleBatch(assign.DocId);
+                            //if (smsg == "1")
+                            //    throw new Exception("同步OracleBatch失敗!");
+                        }
+
+
+                        //Send Mail
+                        //To all users in this repair's flow.
+                        Tmail mail = new Tmail();
+                        string body = "";
+                        string sto = "";
+                        AppUserModel u;
+                        RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
+                        mail.from = new System.Net.Mail.MailAddress(ur.Email); //u.Email
+                        _context.BMEDRepairFlows.Where(f => f.DocId == assign.DocId)
+                                .ToList()
+                                .ForEach(f =>
+                                {
+                                    u = _context.AppUsers.Find(f.UserId);
+                                    sto += u.Email + ",";
+                                });
+                        mail.sto = sto.TrimEnd(new char[] { ',' });
+
+                        mail.message.Subject = "醫工智能保修系統[請修案-結案通知]：設備名稱： " + repair.AssetName;
+                        body += "<p>表單編號：" + repair.DocId + "</p>";
+                        body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
+                        body += "<p>申請人：" + repair.UserName + "</p>";
+                        body += "<p>財產編號：" + repair.AssetNo + "</p>";
+                        body += "<p>設備名稱：" + repair.AssetName + "</p>";
+                        //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
+                        body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
+                        body += "<p>故障描述：" + repair.TroubleDes + "</p>";
+                        body += "<p>處理描述：" + rd.DealDes + "</p>";
+                        body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?DocId=" + repair.DocId + "&dealType=BMEDRepViews" + ">檢視案件</a></p>";
+                        body += "<br/>";
+                        body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
+                        body += "<br/>";
+                        //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
+                        mail.message.Body = body;
+                        mail.message.IsBodyHtml = true;
                         mail.SendMail();
+                    }
+                    else if (assign.FlowCls == "廢除")
+                    {
+                        rf.Opinions = "[廢除]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "3";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.SaveChanges();
+                    }
+                    else
+                    {
+                        //轉送下一關卡
+                        rf.Opinions = "[" + assign.AssignCls + "]" + Environment.NewLine + assign.AssignOpn;
+                        rf.Status = "1";
+                        rf.Rtt = DateTime.Now;
+                        rf.Rtp = ur.Id;
+                        _context.Entry(rf).State = EntityState.Modified;
+                        _context.SaveChanges();
+                        //
+                        RepairFlowModel flow = new RepairFlowModel();
+                        flow.DocId = assign.DocId;
+                        flow.StepId = rf.StepId + 1;
+                        flow.UserId = assign.FlowUid.Value;
+                        flow.UserName = _context.AppUsers.Find(assign.FlowUid.Value).FullName;
+                        flow.Status = "?";
+                        flow.Cls = assign.FlowCls;
+                        flow.Rtt = DateTime.Now;
+                        _context.BMEDRepairFlows.Add(flow);
+                        _context.SaveChanges();
+
+                        //Send Mail
+                        //To user and the next flow user.
+                        Tmail mail = new Tmail();
+                        string body = "";
+                        AppUserModel u;
+                        RepairModel repair = _context.BMEDRepairs.Find(assign.DocId);
+                        mail.from = new System.Net.Mail.MailAddress(ur.Email); //ur.Email
+                        u = _context.AppUsers.Find(flow.UserId);
+                        mail.to = new System.Net.Mail.MailAddress(u.Email); //u.Email
+                                                                            //mail.cc = new System.Net.Mail.MailAddress("99242@cch.org.tw");
+                        mail.message.Subject = "醫工智能保修系統[請修案]：設備名稱： " + repair.AssetName;
+                        body += "<p>表單編號：" + repair.DocId + "</p>";
+                        body += "<p>申請日期：" + repair.ApplyDate.ToString("yyyy/MM/dd") + "</p>";
+                        body += "<p>申請人：" + repair.UserName + "</p>";
+                        body += "<p>財產編號：" + repair.AssetNo + "</p>";
+                        body += "<p>設備名稱：" + repair.AssetName + "</p>";
+                        body += "<p>故障描述：" + repair.TroubleDes + "</p>";
+                        //body += "<p>請修地點：" + repair.PlaceLoc + " " + repair.BuildingName + " " + repair.FloorName + " " + repair.AreaName + "</p>";
+                        body += "<p>放置地點：" + repair.PlaceLoc + "</p>";
+                        body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'" + "?docId=" + repair.DocId + "&dealType=BMEDRepEdit" + ">處理案件</a></p>";
+                        body += "<br/>";
+                        body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
+                        body += "<br/>";
+                        //body += "<h3 style='color:red'>如有任何疑問請聯絡工務部，分機3033或7033。<h3>";
+                        mail.message.Body = body;
+                        mail.message.IsBodyHtml = true;
+                        // 寄信人員控管
+                        if (flow.Cls.Contains("工程師") || flow.Cls == "賀康主管" || flow.Cls == "醫工主管")
+                        {
+                            // 工程師、主管不寄信
+                        }
+                        else
+                        {
+                            mail.SendMail();
+                        }
                     }
                 }
 

@@ -70,10 +70,10 @@ namespace EDIS.Models
         //public virtual DbSet<ExternalUsers> ExternalUsers { get; set; }
         public virtual DbSet<UsersInRolesModel> UsersInRoles { get; set; }  
         //public virtual DbSet<Vendors> Vendors { get; set; }
-
         public virtual DbQuery<UnSignListVModel> UnSignListVModelQuery { get; set; }
+        public virtual DbSet<News> News { get; set; }
 
-       
+
 
 
 
@@ -103,6 +103,28 @@ namespace EDIS.Models
                 entity.Property(e => e.RoleName).IsRequired();
             });
 
+
+            modelBuilder.Entity<News>((Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<News> entity) =>
+            {
+                entity.HasKey(e => e.NewsId);
+
+                entity.ToTable("News");
+
+                entity.Property(e => e.Sdate).HasColumnType("datetime");
+
+                entity.Property(e => e.Edate).HasColumnType("datetime");
+
+                entity.Property(e => e.UserId).HasMaxLength(50);
+
+                entity.Property(e => e.Status).HasMaxLength(10);
+
+               
+                entity.Property(e => e.NewsTitle).IsRequired().HasMaxLength(200);
+
+                entity.Property(e => e.NewsContent).IsRequired().HasMaxLength(500); 
+
+                entity.Property(e => e.RTT).HasColumnType("datetime");
+            });
 
             modelBuilder.Entity<AppUserModel>((Microsoft.EntityFrameworkCore.Metadata.Builders.EntityTypeBuilder<AppUserModel> entity) =>
             {
