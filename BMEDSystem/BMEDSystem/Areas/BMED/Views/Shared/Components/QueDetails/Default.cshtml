@@ -1,0 +1,54 @@
+﻿@model EDIS.Models.QuestionnaireM
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2></h2>
+
+<div>
+    <h4>問卷調查</h4>
+    <hr />
+
+    @if (Model == null)
+    {
+        <p class="text-danger">無任何資料!</p>
+
+    }
+    else
+    {
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Qname)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Qname)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Memo)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Memo)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Flg)
+            </dt>
+
+            <dd>
+                @if (Model.Flg == "Y")
+                {
+                    @Html.DisplayName("開啟")
+                }
+                else
+                {
+                    @Html.DisplayName("關閉")
+                }
+            </dd>
+
+        </dl>
+    }
+</div>

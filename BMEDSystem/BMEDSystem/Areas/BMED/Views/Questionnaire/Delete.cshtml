@@ -1,0 +1,80 @@
+﻿@model EDIS.Models.Questionnaire
+
+@{
+    ViewBag.Title = "刪除/問卷項目";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
+}
+<script src="~/js/BMED/Questionnaire.js" asp-append-version="true"></script>
+
+<h2>刪除</h2>
+
+<h3>您確定要刪除此資料?</h3>
+
+<form asp-action="Delete" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="onSuccessD()"
+      asp-route-id="@Model.VerId"
+      asp-route-qid="@Model.Qid">
+    <h2></h2>
+
+    <div>
+        <h4>問卷調查</h4>
+        <hr />
+
+        @if (Model == null)
+        {
+            <p class="text-danger">無任何資料!</p>
+            <div class="form-actions no-color">
+                @Html.ActionLink("回到最新消息列表", "List", new { @id = Model.VerId })
+            </div>
+        }
+        else
+        {
+            <dl class="dl-horizontal">
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Qid)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Qid)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Qtitle)
+                </dt>
+
+                <dd>
+                    @Html.DisplayFor(model => model.Qtitle)
+                </dd>
+
+                <dt>
+                    @Html.DisplayNameFor(model => model.Required)
+                </dt>
+
+                <dd>
+                    @if (Model.Required == "Y")
+                    {
+                        @Html.DisplayName("開啟")
+                    }
+                    else
+                    {
+                        @Html.DisplayName("關閉")
+                    }
+                </dd>
+
+            </dl>
+            <div class="form-actions no-color">
+                <input id="btn" type="submit" value="確定刪除" class="btn btn-default" data-request-url="@Url.Action("List","Questionnaire",new { @id = Model.VerId})" />    |
+                @Html.ActionLink("回到最新消息列表", "List", new { @id = Model.VerId })
+            </div>
+        }
+
+    </div>
+</form>

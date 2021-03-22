@@ -1,0 +1,79 @@
+﻿@model EDIS.Models.Evaluation
+@{
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
+}
+<link href="~/css/bootstrap-combobox.css" rel="stylesheet" />
+<script src="~/js/bootstrap-combobox.js"></script>
+
+<script>
+    $(document).ready(function () {
+        $('.BMEDCombobox').combobox();
+    });
+    var showmsg = function (data) {
+        var href = $("#btn").data('request-url');
+    
+        if (!data.success) {
+            alert(data.error);
+            $.Toast.hideToast();
+        }
+        else {
+            alert("儲存成功!");
+           if (window.opener === null) {
+                location.replace(homeHref);
+            }
+            else {
+                opener.location.reload();//This will call ReSubmit() function on parent window.
+                //opener.location.reload();//This will refresh parent window.
+                window.close();
+            }
+        }
+    }
+    var onFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>
+
+<h2>醫工智能 @Model.Qname</h2>
+
+<hr />
+<form asp-action="New" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+          'title':'作業進行中，請稍待...',
+          'icon':'loading',
+          'duration':0
+          })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="showmsg">
+
+    @Html.ValidationSummary(true)
+    @Html.HiddenFor(model => model.Docid)
+    @Html.HiddenFor(model => model.YYYYmm)
+    <div class="form-group">
+        <div class="form-inline">
+            <div class="col-md-12 text-left">
+                <label for="CustId" class="control-label col-md-2">單位名稱</label>
+                <div class="col-md-4">
+                    <select asp-for="CustId" asp-items="@ViewData["Dept"] as SelectList" class="form-control BMEDCombobox">
+                        <option value="">請選擇</option>
+                    </select>
+                    @Html.ValidationMessageFor(model => model.CustId, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        </div>
+    </div>
+    @Html.EditorFor(model => model.Questions)
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input id="btn" type="submit" value="確定送出" class="btn btn-default"  />
+        </div>
+    </div>
+</form>
+<div>
+    <div class="form-group">
+        <div class="col-md-offset-2 col-md-10">
+            <input type="submit" value="關閉" class="btn btn-default" onclick="window.close();" />
+        </div>
+    </div>
+</div>

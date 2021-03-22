@@ -1,0 +1,98 @@
+﻿@model EDIS.Models.QuestionnaireM
+
+
+@{
+    ViewBag.Title = "編輯/滿意度調查";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
+}
+
+<script src="~/js/BMED/QuestionnaireEdit.js" asp-append-version="true"></script>
+
+<style>
+    /* Style the scale of checkbox. */
+    input[type=checkbox] {
+        -ms-transform: scale(1.5); /* IE */
+        -moz-transform: scale(1.5); /* FireFox */
+        -webkit-transform: scale(1.5); /* Safari and Chrome */
+        -o-transform: scale(1.5); /* Opera */
+    }
+
+    .requiredTag {
+        color: red;
+    }
+</style>
+
+
+
+<h2>編輯</h2>
+
+<form asp-action="Update" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="flowmsg">
+    <div class="container">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        @Html.HiddenFor(model => model.VerId)
+        @Html.HiddenFor(model => model.Rtp)
+        <div class="row">
+            <div class=form-inline>
+                <div class=form-group>
+                    <label asp-for="RtpName" class="control-title"></label>
+                    <input asp-for="RtpName" class="form-control" readonly />
+                    <span asp-validation-for="RtpName" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class=form-group>
+                    <label asp-for="Qname" class="control-title"></label>
+                    <input asp-for="Qname" class="form-control" />
+                    <span asp-validation-for="Qname" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <label asp-for="Memo" class="control-title"></label>
+                <div class="form-group">
+                    <textarea asp-for="Memo" cols="50" rows="5"></textarea>
+                    <span asp-validation-for="Memo" class="text-danger"></span>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class=form-inline>
+                <div class="form-group">
+                    <label class="control-title">狀態</label>
+                    <input type="radio" value="Y" name="Flg" style="margin: 7px 0px 0px 7px;" checked><span>開啟</span>
+                    <input type="radio" value="N" name="Flg" style="margin: 7px 0px 0px 7px;"><span>關閉</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div style="padding-left: 115px">
+                <input id="btn" type="submit" value="確定送出" class="btn btn-default" data-request-url="@Url.Action("Index", "QuestionnaireMs",new { Area ="BMED"})" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div>
+    <input  type="button" value="關閉" class="btn btn-default" onclick="window.close()"/>
+    @*<a asp-action="Index" asp-controller="QuestionnaireMs" asp-area="BMED">回到列表</a>*@
+</div>
+
+<div>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+
+    }
+</div>

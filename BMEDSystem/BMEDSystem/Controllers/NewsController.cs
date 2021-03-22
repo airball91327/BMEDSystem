@@ -105,7 +105,8 @@ namespace EDIS.Controllers
             {
                 news = n,
                 user = u
-            }).ToList()
+            })
+            .ToList()
             .ForEach(n =>
                 newslist.Add(new NewsViewModel
                 {
@@ -130,7 +131,8 @@ namespace EDIS.Controllers
                {
                    news = n,
                    FullName = u.FullName
-               }).ToList()
+               })
+               .ToList()
                .ForEach(n =>
                    newslist.Add(new NewsViewModel
                    {
@@ -187,7 +189,7 @@ namespace EDIS.Controllers
             News news = new News();
             var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
             news.UserId = ur.Id;
-            news.UserName = ur.UserName;
+            news.UserName = ur.FullName;
             return View(news);
         }
 

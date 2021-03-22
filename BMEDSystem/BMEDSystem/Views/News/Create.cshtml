@@ -25,13 +25,26 @@
 
 <script>
     function onSuccess(data) {
-    if (data.success === false) {
+        var homeHref = "@Url.Action("Index","News",new { Area=""})";
+        $("#btnGO").attr("disabled", false);
+        if (data.success == false) {
         alert(data.error);
     }
     else {
-        $.Toast.hideToast();
-        alert("已送出");
-        location.href = "@Url.Action("Index","News",new { Area=""})"
+        alert("送出成功!");
+
+        /* window.close(), 當前非彈出視窗在最新版本的chrome和firefox裡不能關閉，而在IE中是可以關閉的 
+         * 非彈出視窗，即是指（opener=null 及 非window.open()開啟的視窗,比如URL直接輸入的瀏覽器窗體， 或由其它程式呼叫產生的瀏覽器視窗）
+         */
+        if (window.opener == null) {
+           
+            location.replace(homeHref);
+        }
+        else {
+            window.opener.location = "javascript:fetchPageRATE(1);";//This will call ReSubmit() function on parent window.
+            //opener.location.reload();//This will refresh parent window.
+            window.close();
+        }
     }
 }
 
@@ -108,7 +121,7 @@
 
         <div class="row">
             <div style="padding-left: 115px">
-                <input type="submit" value="確定送出" class="btn btn-default" />
+                <input id ="btnGO" type="submit" value="確定送出" class="btn btn-default" />
             </div>
         </div>
 

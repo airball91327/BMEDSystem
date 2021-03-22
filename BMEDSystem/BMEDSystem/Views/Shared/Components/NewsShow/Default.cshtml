@@ -1,10 +1,11 @@
-﻿@model  IEnumerable<EDIS.Models.NewsViewModel>
+﻿@model IEnumerable<EDIS.Models.NewsViewModel>
 
 <style>
-    .table{
-        margin:0;
-        width:100%;
+    .table {
+        margin: 0;
+        width: 100%;
     }
+
 </style>
 
 <div class="panel panel-info">
@@ -39,11 +40,31 @@
                 </td>
 
                 <td>
-                    @Html.ActionLink("預覽","UnDetails", "News", new { id = item.NewsId }, new { target = "_blank" })
+                    @*@Html.ActionLink("預覽", "UnDetails", "News", new { id = item.NewsId }, new { target = "_blank" })*@
+                    <input type="button" value="預覽" class="btn btn-default" data-toggle="modal" data-target="#modalDETAIL" id="btnQtyDetails" />
                 </td>
             </tr>
+            <!-- 最新消息預覽 Modal -->
+            <div id="modalDETAIL" class="modal fade" role="dialog">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">[最新消息]</h4>
+                        </div>
+                        <div class="modal-body">
+                            @await Component.InvokeAsync("NewsDetails", new { id = item.NewsId })
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">關閉</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
         }
 
     </table>
 </div>
+
+
 

@@ -59,7 +59,7 @@ namespace EDIS.Components.News
                     Sdate = n.news.Sdate,
                     Edate = n.news.Edate
                 })
-            ) ;
+            );
 
             return View(newslist);
         }

@@ -863,7 +863,7 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[12] = m.vendor == null ? "" : m.vendor.VendorName;
                 dw[13] = m.vendor == null ? "" : m.vendor.UniteNo;
                 dw[14] = m.asset.MakeNo;
-                dw[15] = m.asset.DisposeKind;
+                dw[15] = m.asset.DisposeKindC;
                 dw[16] = m.asset.Cost;
                 dw[17] = m.assetkeep == null ? null : m.assetkeep.Cycle;
                 dw[18] = m.assetkeep == null ? null : m.assetkeep.KeepYm;

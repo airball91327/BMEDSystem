@@ -72,6 +72,10 @@ namespace EDIS.Models
         //public virtual DbSet<Vendors> Vendors { get; set; }
         public virtual DbQuery<UnSignListVModel> UnSignListVModelQuery { get; set; }
         public virtual DbSet<News> News { get; set; }
+        public virtual DbSet<QuestionnaireM> QuestionnaireMs { get; set; }
+        public virtual DbSet<Questionnaire> Questionnaires { get; set; }
+        public virtual DbSet<QuestMain> QuestMains { get; set; }
+        public virtual DbSet<QuestAnswer> QuestAnswers { get; set; }
 
 
 
@@ -1184,6 +1188,62 @@ namespace EDIS.Models
                     .HasConstraintName("FK_UsersInRoles_AppUsers");
             });
 
+            modelBuilder.Entity<QuestionnaireM>(entity =>
+            {
+                entity.HasKey(e => e.VerId);
+
+                entity.ToTable("BMEDQuestionnaireM");
+
+                entity.Property(e => e.Qname).HasMaxLength(50);
+
+                entity.Property(e => e.Memo).HasMaxLength(256);
+
+                entity.Property(e => e.Flg).HasMaxLength(10);
+
+                entity.Property(e => e.Rtp).IsRequired();
+
+                entity.Property(e => e.Rtt).HasColumnType("datetime");
+
+            });
+
+            modelBuilder.Entity<Questionnaire>(entity =>
+            {
+                entity.HasKey(e => new { e.VerId , e.Qid });
+
+                entity.ToTable("BMEDQuestionnaire");
+
+                entity.Property(e => e.Qtitle).HasMaxLength(50);
+
+                entity.Property(e => e.Typ).HasMaxLength(50);
+            });
+
+            modelBuilder.Entity<QuestMain>(entity =>
+            {
+                entity.HasKey(e => e.Docid);
+
+                entity.ToTable("BMEDQuestMain");
+
+                entity.Property(e => e.YYYYmm).HasMaxLength(50);
+
+                entity.Property(e => e.CustId).HasMaxLength(50);
+
+                entity.Property(e => e.CustNam).HasMaxLength(50);
+
+                entity.Property(e => e.ContractNo).HasMaxLength(50);
+
+                entity.Property(e => e.Rtt).HasColumnType("date");
+
+
+            });
+
+            modelBuilder.Entity<QuestAnswer>(entity =>
+            {
+                entity.HasKey(e => new { e.Docid ,e.VerId,e.Qid });
+
+                entity.ToTable("BMEDQuestAnswer");
+
+                entity.Property(e => e.Answer).HasMaxLength(265);
+            });
         }
     }
 }
