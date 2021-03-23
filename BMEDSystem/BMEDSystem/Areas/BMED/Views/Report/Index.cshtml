@@ -162,7 +162,7 @@
             @Html.LabelFor(model => model.Sdate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @*<input asp-for="Sdate" type="date" class="form-control" />*@
-                @Html.TextBoxFor(model => model.Sdate, new { @class = "form-control", @id="datepicker1" })
+                @Html.TextBoxFor(model => model.Sdate, new { @class = "form-control", @id = "datepicker1" })
                 @Html.ValidationMessageFor(model => model.Sdate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -171,7 +171,7 @@
             @Html.LabelFor(model => model.Edate, htmlAttributes: new { @class = "control-label col-md-2" })
             <div class="col-md-10">
                 @*<input asp-for="Edate" type="date" class="form-control" />*@
-                @Html.TextBoxFor(model => model.Edate, new { @class = "form-control" , @id="datepicker2"})
+                @Html.TextBoxFor(model => model.Edate, new { @class = "form-control", @id = "datepicker2" })
                 @Html.ValidationMessageFor(model => model.Edate, "", new { @class = "text-danger" })
             </div>
         </div>
@@ -222,6 +222,16 @@
                 @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
                 <div class="col-md-3">
                     @Html.DropDownListFor(model => model.Location, ViewData["Location"] as SelectList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
+        @if (Model.ReportClass == "滿意度調查統計表")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Qname, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    @Html.DropDownListFor(model => model.Qname, ViewData["Qname"] as SelectList, new { @class = "form-control combobox" })
                     @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
                 </div>
             </div>

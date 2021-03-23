@@ -91,11 +91,20 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 _context.Questionnaires.Add(questionnaire);
                 _context.SaveChanges();
-
-                return RedirectToAction("List", new { id = questionnaire.VerId });
+                return new JsonResult(questionnaire)
+                {
+                    Value = new { success = true, error = "" }
+                };
             }
-
-            return View(questionnaire);
+            else
+            {
+                string msg = "";
+                foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                {
+                    msg += error.ErrorMessage + Environment.NewLine;
+                }
+                throw new Exception(msg);
+            }
         }
 
         public IActionResult Delete(int? id, int? qid )
@@ -139,29 +148,17 @@ namespace EDIS.Areas.BMED.Controllers
             string yyyymm = Convert.ToString(dd.Year * 100 + dd.Month);
 
             var evalVM = new Evaluation();
-            QuestMain main = new QuestMain();
-            main.Docid = GetID();
-            main.YYYYmm = yyyymm;
-            main.Rtt = DateTime.Now;
-            _context.QuestMains.Add(main);
-            try
-            {
-                _context.SaveChanges();
-            }
-            catch (Exception e)
-            {
-                //ModelState.AddModelError("", e.Message);
-                return Content(e.Message);
-            }
+            
             //
             evalVM.Qname = _context.QuestionnaireMs.Find(id).Qname;
-            evalVM.Docid = main.Docid;
+            evalVM.Docid = GetID();
             evalVM.YYYYmm = yyyymm;
+            evalVM.Id = id;
             //evalVM.CustId = main.CustId;
             //evalVM.CustNam = main.CustNam;
 
             List<Questionnaire> ql =
-                _context.Questionnaires.Where(qt => qt.VerId == id && qt.Required == "Y").ToList();
+                _context.Questionnaires.Where(qt => qt.VerId == id).ToList();
             Question q;
             int i = 1;
             foreach (Questionnaire a in ql)
@@ -171,6 +168,7 @@ namespace EDIS.Areas.BMED.Controllers
                 q.QID = a.Qid;
                 q.QuestionText = "(" + Convert.ToString(i) + ") " + a.Qtitle;
                 q.Typ = a.Typ;
+                q.Required = a.Required;
                 evalVM.Questions.Add(q);
                 i++;
             }
@@ -196,22 +194,20 @@ namespace EDIS.Areas.BMED.Controllers
         [AllowAnonymous]
         public ActionResult New(Evaluation model)
         {
-            if (model.Questions.Where(q => q.SelectedAnswer == null && q.Typ == "select").Count() > 0)
+            if (model.Questions.Where(q => q.SelectedAnswer == null && q.Required == "Y").Count() > 0)
             {
-                throw new Exception("尚有項目未圈選!!");
+                throw new Exception("尚有*字號題目未填寫!!");
             }
-            if (model.Questions.Where(q => q.SelectedAnswer == null && q.Typ == "text").Count() > 0)
-            {
-                throw new Exception("尚有項目未填寫!!");
-            }
-
             if (ModelState.IsValid)
             {
-                QuestMain main = _context.QuestMains.Find(model.Docid);
+                QuestMain main = new QuestMain();
+                main.Docid = model.Docid;
+                main.YYYYmm = model.YYYYmm;
+                main.Rtt = DateTime.Now;
                 main.CustId = model.CustId;
                 main.CustNam = _context.Departments.Find(model.CustId).Name_C;
-                main.ContractNo = model.ContractNo;
-                _context.Entry(main).State = EntityState.Modified;
+                main.Qtitle = _context.QuestionnaireMs.Find(model.Id).Qname;
+                _context.QuestMains.Add(main);
                 //
                 List<QuestAnswer> at = _context.QuestAnswers.Where(a => a.Docid == model.Docid).ToList();
                 QuestAnswer ar;
@@ -271,7 +267,7 @@ namespace EDIS.Areas.BMED.Controllers
             //evalVM.CustNam = main.CustNam;
 
             List<Questionnaire> ql =
-                _context.Questionnaires.Where(qt => qt.VerId == id && qt.Required == "Y").ToList();
+                _context.Questionnaires.Where(qt => qt.VerId == id ).ToList();
             Question q;
             int i = 1;
             foreach (Questionnaire a in ql)

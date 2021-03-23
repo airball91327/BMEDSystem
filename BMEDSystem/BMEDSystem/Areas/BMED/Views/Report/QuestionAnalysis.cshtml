@@ -1,0 +1,49 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.QuestReport>
+
+
+@using Newtonsoft.Json
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
+@{
+    Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
+}
+
+<p>
+    <a class="btn btn-default" href="@Url.Action("ExcelQA", qry)">匯出Excel</a>
+</p>
+
+<table class="table" style="overflow:scroll;overflow-x:hidden">
+    <div>
+        @await Component.InvokeAsync("QuestTitles",new { v = qry})
+    </div>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.TimeStamp)
+            </td>
+             <td>
+                @Html.DisplayFor(modelItem => item.Qname)
+            </td>
+            @*<td>
+                @Html.DisplayFor(modelItem => item.DptId)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.DptName)
+            </td>*@
+            @foreach (var answer in item.Answers)
+            {
+                <td>
+                    @answer.Answer
+                </td>
+            }
+        </tr>
+    }
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page, ReportClass = "滿意度調查統計表" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

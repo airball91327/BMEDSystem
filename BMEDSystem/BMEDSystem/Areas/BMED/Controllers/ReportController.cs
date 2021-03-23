@@ -51,6 +51,7 @@ namespace EDIS.Areas.BMED.Controllers
 
             List<SelectListItem> listItem = new List<SelectListItem>();
             List<SelectListItem> listItem2 = new List<SelectListItem>();
+            List<SelectListItem> listItem3 = new List<SelectListItem>();
             SelectListItem li;
             listItem.Add(new SelectListItem { Text = "請選擇", Value = "" });
             _context.Departments.ToList()
@@ -72,6 +73,20 @@ namespace EDIS.Areas.BMED.Controllers
             listItem2.Add(new SelectListItem { Text = "鹿基", Value = "U" });
             listItem2.Add(new SelectListItem { Text = "雲基", Value = "T" });
             ViewData["Location"] = new SelectList(listItem2, "Value", "Text");
+
+            //問卷名稱
+            SelectListItem nameq;
+            listItem3.Add(new SelectListItem { Text = "請選擇", Value = "" });
+            _context.QuestionnaireMs.ToList()
+                .ForEach(q =>
+                {
+                    nameq = new SelectListItem();
+                    nameq.Text = q.Qname;
+                    nameq.Value = q.Qname;
+                    listItem3.Add(nameq);
+
+                });
+            ViewData["Qname"] = new SelectList(listItem3, "Value", "Text");
 
             return View(pv);
         }
@@ -1050,9 +1065,17 @@ namespace EDIS.Areas.BMED.Controllers
                         };
                     }
                     return PartialView("CaseOverFive", CaseOverFive(v).ToPagedList(page, pageSize));
-                    //case "滿意度調查統計表":
-                    //    return PartialView("QuestionAnalysis", QuestAnaly(v));
-                    //case "儀器設備保養清單":
+                case "滿意度調查統計表":
+                    if (v.Qname == null)
+                    {
+                        return new JsonResult(v)
+                        {
+                            Value = new { success = false, error = "請選擇問卷名稱!" }
+                            //return NotFound("請輸入時間區間!");
+                        };
+                    }
+                    return PartialView("QuestionAnalysis", QuestAnaly(v).ToPagedList(page, pageSize));
+                //case "儀器設備保養清單":
                     //    return PartialView("AssetKeepList", AssetKeepList(v));
             }
 
@@ -6691,7 +6714,97 @@ namespace EDIS.Areas.BMED.Controllers
             return bmedAssets;
         }
 
-       
+        private List<QuestReport> QuestAnaly(ReportQryVModel v)
+        {
+            TempData["qry"] = JsonConvert.SerializeObject(v);
+            List<QuestReport> qlist = new List<QuestReport>();
+            QuestReport qr;
+            List<QuestMain> qm = _context.QuestMains.ToList();
+            if (v.Sdate != null)
+                qm = qm.Where(s => s.Rtt >= v.Sdate).ToList();
+            if (v.Edate != null)
+                qm = qm.Where(s => s.Rtt <= v.Edate).ToList();
+            if (v.AccDpt != null)
+                qm = qm.Where(s => s.CustId == v.AccDpt).ToList();
+            if (v.Qname != null)
+                qm = qm.Where(s => s.Qtitle == v.Qname).ToList();
+            // Contract c = null;
+            qm.ForEach(m =>
+            {
+                qr = new QuestReport();
+                qr.TimeStamp = m.Rtt.ToString("yyyy/MM/dd");
+                //qr.Contract = m.ContractNo == null ? "" :
+                //(c = db.Contracts.Find(m.ContractNo)) == null ? "" : c.ContractName;
+                qr.Qname = m.Qtitle;
+                qr.DptId = m.CustId;
+                qr.DptName = m.CustNam;
+                qr.Answers = _context.QuestAnswers.Where(a => a.Docid == m.Docid)
+                             .OrderBy(a => a.Qid).ToList();
+                //if (c != null && qr.Answers.Count > 0)
+                //    qlist.Add(qr);
+                if (qr.Answers.Count > 0)
+                    qlist.Add(qr);
+            });
+            return qlist;
+        }
+
+        public IActionResult ExcelQA(ReportQryVModel v)
+        {
+            List<QuestReport> qrlist = QuestAnaly(v);
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("時間戳記");
+            dt.Columns.Add("問卷名稱");
+            dt.Columns.Add("部門代號");
+            dt.Columns.Add("部門名稱");
+            //
+            int cols = 0;
+            _context.QuestionnaireMs.Where(m => m.Flg == "Y" && m.Qname == v.Qname)
+            .Join(_context.Questionnaires.Where(q => q.Required == "Y"), m => m.VerId, q => q.VerId,
+            (m, q) => q).OrderBy(q => q.Qid)
+            .ToList().
+            ForEach(q =>
+            {
+                dt.Columns.Add(q.Qtitle);
+            });
+            //
+            qrlist.ToList()
+                    .ForEach(j =>
+                    {
+                        dw = dt.NewRow();
+                        dw[0] = j.TimeStamp;
+                        dw[1] = j.Qname;
+                        dw[2] = j.DptId;
+                        dw[3] = j.DptName;
+                        cols = 4;
+                        foreach (QuestAnswer s in j.Answers)
+                        {
+                            dw[cols] = s.Answer;
+                            cols++;
+                        }
+                        dt.Rows.Add(dw);
+                    });
+            //
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("滿意度問卷統計表");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "滿意度調查統計表.xlsx"
+            );
+        }
 
         /// <summary>
         /// Get Departments by location.

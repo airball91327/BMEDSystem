@@ -1,7 +1,9 @@
-﻿function flowmsg(data) {
+﻿var flowmsg = function (data) {
     var homeHref = $("#btn").data('request-url');
     $("#btnGO").attr("disabled", false);
-    if (data.success == false) {
+
+    $.Toast.hideToast();
+    if (!data.success) {
         alert(data.error);
     }
     else {

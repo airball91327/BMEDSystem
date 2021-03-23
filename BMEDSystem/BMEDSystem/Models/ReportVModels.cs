@@ -59,6 +59,9 @@ namespace EDIS.Models
 
         [Display(Name = "院區")]
         public string Location { get; set; }
+
+        [Display(Name = "問卷名稱")]
+        public string Qname { get; set; }
     }
     //
     public class UserHour

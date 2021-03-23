@@ -4,7 +4,8 @@
     ViewBag.Title = "新增/問卷項目";
     Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
 }
-<script src="~/js/BMED/QuestionnaireEdit.js"></script>
+<script src="~/js/BMED/Questionnaire.js" asp-append-version="true"></script>
+
 
 <h2>新增</h2>
 
@@ -16,7 +17,7 @@
       'duration':0
       })"
       data-ajax-failure="onFailed"
-      data-ajax-success="onSuccess()">
+      data-ajax-success="onSuccessC">
 
     <div class="form-horizontal">
         <h4>問卷項目</h4>
@@ -61,12 +62,12 @@
 
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">
-                <input id="btn" type="submit" value="確定送出" class="btn btn-default" data-request-url="@Url.Action("List","Questionnaire",new { @id = Model.VerId})"/>
+                <input id="btn" type="submit" value="確定送出" class="btn btn-default"  data-request-url="@Url.Action("List","Questionnaire",new { @id = Model.VerId})" />
             </div>
         </div>
     </div>
 </form>
 
-    <div>
-        @Html.ActionLink("回到列表", "List", new { id = Model.VerId })
-    </div>
+<div>
+    @Html.ActionLink("回到列表", "List", new { id = Model.VerId })
+</div>

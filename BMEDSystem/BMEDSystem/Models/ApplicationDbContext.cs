@@ -1223,13 +1223,13 @@ namespace EDIS.Models
 
                 entity.ToTable("BMEDQuestMain");
 
-                entity.Property(e => e.YYYYmm).HasMaxLength(50);
+                entity.Property(e => e.YYYYmm).HasMaxLength(20);
 
-                entity.Property(e => e.CustId).HasMaxLength(50);
+                entity.Property(e => e.CustId).HasMaxLength(128);
 
-                entity.Property(e => e.CustNam).HasMaxLength(50);
+                entity.Property(e => e.CustNam).HasMaxLength(128);
 
-                entity.Property(e => e.ContractNo).HasMaxLength(50);
+                entity.Property(e => e.Qtitle).HasMaxLength(128);
 
                 entity.Property(e => e.Rtt).HasColumnType("date");
 

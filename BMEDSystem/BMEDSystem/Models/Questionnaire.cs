@@ -76,12 +76,12 @@ namespace EDIS.Models
         public string Docid { get; set; }
         [Display(Name = "年月")]
         public string YYYYmm { get; set; }
-        [Display(Name = "機構代號")]
+        [Display(Name = "部門代號")]
         public string CustId { get; set; }
-        [Display(Name = "機構名稱")]
+        [Display(Name = "部門名稱")]
         public string CustNam { get; set; }
-        [Display(Name = "合約")]
-        public string ContractNo { get; set; }
+        [Display(Name = "題目")]
+        public string Qtitle { get; set; }
         [Display(Name = "異動時間")]
         public DateTime Rtt { get; set; }
     }
@@ -108,8 +108,8 @@ namespace EDIS.Models
         public string TimeStamp { set; get; }
         [Display(Name = "合約案號")]
         public string ContractNo { set; get; }
-        [Display(Name = "合約名稱")]
-        public string Contract { set; get; }
+        [Display(Name = "問卷名稱")]
+        public string Qname { set; get; }
         [Display(Name = "部門代號")]
         public string DptId { get; set; }
         [Display(Name = "部門名稱")]
@@ -126,6 +126,7 @@ namespace EDIS.Models
         public List<Answer> Answers { set; get; }
         public string SelectedAnswer { set; get; }
         public string Typ { set; get; }
+        public string Required { get; set; }
         public Question()
         {
             Answers = new List<Answer>();
@@ -156,8 +157,7 @@ namespace EDIS.Models
         [Required]
         public string CustId { get; set; }
         public string CustNam { get; set; }
-        [Display(Name = "合約名稱")]
-        public string ContractNo { get; set; }
+        public int Id { get; set; }
         public List<Question> Questions { set; get; }
         public Evaluation()
         {

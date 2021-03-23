@@ -10,64 +10,71 @@
 }
 
 <h2>滿意度問卷</h2>
+@if (UserManager.IsInRole(User, "Admin") || 
+     UserManager.IsInRole(User, "MedAssetMgr") ||
+     UserManager.IsInRole(User, "MedMgr") 
+     )
+{
+    <p>
+        @Html.ActionLink("新增", "Create")
+    </p>
+}
 
-<p>
-    @Html.ActionLink("新增", "Create")
-</p>
-
-<table class="table">
-    <tr>
-        <th>
-            @Html.DisplayNameFor(model => model.Qname)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Memo)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Flg)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Rtp)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.Rtt)
-        </th>
-        <th></th>
-    </tr>
-
-    @foreach (var item in Model)
-    {
+    <table class="table">
         <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Qname)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Memo)
-            </td>
-            <td>
-                @Html.Raw(item.Flg == "Y" ? "開啟" : "關閉")
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.RtpName)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Rtt)
-            </td>
-            @if (item.Rtp == UserManager.GetCurrentUserId(User))
-            {
-                <td>
-                    @Html.ActionLink("修改", "Edit", new { id = item.VerId }, new { target = "_blank", rel = "opener" }) |
-                    @Html.ActionLink("問卷項目", "List", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })<br />
-                    @Html.ActionLink("預覽", "Preview2", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
-                </td>
-            }
-            else
-            {
-                <td>
-                    @Html.ActionLink("預覽", "Preview", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
-                </td>
-            }
+            <th>
+                @Html.DisplayNameFor(model => model.Qname)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Memo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Flg)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rtp)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Rtt)
+            </th>
+            <th></th>
         </tr>
-    }
 
-</table>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Qname)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Memo)
+                </td>
+                <td>
+                    @Html.Raw(item.Flg == "Y" ? "開啟" : "關閉")
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.RtpName)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Rtt)
+                </td>
+
+                <td>
+                    @if (item.Rtp == UserManager.GetCurrentUserId(User))
+                    {
+                        @Html.ActionLink("修改", "Edit", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
+                        <span>|</span>
+                        @Html.ActionLink("問卷項目", "List", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
+                        <br />
+                        @Html.ActionLink("預覽", "Preview2", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
+                        <span>|</span>
+                    }
+                    @Html.ActionLink("填寫", "Preview", "Questionnaire", new { id = item.VerId }, new { target = "_blank", rel = "opener" })
+                </td>
+
+
+
+            </tr>
+        }
+
+    </table>

@@ -65,10 +65,15 @@ namespace EDIS.Areas.BMED.Controllers
         public IActionResult Create()
         {
             AppUserModel ur = _context.AppUsers.Where(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            QuestionnaireM que = new QuestionnaireM();
-            que.Rtp = ur.Id;
-            que.RtpName = ur.FullName;
-            return View(que);
+            if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedMgr")
+                 || userManager.IsInRole(User, "MedAssetMgr"))
+            {
+                QuestionnaireM que = new QuestionnaireM();
+                que.Rtp = ur.Id;
+                que.RtpName = ur.FullName;
+                return View(que);
+            }
+            return StatusCode(404);
         }
 
         [HttpPost]
@@ -131,7 +136,10 @@ namespace EDIS.Areas.BMED.Controllers
                 questionnaireM.Rtt = DateTime.Now;
                 _context.Entry(questionnaireM).State = EntityState.Modified;
                 _context.SaveChanges();
-                return PartialView("Edit", questionnaireM);
+                return new JsonResult(questionnaireM)
+                {
+                    Value = new { success = true, error = "" }
+                };
             }
             return BadRequest("案件有誤!");
         }
