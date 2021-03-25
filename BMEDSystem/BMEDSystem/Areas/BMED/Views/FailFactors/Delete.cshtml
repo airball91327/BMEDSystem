@@ -1,0 +1,92 @@
+﻿@model EDIS.Models.FailFactorModel
+
+@{
+    ViewBag.Title = "刪除/故障原因選單";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
+}
+
+<h2>Delete</h2>
+<script>
+    var flowmsg = function (data) {
+
+        $("#btnGO").attr("disabled", false);
+
+        $.Toast.hideToast();
+        console.log(data);
+        if (data != true) {
+
+            alert(data.error);
+        }
+        else {
+            alert("刪除成功!");
+
+            /* window.close(), 當前非彈出視窗在最新版本的chrome和firefox裡不能關閉，而在IE中是可以關閉的
+             * 非彈出視窗，即是指（opener=null 及 非window.open()開啟的視窗,比如URL直接輸入的瀏覽器窗體， 或由其它程式呼叫產生的瀏覽器視窗）
+             */
+            if (window.opener === null) {
+                location.replace(homeHref);
+            }
+            else {
+                opener.location.reload();//This will call ReSubmit() function on parent window.
+                //opener.location.reload();//This will refresh parent window.
+                window.close();
+            }
+        }
+    }
+
+    var onFailed = function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+    };
+</script>
+
+<h2>刪除</h2>
+
+<form asp-action="Delete" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="flowmsg">
+    @Html.AntiForgeryToken()
+
+    <h3>確定要刪除?</h3>
+    <div>
+        <hr />
+        <dl class="dl-horizontal">
+            <dt>
+                @Html.DisplayNameFor(model => model.Title)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Title)
+            </dd>
+
+            <dt>
+                @Html.DisplayNameFor(model => model.Flg)
+            </dt>
+
+            <dd>
+                @Html.DisplayFor(model => model.Flg)
+            </dd>
+
+        </dl>
+
+
+
+        <div class="row">
+            <div style="padding-left: 115px">
+                <input id="btnGO" type="submit" value="確定刪除" class="btn btn-default" />
+            </div>
+        </div>
+
+    </div>
+</form>
+
+<div>
+    <input type="button" value="關閉" class="btn btn-default" onclick="window.close()" />
+    @*<a asp-action="Index" asp-controller="QuestionnaireMs" asp-area="BMED">回到列表</a>*@
+</div>

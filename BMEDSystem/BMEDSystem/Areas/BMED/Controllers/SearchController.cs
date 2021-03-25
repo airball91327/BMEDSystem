@@ -1206,7 +1206,7 @@ namespace EDIS.Areas.BMED.Controllers
             HttpClient client = new HttpClient();
             var str = JsonConvert.SerializeObject(qdata);
             HttpContent content = new StringContent(str, Encoding.UTF8, "application/json");
-            client.BaseAddress = new Uri("http://dms.cch.org.tw/CchBmedWebApi/");
+            client.BaseAddress = new Uri("http://dms.cch.org.tw/CchBmedWebApi/");//
             string url = "api/MedTransRds"; //BmedWebApi
             client.DefaultRequestHeaders.Accept.Clear();
             client.DefaultRequestHeaders.Accept.Add(

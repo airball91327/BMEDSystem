@@ -1,0 +1,58 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.DeviceSortCode>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
+@{
+    ViewBag.Title = "列表/設備分類編碼";
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+}
+
+<p>
+    @Html.ActionLink("新增", "Create")
+</p>
+
+@if (Model.Count() <= 0)
+{
+    <span>無資料!!</span>
+}
+else
+{
+    <table class="table">
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().M_code)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().M_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.FirstOrDefault().Status)
+            </th>
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.M_code)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.M_name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Status)
+                </td>
+                <td>
+                    @Html.ActionLink("修改", "Edit", new { id = item.M_code }, new { target = "_blank", rel = "opener" })
+                </td>
+            </tr>
+        }
+
+    </table>
+}
+<div>
+    @Html.PagedListPager(Model,
+    page => Url.Action("Index", new { page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

@@ -247,10 +247,7 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                 }
 
-                return new JsonResult(assign)
-                {
-                    Value = new { success = true, error = "" }
-                };
+                return Json("ture");
             }
             else
             {

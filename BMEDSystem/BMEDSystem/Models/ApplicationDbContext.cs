@@ -76,6 +76,8 @@ namespace EDIS.Models
         public virtual DbSet<Questionnaire> Questionnaires { get; set; }
         public virtual DbSet<QuestMain> QuestMains { get; set; }
         public virtual DbSet<QuestAnswer> QuestAnswers { get; set; }
+        public virtual DbSet<FailFactor> FailFactors { get; set; }
+        public virtual DbSet<DeviceSortCode> BMEDDeviceSortCodes { get; set; }
 
 
 
@@ -1243,6 +1245,37 @@ namespace EDIS.Models
                 entity.ToTable("BMEDQuestAnswer");
 
                 entity.Property(e => e.Answer).HasMaxLength(265);
+            });
+
+            modelBuilder.Entity<FailFactor>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("FailFactor");
+
+                entity.Property(e => e.Title).HasMaxLength(128);
+
+                entity.Property(e => e.Flg).HasMaxLength(128);
+            });
+
+            modelBuilder.Entity<DeviceSortCode>(entity =>
+            {
+                entity.HasKey(e => e.M_code);
+
+                entity.ToTable("BMEDDeviceSortCodes");
+
+                entity.Property(e => e.M_code)
+                    .HasColumnName("M_code")
+                    .HasMaxLength(200)
+                    .ValueGeneratedNever();
+
+                entity.Property(e => e.M_name)
+                    .IsRequired()
+                    .HasColumnName("M_name");
+
+                entity.Property(e => e.Status)
+                    .HasMaxLength(5)
+                    .HasColumnName("Status");
             });
         }
     }
