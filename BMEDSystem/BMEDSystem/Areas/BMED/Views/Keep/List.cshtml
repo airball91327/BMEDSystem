@@ -222,7 +222,7 @@ else
                     <td width="100px">
                         @if (item.Flg == "?" && item.FlowUid == uid)
                         {
-                            @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                            @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank", rel = "opener"  })
                             @Html.Raw(" |")
                             if (item.FlowCls == "驗收人" && item.IsCharged == "N")
                             {
@@ -233,15 +233,15 @@ else
                         else if ((item.Flg == "?" && item.FlowCls.Contains("工程師") && dptid == "7084") ||
                                  (item.Flg == "?" && item.FlowCls.Contains("工程師") && dptid == "8420")) //其他工程師案件
                         {
-                            @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                            @Html.ActionLink("編輯", "Edit", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank", rel = "opener"  })
                             @Html.Raw(" |")
                         }
                         else
                         {
-                            @Html.ActionLink("預覽", "Views", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                            @Html.ActionLink("預覽", "Views", "Keep", new { Area = "BMED", id = item.DocId }, new { target = "_blank", rel = "opener"  })
                             @Html.Raw(" |")
                         }
-                        @Html.ActionLink("列印", "PrintKeepDoc", "Keep", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
+                        @Html.ActionLink("列印", "PrintKeepDoc", "Keep", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank", rel = "opener"  })
                         @if (item.Flg == "?" && item.FlowUid == uid && item.FlowCls == "申請人")
                         {
                             @Html.Raw(" |")

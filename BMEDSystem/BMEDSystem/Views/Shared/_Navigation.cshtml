@@ -193,9 +193,9 @@
                                 <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "超過五日案件清單" })">超過五日案件清單</a>
                                 </li>
-                                <li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
+                                @*<li class="@Html.IsSelected(controller: "Report", action: "Index", area: "BMED")">
                                     <a href="@Url.Action("Index", "Report", new { Area = "BMED", rpname = "滿意度調查統計表" })">滿意度調查統計表</a>
-                                </li>
+                                </li>*@
                             }
 
                         </ul>
@@ -245,14 +245,14 @@
                                             </li>
                                         </ul>
                                     </li>
-                                    <li class="@Html.IsSelected(controller: "FailFactors", area: "BMED")">
+                                    @*<li class="@Html.IsSelected(controller: "FailFactors", area: "BMED")">
                                         <a href="#">故障原因選單<span class="fa arrow"></span></a>
                                         <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "FailFactors", area: "BMED", cssClass: "in")">
                                             <li>
                                                 <a href="@Url.Action("Index", "FailFactors", new { Area = "BMED" })">故障原因選單列表</a>
                                             </li>
                                         </ul>
-                                    </li>
+                                    </li>*@
                                     @if (UserManager.IsInRole(User, "Admin"))
                                     {
                                         <li class="@Html.IsSelected(controller: "AppUser", area: "")">
@@ -278,14 +278,14 @@
                             </li>
                         </ul>
                     </li>
-                    <li class="@Html.IsSelected(controller: "QuestionnaireMs", area: "BMED")">
+                    @*<li class="@Html.IsSelected(controller: "QuestionnaireMs", area: "BMED")">
                         <a href="#"><i class="fa fa-list-alt"></i><span class="nav-label">滿意度調查</span><span class="fa arrow"></span></a>
                         <ul class="nav nav-second-level collapse @Html.IsSelected(controller: "QuestionnaireMs", area: "BMED", cssClass: "in")">
                             <li class="@Html.IsSelected(controller: "QuestionnaireMs", action: "Index", area: "BMED")">
                                 <a href="@Url.Action("Index", "QuestionnaireMs", new { Area = "BMED" })">滿意度調查卷</a>
                             </li>
                         </ul>
-                    </li>
+                    </li>*@
                 </ul>
             </li>
         </ul>

@@ -786,8 +786,24 @@ namespace EDIS.Areas.BMED.Controllers
                 case "設備工程師":
 
                     /* Get all engineers. */
-                    s = roleManager.GetUsersInRole("MedEngineer").OrderBy(x => x).ToList();
+                    
                     var repEngId = _context.AppUsers.Find(r.EngId).UserName;
+                    var lastflow = _context.BMEDRepairFlows
+                        .Where(f => f.DocId == docid && f.Status == "1")
+                        .Where(f => f.Cls.Contains("工程師") )
+                        .OrderByDescending(x => x.StepId)
+                        .Select(f => f.UserId)
+                        .FirstOrDefault();
+
+                    if (lastflow != 0) {
+                        var ur = _context.AppUsers.Find(lastflow).UserName;
+                        s = roleManager.GetUsersInRole("MedEngineer").Where(x => x == ur).ToList();
+                        s.AddRange(roleManager.GetUsersInRole("MedEngineer").Where(x => x != ur).OrderBy(x => x).ToList());
+                    }
+                    else
+                    {
+                        s = roleManager.GetUsersInRole("MedEngineer").OrderBy(x => x).ToList();
+                    }
 
                     list = new List<SelectListItem>();
                     /* 負責工程師 */

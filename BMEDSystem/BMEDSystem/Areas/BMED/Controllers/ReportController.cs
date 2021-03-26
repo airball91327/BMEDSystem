@@ -333,8 +333,9 @@ namespace EDIS.Areas.BMED.Controllers
             List<AssetKpScheVModel> sv = new List<AssetKpScheVModel>();
             var assetK = _context.BMEDAssetKeeps.Where(x => x.Cycle > 0 );
             //完成保養
-            var dtls = _context.BMEDKeepDtls.Where(d => d.Result == 1);
-            
+            //var dtls = _context.BMEDKeepDtls.Where(d => d.Result == 1);
+            var dtls = _context.BMEDKeepDtls.AsQueryable();
+
             //登入者部門
             var depar = _context.Departments.AsQueryable();
             if (urLocation == "總院")
@@ -347,7 +348,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
 
             var datas = _context.BMEDAssets
-                .Join(assetK,
+                .Join(  assetK,
                         a => a.AssetNo,
                         k => k.AssetNo,
                         (a, k) => new
@@ -356,7 +357,8 @@ namespace EDIS.Areas.BMED.Controllers
                             assetkeep = k
                         }
                 )
-                .Join(depar,
+                .Join(
+                    depar,
                     a => a.asset.DelivDpt,
                     d => d.DptId,
                     (a, d) => new
@@ -366,14 +368,8 @@ namespace EDIS.Areas.BMED.Controllers
                         dept = d
                     })
                 .GroupJoin(_context.BMEDKeeps,
-                        a => new
-                        {
-                            assetNo = a.assetkeep.AssetNo,
-                        },
-                        k => new
-                        {
-                            assetNo = k.AssetNo,
-                        },
+                        a => a.asset.AssetNo,
+                        k => k.AssetNo,
                         (a, k) => new
                         {
                             asset = a.asset,
@@ -382,36 +378,47 @@ namespace EDIS.Areas.BMED.Controllers
                             keep = k
                         })
                 .SelectMany(x => x.keep.DefaultIfEmpty(),
-                         (a, k) => new
+                         (s, k) => new
                          {
-                             assetNo = a.asset.AssetNo,
-                             asset = a.asset,
-                             assetkeep = a.assetkeep,
-                             dept = a.dept,
-                             DocId = k.DocId,
-                             Sdate = k.SentDate
+                             AssetNo = s.asset.AssetNo,
+                             AssetName = s.asset.Cname,
+                             DelivDptName = s.dept.Name_C,
+                             Brand = s.asset.Brand,
+                             Type = s.asset.Type,
+                             //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                             //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
+                             KeepYm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value,
+                             Cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value,
+                             AssetClass = s.asset.AssetClass,
+                             Cname = s.asset.Cname,
+                             AccDpt = s.asset.AccDpt,
+                             DelivDpt = s.asset.DelivDpt,
+                             KeepEngId = s.assetkeep.KeepEngId,
+                             Sdate = k ==  null ? 0 : k.SentDate.Value.Year,
+                             Name_C = s.dept.Name_C,
+                             DocId = k == null ? "" : k.DocId
                          }
                 )
-                .Select( s => new
-                {
-                    AssetNo = s.asset.AssetNo,
-                    AssetName = s.asset.Cname,
-                    DelivDptName = s.dept.Name_C,
-                    Brand = s.asset.Brand,
-                    Type = s.asset.Type,
-                    //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
-                    //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
-                    KeepYm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value,
-                    Cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value,
-                    AssetClass = s.asset.AssetClass,
-                    Cname = s.asset.Cname,
-                    AccDpt = s.asset.AccDpt,
-                    DelivDpt = s.asset.DelivDpt,
-                    KeepEngId = s.assetkeep.KeepEngId,
-                    Sdate = s.Sdate.Value.Year,
-                    Name_C = s.dept.Name_C,
-                    DocId = s.DocId
-                })
+                //.Select( s => new
+                //{
+                //    AssetNo = s.asset.AssetNo,
+                //    AssetName = s.asset.Cname,
+                //    DelivDptName = s.dept.Name_C,
+                //    Brand = s.asset.Brand,
+                //    Type = s.asset.Type,
+                //    //aks.DocId = s.dtls == null ? null : s.dtls.DocId;
+                //    //aks.EDate = s.dtls == null ? null : s.dtls.EndDate == null ? "" : s.dtls.EndDate.Value.ToString("yyyy/MM/dd");
+                //    KeepYm = s.assetkeep.KeepYm == null ? 0 : s.assetkeep.KeepYm.Value,
+                //    Cycle = s.assetkeep.Cycle == null ? 0 : s.assetkeep.Cycle.Value,
+                //    AssetClass = s.asset.AssetClass,
+                //    Cname = s.asset.Cname,
+                //    AccDpt = s.asset.AccDpt,
+                //    DelivDpt = s.asset.DelivDpt,
+                //    KeepEngId = s.assetkeep.KeepEngId,
+                //    Sdate = s.Sdate.Value.Year,
+                //    Name_C = s.dept.Name_C,
+                //    DocId = s.DocId
+                //})
                 //.GroupJoin( dtls,
                 //            a => a.DocId,
                 //            k => k.DocId,
@@ -443,10 +450,11 @@ namespace EDIS.Areas.BMED.Controllers
             //       assetkeep = a.assetkeep,
             //       dept = d
             //   });
-
+            //var ds = datas.ToList();
             datas = datas.Where(r => r.AssetClass == (v.AssetClass1 ?? v.AssetClass2));
+            //ds = datas.ToList();
 
-            
+
             if (!string.IsNullOrEmpty(v.AssetName))
             {
                 datas = datas.Where(r => r.Cname.Contains(v.AssetName));
@@ -470,7 +478,7 @@ namespace EDIS.Areas.BMED.Controllers
                 datas = datas.Where(x => x.KeepEngId == engid);
             }
             datas = datas.Where(k => k.Sdate == v.KeepY);
-
+            //ds = datas.ToList();
             //完工保養單
             var del = datas
                 .GroupJoin( dtls,
@@ -520,7 +528,7 @@ namespace EDIS.Areas.BMED.Controllers
                     Name_C = s.Name_C
                 })
                 .Distinct()
-                .OrderBy(x => x.AssetNo);
+                .OrderBy(x => x.AssetNo).ToList();
 
             AssetKpScheVModel aks;
             int year = DateTime.Now.Year - 1911 ;
@@ -530,7 +538,7 @@ namespace EDIS.Areas.BMED.Controllers
             int m1 = 0;
             int i = 0;
             count = 0;
-            foreach (var s in data.ToList())
+            foreach (var s in data)
             {
                 aks = new AssetKpScheVModel();
                 aks.AssetNo = s.AssetNo;
@@ -560,10 +568,10 @@ namespace EDIS.Areas.BMED.Controllers
                                     if(EDate1 != null) { 
                                         aks.JanDocId = EDate1.DocId;
                                         aks.JanEDate = EDate1.EndDate == null ? "" :  EDate1.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                       
                                         count = 0;
 
-                                    }
+                                    } j++;
                                     break;
                                 case 2:
                                     aks.Feb = "*";
@@ -572,10 +580,10 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.FebDocId = EDate2.DocId;
                                         aks.FebEDate = EDate2.EndDate == null ? "" : EDate2.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
-                                    }
+                                    }j++;
                                     break;
                                 case 3:
                                     aks.Mar = "*" ;
@@ -584,10 +592,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.MarDocId = EDate3.DocId;
                                         aks.MarEDate = EDate3.EndDate == null ? "" :  EDate3.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 4:
                                     aks.Apr = "*";
@@ -596,10 +605,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.AprDocId = EDate4.DocId;
                                         aks.AprEDate = EDate4.EndDate == null ? "" : EDate4.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 5:
                                     aks.May = "*";
@@ -608,10 +618,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.MayDocId = EDate5.DocId;
                                         aks.MayEDate = EDate5.EndDate == null ? "" : EDate5.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 6:
                                     aks.Jun = "*" ;
@@ -620,10 +631,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.JunDocId = EDate6.DocId;
                                         aks.JunEDate = EDate6.EndDate == null ? "" : EDate6.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 7:
                                     aks.Jul = "*";
@@ -632,10 +644,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.JulDocId = EDate7.DocId;
                                         aks.JulEDate = EDate7.EndDate == null ? "" : EDate7.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 8:
                                     aks.Aug = "*" ;
@@ -644,10 +657,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.AugDocId = EDate8.DocId;
                                         aks.AugEDate = EDate8.EndDate == null ? "" :  EDate8.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                       
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 9:
                                     aks.Sep = "*" ;
@@ -656,10 +670,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.SepDocId = EDate9.DocId;
                                         aks.SepEDate = EDate9.EndDate == null ? "" :  EDate9.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 10:
                                     aks.Oct = "*";
@@ -668,10 +683,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.OctDocId = EDate10.DocId;
                                         aks.OctEDate = EDate10.EndDate == null ? "" : EDate10.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                        
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 11:
                                     aks.Nov = "*";
@@ -680,10 +696,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.NovDocId = EDate11.DocId;
                                         aks.NovEDate = EDate11.EndDate == null ? "" :  EDate11.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                       
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                                 case 12:
                                     aks.Dec = "*" ;
@@ -692,10 +709,11 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.DecDocId = EDate12.DocId;
                                         aks.DecEDate = EDate12.EndDate == null ? "" : EDate12.EndDate.Value.ToString("yyyy/MM/dd");
-                                        j++;
+                                       
                                         count = 0;
 
                                     }
+                                    j++;
                                     break;
                             }
                             

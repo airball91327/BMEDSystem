@@ -34,9 +34,11 @@ $("input[name='Application']").click(function () {
     }
     if (s === "患者自帶") {
         $("#ContentFile").hide();
+        $("#ContentFile2").show();
         document.getElementById("Content").required = false;
     } else {
         $("#ContentFile").show();
+        $("#ContentFile2").hide();
         document.getElementById("Content").required = true;
     }
 });
