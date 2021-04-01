@@ -116,4 +116,36 @@ namespace EDIS.Models
         public string BMEDKInOut { get; set; }
     }
 
+    public class QryVendorData
+    {
+        public string CONTRACT_NO { get; set; } //合約
+
+        public string VENDOR_NO { get; set; }//廠商代碼
+
+        public string VENDOR_NAME { get; set; } //廠商名稱
+
+        public string PURCHASE_NO { get; set; }//採購編號
+
+        public string ASSET_NO { get; set; } // 財產編號
+
+
+        public string PLANT_NAME { get; set; } //維修地點
+
+        public string KEEP_YEAR { get; set; }//保固年限
+
+        public string QTY { get; set; }//數量
+
+        public string BRAND { get; set; } //廠牌
+
+        public string MODEL { get; set; }//型號
+
+        public string DELIV_DPT { get; set; }//保管部門
+
+        public string DELIV_NAME { get; set; } //保管部門編號
+
+        public string DPT_COD { get; set; }//部門
+
+        public string DPT_NAME { get; set; }//部門編號
+    }
+
 }

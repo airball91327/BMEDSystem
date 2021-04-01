@@ -19,7 +19,6 @@ namespace EDIS.Areas.BMED.Components.ERPProduct
 
         public async Task<IViewComponentResult> InvokeAsync(int? stockId)
         {
-
             return View();
         }
 

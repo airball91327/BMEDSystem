@@ -246,28 +246,33 @@
             <div id="ContentFile">
                 <span style="color:red;">(選項擇一)</span>
                 <div class="col-auto">
-                    @Html.RadioButtonFor(model => model.Content, "經衛生福利部醫療器材許可證")經衛生福利部醫療器材許可證(影本)
+                    <span>1.</span>
+                    @Html.RadioButtonFor(model => model.Content, "經衛生福利部醫療器材許可證")
+                    <span style="font-weight:bold;">經衛生福利部醫療器材許可證(影本)</span>
                     <div id="license">
                         <input id="btnFILES" type="button" value="夾帶附件檔案" class="btn  btn-primary" data-toggle="modal" data-target="#modalFILES">
                     </div>
-                    <br />@Html.RadioButtonFor(model => model.Content, "貨品進口同意書")貨品進口同意書(影本，經衛生福利部核准)
+                    <br />
+                    <span>2.</span>
+                    @Html.RadioButtonFor(model => model.Content, "貨品進口同意書")
+                    <span style="font-weight:bold;">貨品進口同意書(影本，經衛生福利部核准)</span>
                     <div id="Consent">
                         <input id="btnFILES" type="button" value="夾帶附件檔案" class="btn  btn-primary" data-toggle="modal" data-target="#modalFILES">
                     </div>
                     @Html.ValidationMessageFor(model => model.Content, "", new { @class = "text-danger" })
-                    <br /><span>❃</span><span>特殊水、電、氣的需求,請提供資料(須會工務部)</span>
-                    <br /><span>❃</span><span>為游離輻射設備(須會輻安室)</span>
-                    <br /><span>❃</span><span>儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</span>
+                    <br /><span>3.</span><span>特殊水、電、氣的需求,請提供資料(須會工務部)</span>
+                    <br /><span>4.</span><span>為游離輻射設備(須會輻安室)</span>
+                    <br /><span>5.</span><span>儀器保養表,試用一個月以上,須至醫工部拿取保養貼紙於機器上,並提供保養週期與保養紀錄於醫工存查</span>
                 </div>
             </div>
             <div id="ContentFile2">
                 <div class="col-auto">
-                    <span>❃</span><span>患者自帶之設備,工程師做安全性檢查後,始可使用(可檢查時段為8:00~1730,但CPAP呼吸器的檢查時間不受限):</span>
+                    <span>6.</span><span>患者自帶之設備,工程師做安全性檢查後,始可使用(可檢查時段為8:00~1730,但CPAP呼吸器的檢查時間不受限):</span>
                     <div style="padding-left:10px">
-                        <span>1-1</span> <span>電線接頭無破損</span>
-                        <br /><span>1-2</span> <span>電線無破損裸露</span>
-                        <br /><span>1-3</span> <span>機器外觀無破損</span>
-                        <br /><span>1-4</span> <span>檢測無符合上述需求,儀器不可使用</span>
+                        <span>6-1</span> <span>電線接頭無破損</span>
+                        <br /><span>6-2</span> <span>電線無破損裸露</span>
+                        <br /><span>6-3</span> <span>機器外觀無破損</span>
+                        <br /><span>6-4</span> <span>檢測無符合上述需求,儀器不可使用</span>
                     </div>
                 </div>
             </div>

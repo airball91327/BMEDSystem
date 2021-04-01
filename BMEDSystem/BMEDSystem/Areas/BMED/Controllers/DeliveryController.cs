@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
 using System.Threading.Tasks;
 using EDIS.Models;
 using EDIS.Models.Identity;
@@ -864,7 +867,42 @@ namespace EDIS.Areas.BMED.Controllers
             return Json(deliveryCount);
         }
 
-        protected override void Dispose(bool disposing)
+        [HttpPost]
+        public async Task<IActionResult> GetVendorInContractNo(string type, string contract_no)
+        {
+            List<QryVendorData> rv = new List<QryVendorData>();
+            //
+            //var s = new { type, contract_no };//"[" + "{" + "type:" + type + "," + "contract_no:" + contract_no + "}" + "]";
+            var s = "["+"{"+"type:" + "null" + "," + "contract_no:" + contract_no+"}"+"]";//new { type, contract_no }.ToString().Replace("=", ":");//"[" + "{" + "type:" + type + "," + "contract_no:" + contract_no + "}" + "]";
+            // var s = "{"+"type:" + type + "," + "contract_no:" + contract_no+"}";
+            HttpClient client = new HttpClient();
+            //var str = JsonConvert.SerializeObject(s);
+            HttpContent content = new StringContent(s, Encoding.UTF8, "application/json");
+            client.BaseAddress = new Uri("https://api.cch.org.tw/HIS_WS_CONTRACT/");//
+            string url = "AssetApi/Get_Info"; //BmedWebApi
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            //HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            string rstr = "";
+            if (response.IsSuccessStatusCode)
+            {
+                rstr = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(rstr))
+                {
+                    rv.AddRange(JsonConvert.DeserializeObject<List<QryVendorData>>(rstr));
+                }
+            }
+            client.Dispose();
+            if (rv.Where(r => r.CONTRACT_NO.Contains("Error")).Count() > 0 || rv == null)
+            {
+                return BadRequest("查無資料");
+            }
+            return Json(rv);
+        }
+
+        protected override void Dispose(bool disposing) 
         {
             _context.Dispose();
             base.Dispose(disposing);

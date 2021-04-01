@@ -22,6 +22,7 @@ using EDIS.Areas.WebService.Models;
 using WebService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Hosting;
+using System.Text;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
@@ -2596,8 +2597,9 @@ namespace EDIS.Areas.BMED.Controllers
 
         public ActionResult RecoveryDoc(string DocId)
         {
-            if (!String.IsNullOrEmpty(DocId)) {
-                
+            if (!String.IsNullOrEmpty(DocId))
+            {
+
                 var flow = _context.BMEDRepairFlows.Where(f => f.DocId == DocId && f.Status == "2")
                     .LastOrDefault();
                 if (flow == null)
@@ -2611,7 +2613,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 flow.Status = "?";
 
-                _context.Entry(flow).State = EntityState.Modified;;
+                _context.Entry(flow).State = EntityState.Modified; ;
                 _context.SaveChanges();
 
                 return new JsonResult(flow)
@@ -2628,7 +2630,10 @@ namespace EDIS.Areas.BMED.Controllers
                 }
                 throw new Exception(msg);
             }
-
         }
+
+       
+
+    
     }
 }

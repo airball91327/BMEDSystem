@@ -64,6 +64,7 @@
         </div>
         <div class="editor-field">
             <input asp-for="ContractNo" class="form-control" />
+            @*<button type="button" class="btn btn-default" id="btnQtyContractNo">查詢</button>*@
             <span asp-validation-for="ContractNo" class="text-danger"></span>
         </div>
         <div class="editor-label">
@@ -345,6 +346,29 @@
                         }
                     });
                 }
+            });
+
+             $("#btnQtyContractNo").click(function () {
+                 var keynam = $("#ContractNo").val();
+                 var ul = '@Url.Action("GetVendorInContractNo", "Delivery", new { Area = "BMED" })';
+                $.ajax({
+                    url: ul ,
+                    type: "POST",
+                    data: { type:"",contract_no: keynam },
+                    dataType: "json",
+                    success: function (data) {
+                        console.log(data);
+                        if (data != null) {
+                            alert("會入資料"+data);
+                            $("#ContractNo").val("123");
+                            $("#VendorId").val(data.vendoR_NO);
+                            $("#VendorNam").text("456");
+                        }
+                    },
+                    error: function (error) {
+                        alert(error.responseText);
+                    }
+                });
             });
 
         });

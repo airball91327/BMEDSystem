@@ -37,9 +37,9 @@ function uploadFiles() {
             contentType: false,
             type: "POST",
             success: function (response) {
-                if (!response.data.success) {
-                    console.log(data);
-                    alert('檔案上傳有誤，請檢查欄位是否填寫齊全!');
+                console.log(response);
+                if (!response.success) {
+                    alert(response.error);
                 }
                 else
                     alert('上傳成功');
@@ -78,8 +78,8 @@ function uploadFiles() {
                 contentType: false,
                 type: "POST",
                 success: function (response) {
-                    if (!response.data.success) {
-                        console.log(data);
+                    console.log(response);
+                    if (!response.success) {
                         alert('檔案上傳有誤，請檢查欄位是否填寫齊全!');
                     }
                     else

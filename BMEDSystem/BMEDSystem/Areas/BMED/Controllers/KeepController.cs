@@ -172,6 +172,10 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.SaveChanges();
                     //
                     AssetKeepModel kp = _context.BMEDAssetKeeps.Find(keep.AssetNo);
+                    if (kp == null)
+                    {
+                        throw new Exception("請先維護此設備保養維護資料!!");
+                    }
                     AssetModel at = _context.BMEDAssets.Find(keep.AssetNo);
                     //
                     keep.AssetName = _context.BMEDAssets.Find(keep.AssetNo).Cname;

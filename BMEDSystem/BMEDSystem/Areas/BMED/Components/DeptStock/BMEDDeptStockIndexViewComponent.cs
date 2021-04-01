@@ -17,10 +17,10 @@ namespace EDIS.Areas.BMED.Components.DeptStock
             _context = context;
         }
 
-        public async Task<IViewComponentResult> InvokeAsync(int? stockId)
+        public async Task<IViewComponentResult> InvokeAsync(int? stockId,string id)
         {
             ViewBag.StockClsId = new SelectList(_context.BMEDDeptStocks, "StockId", "StockName", stockId);
-
+            ViewData["docid"] = id;
             return View();
         }
 

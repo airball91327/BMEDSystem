@@ -568,10 +568,9 @@ namespace EDIS.Areas.BMED.Controllers
                                     if(EDate1 != null) { 
                                         aks.JanDocId = EDate1.DocId;
                                         aks.JanEDate = EDate1.EndDate == null ? "" :  EDate1.EndDate.Value.ToString("yyyy/MM/dd");
-                                       
-                                        count = 0;
-
-                                    } j++;
+                                    }
+                                    count = 0;
+                                    j++;
                                     break;
                                 case 2:
                                     aks.Feb = "*";
@@ -580,10 +579,9 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.FebDocId = EDate2.DocId;
                                         aks.FebEDate = EDate2.EndDate == null ? "" : EDate2.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
-                                    }j++;
+                                    }
+                                    count = 0;
+                                    j++;
                                     break;
                                 case 3:
                                     aks.Mar = "*" ;
@@ -592,10 +590,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.MarDocId = EDate3.DocId;
                                         aks.MarEDate = EDate3.EndDate == null ? "" :  EDate3.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 4:
@@ -605,10 +601,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.AprDocId = EDate4.DocId;
                                         aks.AprEDate = EDate4.EndDate == null ? "" : EDate4.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 5:
@@ -618,10 +612,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.MayDocId = EDate5.DocId;
                                         aks.MayEDate = EDate5.EndDate == null ? "" : EDate5.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 6:
@@ -631,10 +623,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.JunDocId = EDate6.DocId;
                                         aks.JunEDate = EDate6.EndDate == null ? "" : EDate6.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 7:
@@ -644,10 +634,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.JulDocId = EDate7.DocId;
                                         aks.JulEDate = EDate7.EndDate == null ? "" : EDate7.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 8:
@@ -657,10 +645,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.AugDocId = EDate8.DocId;
                                         aks.AugEDate = EDate8.EndDate == null ? "" :  EDate8.EndDate.Value.ToString("yyyy/MM/dd");
-                                       
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 9:
@@ -670,10 +656,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.SepDocId = EDate9.DocId;
                                         aks.SepEDate = EDate9.EndDate == null ? "" :  EDate9.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 10:
@@ -683,10 +667,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.OctDocId = EDate10.DocId;
                                         aks.OctEDate = EDate10.EndDate == null ? "" : EDate10.EndDate.Value.ToString("yyyy/MM/dd");
-                                        
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 11:
@@ -696,10 +678,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.NovDocId = EDate11.DocId;
                                         aks.NovEDate = EDate11.EndDate == null ? "" :  EDate11.EndDate.Value.ToString("yyyy/MM/dd");
-                                       
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                                 case 12:
@@ -709,10 +689,8 @@ namespace EDIS.Areas.BMED.Controllers
                                     {
                                         aks.DecDocId = EDate12.DocId;
                                         aks.DecEDate = EDate12.EndDate == null ? "" : EDate12.EndDate.Value.ToString("yyyy/MM/dd");
-                                       
-                                        count = 0;
-
                                     }
+                                    count = 0;
                                     j++;
                                     break;
                             }
@@ -2412,6 +2390,26 @@ namespace EDIS.Areas.BMED.Controllers
                           Cost = d.Cost
                         }
                      )
+                .GroupJoin( _context.BMEDDealStatuses,
+                        r => r.DealDes,
+                        d => d.Id.ToString(),
+                        (r,d) => new { bemd = r, deal = d }
+                )
+                .SelectMany( x => x.deal.DefaultIfEmpty(),
+                    (r,d) => new
+                    {
+                        DocType = "請修",
+                        DocId = r.bemd.DocId,
+                        AssetNo = r.bemd.AssetNo,
+                        AssetName = r.bemd.AssetName,
+                        ApplyDate = r.bemd.ApplyDate,
+                        TroubleDes = r.bemd.TroubleDes,
+                        DealDes = d == null ? "" : d.Title,
+                        EndDate = r.bemd.EndDate,
+                        Hours = r.bemd.Hours,
+                        Cost = r.bemd.Cost
+                    }
+                )
                 .GroupJoin(  repairE,
                         d => d.DocId, e => e.DocId,
                         (d, e) => new { bemd = d , repaire = e})
@@ -2466,7 +2464,27 @@ namespace EDIS.Areas.BMED.Controllers
                             Hours = d.Hours,
                             Cost = d.Cost
                         }
-                     )
+                 )
+                 .GroupJoin( _context.BMEDDealStatuses,
+                        r => r.DealDes.ToString(),
+                        d => d.Id.ToString(),
+                         (r, d) => new { keep = r, deal = d }
+                 )
+                 .SelectMany(x => x.deal.DefaultIfEmpty(),
+                    (r, d) => new
+                    {
+                        DocType = "保養",
+                        DocId = r.keep.DocId,
+                        AssetNo = r.keep.AssetNo,
+                        AssetName = r.keep.AssetName,
+                        ApplyDate = r.keep.ApplyDate,
+                        TroubleDes = "",
+                        DealDes = d == null ? "" : d.Title,
+                        EndDate = r.keep.EndDate,
+                        Hours = r.keep.Hours,
+                        Cost = r.keep.Cost
+                    }
+                )
                  .GroupJoin(keepE,
                         d => d.DocId, e => e.DocId,
                         (d, e) => new { keep = d, repaire = e })
@@ -2515,10 +2533,13 @@ namespace EDIS.Areas.BMED.Controllers
             List<UnSignListVModel> sv = new List<UnSignListVModel>();
             List<UnSignListVModel> sv1 = new List<UnSignListVModel>();
             List<UnSignListVModel> sv2 = new List<UnSignListVModel>();
-            TempData["qry"] = JsonConvert.SerializeObject(v); ;
+            TempData["qry"] = JsonConvert.SerializeObject(v); 
 
+           
             _context.BMEDRepairFlows.Where(f => f.Status == "?")
-            .Join(_context.BMEDRepairDtls.Where(d => d.CloseDate == null), f => f.DocId, rd => rd.DocId,
+            .Join(_context.BMEDRepairDtls.Where(d => d.CloseDate == null), 
+            f => f.DocId, 
+            rd => rd.DocId,
             (f, rd) => new
             {
                 f.DocId,
@@ -2532,7 +2553,9 @@ namespace EDIS.Areas.BMED.Controllers
                 rd.DealState,
                 rd.InOut
             })
-            .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), rd => rd.DocId, k => k.DocId,
+            .Join(_context.BMEDRepairs.Where(r => r.Loc == urLocation), 
+            rd => rd.DocId, 
+            k => k.DocId,
             (rd, k) => new
             {
                 rd.DocId,
@@ -2613,15 +2636,24 @@ namespace EDIS.Areas.BMED.Controllers
                 EngNam = null,
                 ClsEmp = u.FullName + "(" + u.UserName + ")",
                 AssetClass = ""
-            }).ToList()
-            .GroupJoin(_context.BMEDRepairEmps.Join(_context.AppUsers, b => b.UserId, u => u.Id, (b, u) => new { b, u}), u => u.DocId, p => p.b.DocId,
-            (u, p) => new { u, p}).SelectMany(x => x.p.DefaultIfEmpty(),
+            })//.ToList()
+            .GroupJoin(_context.BMEDRepairEmps
+            .Join(_context.AppUsers, 
+                    b => b.UserId, 
+                    u => u.Id,
+                    (b, u) => new { b, u}), 
+                        u => u.DocId, 
+                        p => p.b.DocId,
+                        (u, p) => new { u, p})
+            .SelectMany(x => x.p.DefaultIfEmpty(),
             (o, g) => new { data = o.u, g})
+            //.Distinct()
             .ToList()
             .ForEach(y => {
                 y.data.EngNam = y.g == null ? "" : y.g.u.FullName + "(" + y.g.u.UserName + ")";
                 sv1.Add(y.data);
             });
+
             sv1.GroupJoin(_context.BMEDRepairCosts.GroupBy(x => x.DocId).Select(x => new { docid = x.Key , cost = x.Sum(y => y.TotalCost)}),
                 s => s.DocId, c => c.docid, (s, c) => new { s, c }).SelectMany(x => x.c.DefaultIfEmpty(),
                 (o, g) => new { data = o.s, g }).ToList()
