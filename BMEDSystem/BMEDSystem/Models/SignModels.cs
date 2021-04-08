@@ -12,6 +12,7 @@ namespace EDIS.Models
         public int BuyEvalateCount { get; set; }
         public int DeliveryCount { get; set; }
         public int OutsideBmedCount { get; set; }
+        public int RepResignCount { get; set; }
     }
 
     public class AssignModel

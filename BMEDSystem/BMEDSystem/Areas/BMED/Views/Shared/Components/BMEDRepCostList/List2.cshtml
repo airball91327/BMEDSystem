@@ -8,7 +8,7 @@
 
 @*該設備為統包，且使用者無以下腳色，隱藏相關金額資料*@
 @if ((ViewData["HideCost"].ToString() == "Y") &&
-    (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+    (UserManager.IsInRole(User, "Admin")  ||
      UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr") ||
      UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "Engineer")) == false)
 {

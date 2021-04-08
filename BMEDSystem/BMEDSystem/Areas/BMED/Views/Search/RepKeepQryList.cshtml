@@ -80,11 +80,11 @@ else
             <tr>
                     @if(@item.DocType == "請修"){
                         <td width="100px">
-                        
+
                             @Html.ActionLink("預覽", "Views", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
                             @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
-                            @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))))
+                             @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))))
                             {
                                 <a asp-action="RecoveryDoc" asp-controller="Repair" asp-area="BMED" asp-route-DocId="@item.DocId" data-ajax="true" class="btn btn-danger btn-sm"
                                    data-ajax-update="#pnlREPLIST" data-ajax-method="POST" id="recovery"
@@ -92,8 +92,6 @@ else
                                    data-ajax-success="RecoverySuccess()">
                                     恢復流程
                                 </a>
-                                @*<input type="button" value="恢復流程" class="btn btn-danger btn-sm" onclick="recovery(item.DocId)" />*@
-                                @*@Html.ActionLink("恢復流程", "RecoveryDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { @class="btn btn-danger btn-sm",id ="recovery" })*@
                             }
                         </td>
                     }

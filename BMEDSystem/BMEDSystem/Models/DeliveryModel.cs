@@ -52,9 +52,9 @@ namespace EDIS.Models
         public string VendorNam { get; set; }
         [NotMapped]
         public string UserDpt { get; set; }
-        [Required]
+        [Required(ErrorMessage = "設備工程師為必填欄位")]
         [Display(Name = "設備工程師")]
-        public int? EngId { get; set; }
+        public int EngId { get; set; }
         [NotMapped]
         public string EngName { get; set; }
         [Display(Name = "保固金")]

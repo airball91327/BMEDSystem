@@ -32,7 +32,7 @@
             <td>@Model.KeepCost</td>
         </tr>
     }
-    else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+    else if (UserManager.IsInRole(User, "Admin")||
             UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
             UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
             UserManager.IsInRole(User, "MedToDo"))

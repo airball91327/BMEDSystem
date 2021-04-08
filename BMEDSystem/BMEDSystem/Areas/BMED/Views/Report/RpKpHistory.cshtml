@@ -110,7 +110,7 @@
             {
                 <td>@Html.DisplayFor(modelItem => item.Cost)</td>
             }
-            else if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+            else if (UserManager.IsInRole(User, "Admin")||
                     UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
                     UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
                     UserManager.IsInRole(User, "MedToDo"))

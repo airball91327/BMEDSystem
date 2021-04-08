@@ -1,33 +1,40 @@
-﻿@model IEnumerable<EDIS.Models.MonthFailRateVModel>
+﻿@model X.PagedList.IPagedList<EDIS.Models.MonthFailRateVModel>
+
+@using Newtonsoft.Json;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
 @{
     Layout = null;
+    var qry = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry"].ToString());
 }
-<script src="~/js/HtmltoExcel.js"></script>
 
-<input id="exportExcel" type="button" value="匯出Excel" class="btn btn-default"
-       onclick="javascript:exportExcel('tbFailRate')" />
+<p>
+    <a class="btn btn-default" href="@Url.Action("MonthFailRateExcel", qry)">匯出Excel</a>
+</p>
+
+
 <table class="table" id="tbFailRate">
     <tr>
         @*<th>
-            @Html.DisplayNameFor(model => model.AssetNo)
+                @Html.DisplayNameFor(model => model.AssetNo)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Cname)
+            </th>*@
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustId)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Cname)
-        </th>*@
-        <th>
-            @Html.DisplayNameFor(model => model.CustId)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().CustNam)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.CustNam)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().RepairAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.RepairAmt)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().PlantAmt)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.PlantAmt)
-        </th>
-        <th>
-            @Html.DisplayNameFor(model => model.FailRate)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().FailRate)
         </th>
     </tr>
 
@@ -35,11 +42,11 @@
     {
         <tr>
             @*<td>
-                @Html.DisplayFor(modelItem => item.AssetNo)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Cname)
-            </td>*@
+                    @Html.DisplayFor(modelItem => item.AssetNo)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Cname)
+                </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.CustId)
             </td>
@@ -59,3 +66,8 @@
     }
 
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page, ReportClass = "月故障率統計表" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>

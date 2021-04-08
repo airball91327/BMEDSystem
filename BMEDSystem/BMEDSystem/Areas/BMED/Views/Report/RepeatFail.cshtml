@@ -11,19 +11,22 @@
 <table class="table">
     <tr>
         <th style="width: 100px; text-align: right">
+            @Html.DisplayNameFor(model => model.AssetNo)
+        </th>
+        <th style="width: 100px; text-align: right">
+            @Html.DisplayNameFor(model => model.AssetNam)
+        </th>
+        <th style="width: 100px; text-align: right">
             @Html.DisplayNameFor(model => model.DocId)
         </th>
         <th style="width: 100px; text-align: right">
             @Html.DisplayNameFor(model => model.ApplyDate)
         </th>
         <th style="text-align: right">
-            @Html.DisplayNameFor(model => model.CustNam)
+            @Html.DisplayNameFor(model => model.AccDptNo)
         </th>
-        <th style="width: 100px; text-align: right">
-            @Html.DisplayNameFor(model => model.AssetNo)
-        </th>
-        <th style="width: 100px; text-align: right">
-            @Html.DisplayNameFor(model => model.Type)
+        <th style="text-align: right">
+            @Html.DisplayNameFor(model => model.AccDptNam)
         </th>
         <th style="width: 100px;">
             @Html.DisplayNameFor(model => model.TroubleDes)
@@ -43,20 +46,19 @@
     {
         <tr>
             <td style="text-align: right">
+                @item.AssetNo 
+            </td>
+            <td style="text-align: right">
                 @Html.DisplayFor(modelItem => item.DocId)
             </td>
             <td style="text-align: right">
                 @item.ApplyDate.ToString("yyyy/MM/dd")
             </td>
             <td style="text-align: right">
-                @Html.DisplayFor(modelItem => item.CustNam)
+                @Html.DisplayFor(modelItem => item.AccDptNo)
             </td>
             <td style="text-align: right">
-                @item.AssetNo <br />
-                @item.AssetNam
-            </td>
-            <td style="text-align: right">
-                @Html.DisplayFor(modelItem => item.Type)
+                @Html.DisplayFor(modelItem => item.AccDptNam)
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.TroubleDes)

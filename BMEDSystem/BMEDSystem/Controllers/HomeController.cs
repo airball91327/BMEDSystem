@@ -50,6 +50,10 @@ namespace EDIS.Controllers
             //
             var rps = _context.BMEDRepairs.Where(r => r.Loc == urLocation);
             var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
+            /* 所有尚未指派工程師的案件 */
+            var rfs = _context.BMEDRepairFlows.Where(r => r.Status == "?" && r.Cls.Contains("工程師"))
+                                              .Where(r => r.UserId == 0);
+
             if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
             {
                 rps = _context.BMEDRepairs;
@@ -79,6 +83,32 @@ namespace EDIS.Controllers
             //外部醫療儀器使用申請案件數
             var FORMSoutsidebmedCount = _db.OutsideBmedFlows.Where(f => f.Status == "?")
                                                     .Where(f => f.UserId == ur.Id).Count();
+            //未分派案件
+            var BMEDRepResignCount = _context.BMEDRepairs.Where(r => r.EngId == 0)
+                .Join(rfs, r => r.DocId, rf => rf.DocId,
+                (r, rf) => new
+                {
+                    repair = r,
+                    flow = rf
+                })
+                .Join(_context.BMEDRepairDtls, r => r.repair.DocId, d => d.DocId,
+                (r, d) => new
+                {
+                    repair = r.repair,
+                    flow = r.flow,
+                    repdtl = d
+                })
+                .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                (j, d) => new
+                {
+                    repair = j.repair,
+                    flow = j.flow,
+                    repdtl = j.repdtl,
+                    dpt = d
+                })
+                .Where(item => item.repair.Loc == urLocation)
+                .Count();
+
 
 
             UnsignCounts v = new UnsignCounts();
@@ -87,6 +117,7 @@ namespace EDIS.Controllers
             v.DeliveryCount = BMEDdeliveryCount;
             v.BuyEvalateCount = BMEDbuyCount;
             v.OutsideBmedCount = FORMSoutsidebmedCount;
+            v.RepResignCount = BMEDRepResignCount;
 
             //if (fBrowserIsMobile())
             //{

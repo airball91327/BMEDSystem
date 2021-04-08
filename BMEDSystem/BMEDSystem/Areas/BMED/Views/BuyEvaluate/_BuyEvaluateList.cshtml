@@ -83,7 +83,7 @@
                             @Html.ActionLink("驗收", "Create", "Delivery", new { id = item.DocId }, null)
                         }
                     }
-                    @if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedToDo"))))
+                    @*@if (item.Flg == "2" && ((UserManager.IsInRole(User, "MedToDo"))))
                     {
                         @Html.Raw("| ")
                         <a asp-action="FlowRecovery" asp-controller="BuyFlow" asp-area="BMED" asp-route-DocId="@item.DocId"
@@ -93,7 +93,7 @@
                            data-ajax-success="RecoverySuccess()">
                             恢復流程
                         </a>
-                    }
+                    }*@
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.DocType)

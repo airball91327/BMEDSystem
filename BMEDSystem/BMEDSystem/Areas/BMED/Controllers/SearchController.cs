@@ -1612,6 +1612,10 @@ namespace EDIS.Areas.BMED.Controllers
                         item.Brand = asset.Brand;
                         item.Type = asset.Type;
                     }
+                    else
+                    {
+                        item.AssetName = repairDoc.AssetName;
+                    }
                 }
                 else
                 {

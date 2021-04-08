@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
 using EDIS.Models;
@@ -13,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
@@ -172,18 +174,66 @@ namespace EDIS.Areas.BMED.Controllers
                     _context.SaveChanges();
                     //
                     AssetKeepModel kp = _context.BMEDAssetKeeps.Find(keep.AssetNo);
-                    if (kp == null)
-                    {
-                        throw new Exception("請先維護此設備保養維護資料!!");
-                    }
+
+                    int? engId = kp == null ? null : kp.KeepEngId;
+                    //if (kp == null)
+                    //{
+                    //    throw new Exception("請先維護此設備保養維護資料!!");
+                    //}
                     AssetModel at = _context.BMEDAssets.Find(keep.AssetNo);
                     //
-                    keep.AssetName = _context.BMEDAssets.Find(keep.AssetNo).Cname;
-                    if (!kp.KeepEngId.HasValue)
-                    {
-                        throw new Exception("此設備尚未設定保養工程師!!");
-                    }
-                    keep.EngId = kp.KeepEngId.Value;
+                    keep.AssetName = at == null ? keep.AssetName : at.Cname;
+                    
+                        if (!engId.HasValue)  //該設備無預設工程師，改為擷取保管部門所對應工程師
+                        {
+                            if (at != null)
+                            {
+                                var dptid = at.DelivDpt;
+                                if (!string.IsNullOrEmpty(at.DelivDpt))
+                                {
+                                    var eid = _context.EngsInDpts.Where(e => e.AccDptId == dptid).FirstOrDefault();
+                                    if (eid != null)
+                                    {
+                                        engId = _context.AppUsers.Find(eid.EngId).Id;
+                                    }
+                                    else
+                                    {
+                                        eid = _context.EngsInDpts.Where(e => e.AccDptId == ur.DptId).FirstOrDefault();
+                                        if (eid != null)
+                                        {
+                                            engId = _context.AppUsers.Find(eid.EngId).Id;
+                                        }
+                                    }
+                                }
+                                else   //設備無保管部門
+                                {
+                                    // 依照使用者的部門設定工程師
+                                    var eid = _context.EngsInDpts.Where(e => e.AccDptId == ur.DptId).FirstOrDefault();
+                                    if (eid != null)
+                                    {
+                                        engId = _context.AppUsers.Find(eid.EngId).Id;
+                                    }
+                                }
+                                if (!engId.HasValue)//上述條件皆對應不到工程師，設定選取ID為0的User，為尚未分配之案件
+                                {
+                                    engId = 0;
+                                }
+                            }
+                            else  //查無設備
+                            {
+                                // 依照使用者的部門設定工程師
+                                var eid = _context.EngsInDpts.Where(e => e.AccDptId == ur.DptId).FirstOrDefault();
+                                if (eid != null)
+                                {
+                                    engId = _context.AppUsers.Find(eid.EngId).Id;
+                                }
+                                if (!engId.HasValue )//該部門無預設工程師，設定選取ID為0的User，為尚未分配之案件
+                                {
+                                    engId = 0;
+                                }
+                            }
+                        }
+                    keep.EngId = engId.Value;
                     //keep.AccDpt = at.AccDpt;
                     keep.SentDate = DateTime.Now;
                     keep.Cycle = kp == null ? 0 : (kp.Cycle == null ? 0 : kp.Cycle.Value);
@@ -314,7 +364,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 did = Convert.ToString(yymm * 100000 + 1);
             }
-            return did;
+                return did;
         }
 
         public string GetID2()
@@ -576,7 +626,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "已結案":
                     var kf = _context.BMEDKeepFlows.Where(f => f.Status == "2");
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
+                    if (userManager.IsInRole(User, "Admin") || 
                         userManager.IsInRole(User, "Manager") || userManager.IsInRole(User, "MedEngineer"))
                     {
                         if (userManager.IsInRole(User, "Manager"))
@@ -678,7 +728,7 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = f
                     });
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
+                    if (userManager.IsInRole(User, "Admin") || 
                         userManager.IsInRole(User, "MedEngineer"))
                     {
                         /* If has other search values, search all RepairDocs which flowCls is in engineer. */
@@ -979,41 +1029,87 @@ namespace EDIS.Areas.BMED.Controllers
         // GET: BMED/Keep/QueryAssets
         public JsonResult QueryAssets(string QueryStr, string QueryAccDpt, string QueryDelivDpt)
         {
-            List<AssetModel> assets = new List<AssetModel>();
+            List<AssetModel> assets = null;
+            List<AssetQryResult> objs = new List<AssetQryResult>();
+            List<SelectListItem> list = new List<SelectListItem>();
+            if (QueryStr == "99999")
+            {
+                assets = _context.BMEDAssets.Where(a => !string.IsNullOrEmpty(a.AssetNo))
+                                   .Where(a => !string.IsNullOrEmpty(a.Cname))
+                                   .Where(a => a.AssetNo.Contains(QueryStr) ||
+                                               a.Cname.Contains(QueryStr))
+                                   .Where(a => a.DisposeKind != "報廢")
+                                   .ToList();
+                if (assets.Count() != 0)
+                {
+                    assets.ForEach(asset =>
+                    {
+                        list.Add(new SelectListItem
+                        {
+                            Text = asset.Cname + "(" + asset.AssetNo + ")",
+                            Value = asset.AssetNo.ToString()
+                        });
+                    });
+                }
+                return Json(list);
+            }
             // No query string.
             if (string.IsNullOrEmpty(QueryStr) && string.IsNullOrEmpty(QueryAccDpt) && string.IsNullOrEmpty(QueryDelivDpt))
             {
-                assets = _context.BMEDAssets.Where(a => a.AssetNo.Contains(QueryStr) ||
-                                                        a.Cname.Contains(QueryStr)).ToList();
+                //assets = _context.BMEDAssets.Where(a => a.AssetNo.Contains(QueryStr) ||
+                //                                        a.Cname.Contains(QueryStr)).ToList();
             }
             else
             {
-                assets = _context.BMEDAssets.ToList();
-                if (!string.IsNullOrEmpty(QueryStr))     /* Search assets by assetNo or Cname. */
-                {
-                    assets = assets.Where(a => a.AssetNo.Contains(QueryStr) ||
-                                               a.Cname.Contains(QueryStr)).ToList();
-                }
-                if (!string.IsNullOrEmpty(QueryAccDpt))    /* Search assets by AccDpt. */
-                {
-                    assets = assets.Where(a => a.AccDpt == QueryAccDpt).ToList();
-                }
-                if (!string.IsNullOrEmpty(QueryDelivDpt))   /* Search assets by DelivDpt. */
-                {
-                    assets = assets.Where(a => a.DelivDpt == QueryDelivDpt).ToList();
-                }
-            }
+                //
+                string responseString = "";
 
-            List<SelectListItem> list = new List<SelectListItem>();
-            if (assets.Count() != 0)
-            {
-                assets.ForEach(asset => {
-                       list.Add(new SelectListItem
-                       {
-                           Text = asset.Cname + "(" + asset.AssetNo + ")",
-                           Value = asset.AssetNo.ToString()
-                       });
-                });
+                using (var client = new HttpClient())
+                {
+                    string urlstr = "http://dms.cch.org.tw/CchWebApi/api/AssetData";
+                    urlstr += "?keyword=" + QueryStr + "&accdpt=" + QueryAccDpt + "&delivdpt=" + QueryDelivDpt;
+                    var url = new Uri(urlstr, UriKind.Absolute);
+                    //string json = JsonConvert.SerializeObject(apps);
+                    //HttpContent contentPost = new StringContent(json);
+                    //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    try
+                    {
+                        var response = client.GetAsync(url); //
+                        responseString = response.Result.Content.ReadAsStringAsync().Result;
+                        objs = JsonConvert.DeserializeObject<List<AssetQryResult>>(responseString);
+                        objs.ForEach(x =>
+                        {
+                            list.Add(new SelectListItem
+                            {
+                                Text = x.NAME_C + "(" + x.ASSET_NO + ")",
+                                Value = x.ASSET_NO
+                            });
+                        });
+                        // no result.
+                        if (objs.Count() <= 0)
+                        {
+                            assets = _context.BMEDAssets.Where(a => a.AssetNo.Contains(QueryStr) ||
+                                                                    a.Cname.Contains(QueryStr))
+                                    .Where(a => a.DisposeKind != "報廢")
+                                    .ToList();
+                            if (assets.Count() != 0)
+                            {
+                                assets.ForEach(asset =>
+                                {
+                                    list.Add(new SelectListItem
+                                    {
+                                        Text = asset.Cname + "(" + asset.AssetNo + ")",
+                                        Value = asset.AssetNo.ToString()
+                                    });
+                                });
+                            }
+                        }
+                    }
+                    catch (Exception e)
+                    {
+                        return null;
+                    }
+                }
             }
             return Json(list);
         }
@@ -1030,7 +1126,7 @@ namespace EDIS.Areas.BMED.Controllers
                 {
                     return StatusCode(404);
                 }
-                if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
+                if (userManager.IsInRole(User, "Admin")|| 
                     userManager.IsInRole(User, "MedManager") || userManager.IsInRole(User, "MedEngineer"))
                 {
                     return View(keep);
@@ -1370,14 +1466,17 @@ namespace EDIS.Areas.BMED.Controllers
 
         public ActionResult RecoveryDoc(string DocId)
         {
-            if (!String.IsNullOrEmpty(DocId))
+            if (!string.IsNullOrEmpty(DocId))
             {
-
+                if (!(userManager.IsInRole(User, "MedAssetMgr")))
+                {
+                    BadRequest("權限不足!");
+                }
                 var flow = _context.BMEDKeepFlows.Where(f => f.DocId == DocId && f.Status == "2")
                     .LastOrDefault();
 
-                if (flow == null)
-                {
+                 if (flow == null)
+                 {
                     string msg = "";
                     foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
                     {
@@ -1386,11 +1485,56 @@ namespace EDIS.Areas.BMED.Controllers
                     throw new Exception(msg);
                 }
 
-                flow.Status = "?";
+                string responseString = "";
+                //int? inf = null;
 
-                _context.Entry(flow).State = EntityState.Modified; ;
-                _context.SaveChanges();
+                    var client = new HttpClient();
+                    string urlstr = "http://dms.cch.org.tw/CchWebApi2/api/AccOpr/GetShutDate";
+                    urlstr += "?doctyp=" + "保養" + "&" + "docid=" + DocId;
+                    var url = new Uri(urlstr, UriKind.Absolute);
+                    //string json = JsonConvert.SerializeObject(apps);
+                    //HttpContent contentPost = new StringContent(json);
+                    //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                    try
+                    {
+                        var response = client.GetAsync(url); //
+                        responseString = response.Result.Content.ReadAsStringAsync().Result;
+                        
+                    }
+                    catch (Exception e)
+                    {
+                        throw new Exception(e.Message);
+                    }
 
+                if (responseString == "0" || responseString == "null")
+                {
+                    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+                    if (ur == null)
+                    {
+                        return BadRequest("查無此帳號!!");
+                    }
+
+
+                    flow.Status = "?";
+
+                    _context.Entry(flow).State = EntityState.Modified;
+
+                    TamperModel tamper = new TamperModel();
+                    tamper.DocId = flow.DocId;
+                    tamper.RepType = "保養";
+                    tamper.UserName = ur.UserName;
+                    tamper.FullName = ur.FullName;
+                    tamper.Rtt = DateTime.Now;
+                    tamper.Title = "恢復流程";
+
+                    _context.BMEDTamper.Add(tamper);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    return BadRequest("此筆資料已關帳,無法恢復流程");
+                }
                 return new JsonResult(flow)
                 {
                     Value = new { success = true, error = "" }
@@ -1628,7 +1772,7 @@ namespace EDIS.Areas.BMED.Controllers
                 case "已結案":
                     var kf = _context.BMEDKeepFlows.Where(f => f.Status == "2");
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") ||
+                    if (userManager.IsInRole(User, "Admin") ||
                         userManager.IsInRole(User, "Manager") || userManager.IsInRole(User, "MedEngineer"))
                     {
                         if (userManager.IsInRole(User, "Manager"))
@@ -1730,7 +1874,7 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = f
                     });
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") ||
+                    if (userManager.IsInRole(User, "Admin")||
                         userManager.IsInRole(User, "MedEngineer"))
                     {
                         /* If has other search values, search all RepairDocs which flowCls is in engineer. */

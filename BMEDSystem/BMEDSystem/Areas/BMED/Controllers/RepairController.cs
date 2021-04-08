@@ -301,7 +301,7 @@ namespace EDIS.Areas.BMED.Controllers
                     /* Get all closed repair docs. */
                     var rf = _context.BMEDRepairFlows.Where(f => f.Status == "2");
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
+                    if (userManager.IsInRole(User, "Admin")|| 
                         userManager.IsInRole(User, "Manager") || userManager.IsInRole(User, "MedEngineer"))
                     {
                         if (userManager.IsInRole(User, "Manager"))
@@ -387,7 +387,7 @@ namespace EDIS.Areas.BMED.Controllers
                         repair = r,
                         flow = f
                     });
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") || 
+                    if (userManager.IsInRole(User, "Admin")|| 
                         userManager.IsInRole(User, "MedEngineer"))
                     {
                         /* If has other search values, search all RepairDocs which flowCls is in engineer. */
@@ -712,7 +712,10 @@ namespace EDIS.Areas.BMED.Controllers
             }
             ViewData["AllEngs"] = new SelectList(list, "Value", "Text");
             /* Get default assets by user's dpt. */
-            var dptAssets = _context.BMEDAssets.Where(a => a.AccDpt == ur.DptId).ToList();
+            var dptAssets = _context.BMEDAssets
+                            .Where(a => a.AccDpt == ur.DptId)
+                            .Where(a => a.DisposeKind != "報廢")
+                            .ToList();
             List<SelectListItem> list2 = new List<SelectListItem>();
             foreach (var item in dptAssets)
             {
@@ -851,7 +854,8 @@ namespace EDIS.Areas.BMED.Controllers
                         msg += error.ErrorMessage + Environment.NewLine;
                     }
                 }
-            }catch(Exception ex)
+            }
+            catch(Exception ex)
             {
                 msg = ex.Message;
             }
@@ -1476,7 +1480,9 @@ namespace EDIS.Areas.BMED.Controllers
                 assets = _context.BMEDAssets.Where(a => !string.IsNullOrEmpty(a.AssetNo))
                                    .Where(a => !string.IsNullOrEmpty(a.Cname))
                                    .Where(a => a.AssetNo.Contains(QueryStr) ||
-                                               a.Cname.Contains(QueryStr)).ToList();
+                                               a.Cname.Contains(QueryStr))
+                                   .Where(a => a.DisposeKind != "報廢")
+                                   .ToList();
                 if (assets.Count() != 0)
                 {
                     assets.ForEach(asset =>
@@ -1526,7 +1532,9 @@ namespace EDIS.Areas.BMED.Controllers
                         if (objs.Count() <= 0)
                         {
                             assets = _context.BMEDAssets.Where(a => a.AssetNo.Contains(QueryStr) ||
-                                                                    a.Cname.Contains(QueryStr)).ToList();
+                                                                    a.Cname.Contains(QueryStr))
+                                    .Where(a => a.DisposeKind != "報廢")
+                                    .ToList();
                             if (assets.Count() != 0)
                             {
                                 assets.ForEach(asset =>
@@ -1919,7 +1927,7 @@ namespace EDIS.Areas.BMED.Controllers
                     /* Get all closed repair docs. */
                     var rf = _context.BMEDRepairFlows.Where(f => f.Status == "2");
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") ||
+                    if (userManager.IsInRole(User, "Admin") ||
                         userManager.IsInRole(User, "Manager") || userManager.IsInRole(User, "MedEngineer"))
                     {
                         if (userManager.IsInRole(User, "Manager"))
@@ -2006,7 +2014,7 @@ namespace EDIS.Areas.BMED.Controllers
                         flow = f
                     });
 
-                    if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedAdmin") ||
+                    if (userManager.IsInRole(User, "Admin")||
                         userManager.IsInRole(User, "MedEngineer"))
                     {
                         /* If has other search values, search all RepairDocs which flowCls is in engineer. */
@@ -2465,6 +2473,10 @@ namespace EDIS.Areas.BMED.Controllers
                         item.Brand = asset.Brand;
                         item.Type = asset.Type;
                     }
+                    else
+                    {
+                        item.AssetName = item.repdata.AssetName;
+                    }
                 }
                 else
                 {
@@ -2597,12 +2609,17 @@ namespace EDIS.Areas.BMED.Controllers
 
         public ActionResult RecoveryDoc(string DocId)
         {
-            if (!String.IsNullOrEmpty(DocId))
+            if (!string.IsNullOrEmpty(DocId))
             {
+                if (!(userManager.IsInRole(User, "MedAssetMgr") ))
+                {
+                    BadRequest("權限不足!");
+                }
 
                 var flow = _context.BMEDRepairFlows.Where(f => f.DocId == DocId && f.Status == "2")
                     .LastOrDefault();
-                if (flow == null)
+                var rep = _context.BMEDRepairs.Where(f => f.DocId == DocId).FirstOrDefault();
+                if (flow == null || rep == null )
                 {
                     string msg = "";
                     foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
@@ -2611,10 +2628,56 @@ namespace EDIS.Areas.BMED.Controllers
                     }
                     throw new Exception(msg);
                 }
-                flow.Status = "?";
 
-                _context.Entry(flow).State = EntityState.Modified; ;
-                _context.SaveChanges();
+                string responseString = "";
+                //int? inf = null;
+
+                var client = new HttpClient();
+                string urlstr = "http://dms.cch.org.tw/CchWebApi2/api/AccOpr/GetShutDate";
+                urlstr += "?doctyp=" + "請修" + "&" + "docid=" + DocId;
+                var url = new Uri(urlstr, UriKind.Absolute);
+                //string json = JsonConvert.SerializeObject(apps);
+                //HttpContent contentPost = new StringContent(json);
+                //contentPost.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                try
+                {
+                    var response = client.GetAsync(url); //
+                    responseString = response.Result.Content.ReadAsStringAsync().Result;
+
+                }
+                catch (Exception e)
+                {
+                    throw new Exception(e.Message);
+                }
+
+                if (responseString == "0" || responseString == "null")
+                {
+                    var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).FirstOrDefault();
+
+                    if (ur == null)
+                    {
+                        return BadRequest("查無此帳號!!");
+                    }
+
+                    flow.Status = "?";
+
+                    _context.Entry(flow).State = EntityState.Modified;
+
+                    TamperModel tamper = new TamperModel();
+                    tamper.DocId = flow.DocId;
+                    tamper.RepType = rep.RepType;
+                    tamper.UserName = ur.UserName;
+                    tamper.FullName = ur.FullName;
+                    tamper.Rtt = DateTime.Now;
+                    tamper.Title = "恢復流程";
+
+                    _context.BMEDTamper.Add(tamper);
+                    _context.SaveChanges();
+                }
+                else
+                {
+                    return BadRequest("此筆資料已關帳,無法恢復流程");
+                }
 
                 return new JsonResult(flow)
                 {

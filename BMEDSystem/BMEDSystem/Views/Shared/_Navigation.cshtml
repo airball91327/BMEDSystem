@@ -58,7 +58,7 @@
                             <li class="@Html.IsSelected(action: "Create", area: "BMED")">
                                 <a href="@Url.Action("Create", "Keep", new { Area = "BMED" })">保養單</a>
                             </li>
-                            @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                            @if (UserManager.IsInRole(User, "Admin") ||
                          UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
                          UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedDirector") ||
                          UserManager.IsInRole(User, "MedToDo"))
@@ -133,7 +133,7 @@
                             <li class="@Html.IsSelected(controller: "Report", action: "Index3", area: "BMED")">
                                 <a href="@Url.Action("Index3", "Report", new { Area = "BMED", rpname = "設備保養排程年報" })">設備保養排程年報</a>
                             </li>
-                            @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                            @if (UserManager.IsInRole(User, "Admin")||
                      UserManager.IsInRole(User, "MedEngineer") || UserManager.IsInRole(User, "MedAssetMgr") ||
                      UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr") ||
                      UserManager.IsInRole(User, "DeviceMgr"))
@@ -212,7 +212,7 @@
                     </li>
 
                     @{
-                        if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAdmin") ||
+                        if (UserManager.IsInRole(User, "Admin") ||UserManager.IsInRole(User, "MedAdmin") ||
                             UserManager.IsInRole(User, "MedAssetMgr"))
                         {
                             <li class="@Html.IsSelected(controller: "KeepFormat", area: "BMED")
@@ -229,6 +229,8 @@
                                             </li>
                                         </ul>
                                     </li>
+                                    @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr"))
+                                    {
                                     <li class="@Html.IsSelected(controller: "Asset", area: "BMED")">
                                         <a href="#">資產設備管理<span class="fa arrow"></span></a>
                                         <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "Asset", area: "BMED", cssClass: "in")">
@@ -245,14 +247,15 @@
                                             </li>
                                         </ul>
                                     </li>
+                                    }
                                     @*<li class="@Html.IsSelected(controller: "FailFactors", area: "BMED")">
-                                        <a href="#">故障原因選單<span class="fa arrow"></span></a>
-                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "FailFactors", area: "BMED", cssClass: "in")">
-                                            <li>
-                                                <a href="@Url.Action("Index", "FailFactors", new { Area = "BMED" })">故障原因選單列表</a>
-                                            </li>
-                                        </ul>
-                                    </li>*@
+            <a href="#">故障原因選單<span class="fa arrow"></span></a>
+            <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "FailFactors", area: "BMED", cssClass: "in")">
+                <li>
+                    <a href="@Url.Action("Index", "FailFactors", new { Area = "BMED" })">故障原因選單列表</a>
+                </li>
+            </ul>
+        </li>*@
                                     @if (UserManager.IsInRole(User, "Admin"))
                                     {
                                         <li class="@Html.IsSelected(controller: "AppUser", area: "")">

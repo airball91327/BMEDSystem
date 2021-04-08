@@ -391,10 +391,10 @@ namespace EDIS.Models
         public string DocId { get; set; }
         [Display(Name = "請修日期")]
         public DateTime ApplyDate { get; set; }
-        [Display(Name = "單位代號")]
-        public string CustId { get; set; }
-        [Display(Name = "單位名稱")]
-        public string CustNam { get; set; }
+        [Display(Name = "成本中心代號")]
+        public string AccDptNo { get; set; }
+        [Display(Name = "成本中心名稱")]
+        public string AccDptNam { get; set; }
         [Display(Name = "設備財編")]
         public string AssetNo { get; set; }
         [Display(Name = "設備名稱")]
@@ -448,12 +448,12 @@ namespace EDIS.Models
                 if (r != null)
                 {
                     m.TroubleDes = r.TroubleDes;
-                    m.CustId = r.AccDpt;
+                    m.AccDptNo = r.AccDpt;
                     o = db.Departments.Where(c => c.DptId == r.AccDpt).ToList().FirstOrDefault();
                     //if (o.GroupId != gid)
                     //    continue;
                     if (o != null)
-                        m.CustNam = o.Name_C;
+                        m.AccDptNam = o.Name_C;
                     m.ApplyDate = r.ApplyDate;
                     m.AssetNo = r.AssetNo;
                     if (!String.IsNullOrEmpty(cls))
@@ -532,6 +532,8 @@ namespace EDIS.Models
         public decimal Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "工程師代碼")]
+        public string EngNamNo { get; set; }
         [Display(Name = "目前關卡人員")]
         public string ClsNam { get; set; }
         [Display(Name = "總工時")]
@@ -546,7 +548,12 @@ namespace EDIS.Models
         public string PlaceLoc { get; set; }
         [Display(Name = "數量")]
         public int Amt { get; set; }
-
+        [Display(Name = "[是][否]為器械")]
+        public string IsInstrument { get; set; }
+        [Display(Name = "[是][否]為資安事件")]
+        public string IsSecurity { get; set; }
+        [Display(Name = "費用別")]
+        public string StockType { get; set; }
         private readonly ApplicationDbContext db;
         public MonthRepairVModel(ApplicationDbContext context)
         {
@@ -1590,6 +1597,8 @@ namespace EDIS.Models
         public decimal? Cost { get; set; }
         [Display(Name = "工程師")]
         public string EngNam { get; set; }
+        [Display(Name = "工程師代碼")]
+        public string EngNamNo { get; set; }
         [Display(Name = "現在關卡")]
         public string ClsEmp { get; set; }
         public string AssetClass { get; set; }

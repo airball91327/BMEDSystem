@@ -10,8 +10,15 @@
 
 <h2>驗收單/新增</h2>
 
-@using (Html.BeginForm())
-{
+<form asp-action="Create" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onFailed"
+      data-ajax-success="onSuccess()">
     @Html.AntiForgeryToken()
     @Html.ValidationSummary(true)
 
@@ -63,9 +70,11 @@
             <label asp-for="ContractNo" class="control-title"></label>
         </div>
         <div class="editor-field">
-            <input asp-for="ContractNo" class="form-control" />
-            @*<button type="button" class="btn btn-default" id="btnQtyContractNo">查詢</button>*@
-            <span asp-validation-for="ContractNo" class="text-danger"></span>
+            <div class="form-inline">
+                <input asp-for="ContractNo" class="form-control" />
+                <button type="button" class="btn btn-default" id="btnQtyContractNo">查詢</button>
+                <span asp-validation-for="ContractNo" class="text-danger"></span>
+            </div>
         </div>
         <div class="editor-label">
             <label asp-for="WartyMon" class="control-title"></label>
@@ -150,7 +159,7 @@
             <div class="form-inline">
                 <input asp-for="VendorNam" class="form-control" />
                 <input type="button" value="選擇" class="btn btn-default" data-toggle="modal" data-target="#modalVENDOR" />
-                <span asp-validation-for="VendorNam" class="text-danger"></span>
+                <span style="color:forestgreen" id="VendorNamErrorMsg"></span>
             </div>
         </div>
 
@@ -201,35 +210,45 @@
             <input class="btn btn-primary" id="btnSEND" type="submit" value="確定送出" />
         </div>
     </fieldset>
-}
+</form>
 
-<div style="padding-top:20px;">
-    <a asp-action="Index" asp-controller="Home" asp-area="">回到列表</a>
-</div>
+    <div style="padding-top:20px;">
+        <a asp-action="Index" asp-controller="Home" asp-area="">回到列表</a>
+    </div>
 
-<!-- 廠商 Modal -->
-<div id="modalVENDOR" class="modal fade" role="dialog">
-    <div class="modal-dialog">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h4 class="modal-title">選擇廠商</h4>
-            </div>
-            <div id="pnlSELECTVENDOR" class="modal-body">
-                @await Component.InvokeAsync("BMEDQryVendor")
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">儲存</button>
+    <!-- 廠商 Modal -->
+    <div id="modalVENDOR" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">選擇廠商</h4>
+                </div>
+                <div id="pnlSELECTVENDOR" class="modal-body">
+                    @await Component.InvokeAsync("BMEDQryVendor")
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">儲存</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
 
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-    <script>
+    @section Scripts {
+        @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+        <script>
+            var onFailed = function (data) {
+                alert(data.responseText);
+                $.Toast.hideToast();
+            };
+            function onSuccess() {
+                $.Toast.hideToast();
+                alert("已送出");
+                location.href = '../../Home/Index';
+            }
+
         $(function () {
             $('.combobox').combobox();
             var url = '@Url.Action("", "AppUser", new { Area = "" })';
@@ -359,10 +378,11 @@
                     success: function (data) {
                         console.log(data);
                         if (data != null) {
-                            alert("會入資料"+data);
-                            $("#ContractNo").val("123");
-                            $("#VendorId").val(data.vendoR_NO);
-                            $("#VendorNam").text("456");
+                            $("#ContractNo").val(data.contracT_NO);
+                            $("#VendorId").val(data.vendoR_No);
+                            $("#VendorNam").val(data.vendoR_NAME);
+                            $("#VendorNamErrorMsg").html(data.vendoR_NAME);
+                            $("#BudgetId").val(data.purchasE_NO);
                         }
                     },
                     error: function (error) {
@@ -372,5 +392,5 @@
             });
 
         });
-    </script>
-}
+        </script>
+    }

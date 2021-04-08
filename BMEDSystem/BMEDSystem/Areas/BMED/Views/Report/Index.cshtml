@@ -1,5 +1,9 @@
 ﻿@model EDIS.Models.ReportQryVModel
 
+
+@using EDIS.Models.Identity
+@inject CustomUserManager UserManager
+
 @{
     Layout = "~/Views/Shared/_PassedLayout.cshtml";
 }
@@ -216,7 +220,7 @@
                 </div>
             </div>
         }
-        @if (Model.ReportClass == "分攤費用清單" || Model.ReportClass == "超過五日案件清單")
+        @if (UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))
         {
             <div class="form-group">
                 @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })

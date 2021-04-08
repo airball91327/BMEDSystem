@@ -78,6 +78,8 @@ namespace EDIS.Models
         public virtual DbSet<QuestAnswer> QuestAnswers { get; set; }
         public virtual DbSet<FailFactor> FailFactors { get; set; }
         public virtual DbSet<DeviceSortCode> BMEDDeviceSortCodes { get; set; }
+        public virtual DbSet<TamperModel> BMEDTamper { get; set; }
+
 
 
 
@@ -1276,6 +1278,25 @@ namespace EDIS.Models
                 entity.Property(e => e.Status)
                     .HasMaxLength(5)
                     .HasColumnName("Status");
+            });
+
+            modelBuilder.Entity<TamperModel>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.ToTable("BMEDTamper");
+
+                entity.Property(e => e.DocId).HasMaxLength(50);
+
+                entity.Property(e => e.RepType).HasMaxLength(50);
+
+                entity.Property(e => e.UserName).HasMaxLength(50);
+
+                entity.Property(e => e.FullName).HasMaxLength(50);
+
+                entity.Property(e => e.Rtt).HasColumnType("date");
+
+                entity.Property(e => e.Title).HasMaxLength(50);
             });
         }
     }

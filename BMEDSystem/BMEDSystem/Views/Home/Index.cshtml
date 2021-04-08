@@ -64,7 +64,7 @@
     @if (UserManager.IsInRole(User, "Admin") || UserManager.IsInRole(User, "MedAssetMgr") ||
         UserManager.IsInRole(User, "MedMgr") || UserManager.IsInRole(User, "MedBranchMgr"))
     {
-        <li><a href="#menu5">請修-未分派案件 <span class="badge"></span></a></li>
+        <li><a href="#menu5">請修-未分派案件 <span class="badge" id="BMEDRepResignCount">@Model.RepResignCount</span></a></li>
     }
     @if (!UserManager.IsInRole(User, "Vendor")){
         <li><a href="#menu6">外部醫療儀器使用 <span class="badge" id="OutsideBmedCount">@Model.OutsideBmedCount</span></a></li>

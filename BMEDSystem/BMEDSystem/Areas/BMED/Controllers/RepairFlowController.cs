@@ -933,22 +933,26 @@ namespace EDIS.Areas.BMED.Controllers
             hd.PS_DD = DateTime.Now.Date;
             hd.SAL_NO = User.Identity.Name;
             //Get SAL_NO
-            var salStocks = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
-                                                    .Where(rc => rc.StockType == "0").ToList();
-            var salTickets = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
-                                                     .Where(rc => rc.StockType == "2").ToList();
-            if (salStocks.Count() > 0)
-            {
-                var salId = salStocks.FirstOrDefault().Rtp;
-                var user = _context.AppUsers.Find(salId);
-                hd.SAL_NO = user.UserName;
-            }
-            else
-            {
-                var salId = salTickets.OrderByDescending(s => s.Rtt).FirstOrDefault().Rtp;
-                var user = _context.AppUsers.Find(salId);
-                hd.SAL_NO = user.UserName;
-            }
+            //var salStocks = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
+            //                                        .Where(rc => rc.StockType == "0").ToList();
+            //var salTickets = _context.BMEDRepairCosts.Where(rc => rc.DocId == docId)
+            //                                         .Where(rc => rc.StockType == "2").ToList();
+            //if (salStocks.Count() > 0)
+            //{
+            //    var salId = salStocks.FirstOrDefault().Rtp;
+            //    var user = _context.AppUsers.Find(salId);
+            //    hd.SAL_NO = user.UserName;
+            //}
+            //else
+            //{
+            //    var salId = salTickets.OrderByDescending(s => s.Rtt).FirstOrDefault().Rtp;
+            //    var user = _context.AppUsers.Find(salId);
+            //    hd.SAL_NO = user.UserName;
+            //}
+            var user = _context.BMEDRepairEmps.Where(e => e.DocId == docId).FirstOrDefault().UserId;
+
+            hd.SAL_NO = _context.AppUsers.Find(user).UserName;
+
             if (repair != null)
             {
                 hd.CUS_NO = repair.AccDpt;

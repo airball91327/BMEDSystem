@@ -703,6 +703,10 @@ namespace EDIS.Areas.BMED.Controllers
         {
             // Get Login User's details.
             var loginUser = _userRepo.Find(ur => ur.UserName == User.Identity.Name).FirstOrDefault();
+            if (!userManager.IsInRole(User, "MedToDo"))
+            {
+                throw new Exception("權限不足!");
+            }
             var lastFlow = _context.BuyFlows.Where(bf => bf.DocId == docId && bf.Status == "2").FirstOrDefault();
             if (lastFlow != null)
             {

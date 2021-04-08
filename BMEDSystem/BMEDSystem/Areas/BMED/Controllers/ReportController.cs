@@ -825,6 +825,28 @@ namespace EDIS.Areas.BMED.Controllers
         [HttpPost]
         public IActionResult Index(ReportQryVModel v, int page = 1)
         {
+            /* Get login user. */
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+
+            /* Get login user's location. */
+            var loc = new DepartmentModel(_context).GetUserLocation(usr);
+
+            if (!string.IsNullOrEmpty(v.Location)) { 
+                // Admin & 設備主管才可查詢全單位，其餘Role只可查詢自己單位
+                if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedMgr")
+                    || userManager.IsInRole(User, "MedAssetMgr"))
+                {
+                    // Do nothing.
+                }
+                else
+                {
+                    v.Location = loc;
+                }
+            }
+            else
+            {
+                v.Location = loc;
+            }
 
             if (v.Edate != null)
             {
@@ -832,6 +854,7 @@ namespace EDIS.Areas.BMED.Controllers
                     .AddMinutes(59)
                     .AddSeconds(59);
             }
+
             //TempData["qry"] = v; //the TempData serializer currently supports only a limited set of data types for simplicity. It supports a few primitive types such as int, string, and bool, and simple containers of those types, such as lists.
             switch (v.ReportClass)
             {
@@ -843,7 +866,7 @@ namespace EDIS.Areas.BMED.Controllers
                             Value = new { success = false, error = "需選擇一個時間!" }
                         };
                     }
-                    return PartialView("MonthFailRate", MonthFailRate(v));
+                    return PartialView("MonthFailRate", MonthFailRate(v).ToPagedList(page, pageSize));
                 case "月維修清單":
                     if (v.Edate == null || v.Sdate == null)
                     {
@@ -1036,14 +1059,6 @@ namespace EDIS.Areas.BMED.Controllers
                             //return NotFound("請輸入時間區間!");
                         };
                     }
-                    else if (string.IsNullOrEmpty(v.Location))
-                    {
-                        //return NotFound("請選擇院區!");
-                        return new JsonResult(v)
-                        {
-                            Value = new { success = false, error = "請選擇院區!" }
-                        };
-                    }
                     return PartialView("ReKeShCosCheck", ReKeShCosCheck(v).ToPagedList(page, pageSize));
                 case "超過五日案件清單":
                     if (v.Edate == null || v.Sdate == null)
@@ -1051,13 +1066,6 @@ namespace EDIS.Areas.BMED.Controllers
                         return new JsonResult(v)
                         {
                             Value = new { success = false, error = "時間區間皆都需選擇!" }
-                        };
-                    }
-                    else if (string.IsNullOrEmpty(v.Location))
-                    {
-                        return new JsonResult(v)
-                        {
-                            Value = new { success = false, error = "請選擇院區!" }
                         };
                     }
                     return PartialView("CaseOverFive", CaseOverFive(v).ToPagedList(page, pageSize));
@@ -2519,10 +2527,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<UnSignListVModel> UnSignList(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             var dslist = _context.BMEDDealStatuses.ToList();
             var fflist = _context.BMEDFailFactors.ToList();
             //if (v.Sdate == null || v.Edate == null)
@@ -2634,23 +2639,25 @@ namespace EDIS.Areas.BMED.Controllers
                 DealState = dslist.Where(d => d.Id == k.DealState).FirstOrDefault().Title,
                 InOut = k.InOut,
                 EngNam = null,
+                EngNamNo = null,
                 ClsEmp = u.FullName + "(" + u.UserName + ")",
                 AssetClass = ""
             })//.ToList()
-            .GroupJoin(_context.BMEDRepairEmps
-            .Join(_context.AppUsers, 
-                    b => b.UserId, 
+            .GroupJoin(_context.BMEDAssets
+                .Join(_context.AppUsers, 
+                    b => b.AssetEngId, 
                     u => u.Id,
                     (b, u) => new { b, u}), 
-                        u => u.DocId, 
-                        p => p.b.DocId,
+                        u => u.AssetNo, 
+                        p => p.b.AssetNo,
                         (u, p) => new { u, p})
             .SelectMany(x => x.p.DefaultIfEmpty(),
             (o, g) => new { data = o.u, g})
             //.Distinct()
             .ToList()
             .ForEach(y => {
-                y.data.EngNam = y.g == null ? "" : y.g.u.FullName + "(" + y.g.u.UserName + ")";
+                y.data.EngNam = y.g == null ? "" : y.g.u.FullName ;
+                y.data.EngNamNo = y.g == null ? "" : y.g.u.UserName ;
                 sv1.Add(y.data);
             });
 
@@ -2682,7 +2689,7 @@ namespace EDIS.Areas.BMED.Controllers
             str += "ELSE '' END AS DEALSTATE, ";
             str += "CASE C.INOUT WHEN '0' THEN '自行' WHEN '1' THEN '委外' WHEN '2' THEN '租賃' WHEN '3'THEN '保固' WHEN '4' THEN '借用' ";
             str += "ELSE '' END AS INOUT, ";
-            str += "C.COST, (G.KeepEngName+'('+U2.USERNAME+')') AS ENGNAM, C.MEMO AS FAILFACTOR, CONVERT(varchar, B.CYCLE) AS TroubleDes, ";
+            str += "C.COST, G.KeepEngName AS ENGNAM,U2.USERNAME AS ENGNAMNO, C.MEMO AS FAILFACTOR, CONVERT(varchar, B.CYCLE) AS TroubleDes, ";
             str += "C.MEMO AS DEALDES, F.ASSETCLASS ";
             str += "FROM BMEDKEEPFLOWS AS A JOIN BMEDKEEPS AS B ON A.DOCID = B.DOCID ";
             str += "JOIN BMEDKEEPDTLS AS C ON B.DOCID = C.DOCID ";
@@ -2721,7 +2728,7 @@ namespace EDIS.Areas.BMED.Controllers
         {
             string str = "";
             str += "類別,表單編號,送單日期,完工日期,財產編號,設備名稱,型號,成本中心,成本中心名稱,";
-            str += "故障描述/保養週期,故障原因,處理狀況/保養結果,保養方式,處理描述,費用,工程師,現在關卡";
+            str += "故障描述/保養週期,故障原因,處理狀況/保養結果,保養方式,處理描述,費用,工程師代碼,工程師,現在關卡";
             DataTable dt = new DataTable();
             DataRow dw;
             str.Split(new char[] { ',' }).ToList()
@@ -2736,8 +2743,8 @@ namespace EDIS.Areas.BMED.Controllers
                 dw = dt.NewRow();
                 dw[0] = m.DocTyp;
                 dw[1] = m.DocId;
-                dw[2] = m.ApplyDate;
-                dw[3] = m.EndDate;
+                dw[2] = m.ApplyDate.ToString("yyyy/MM/dd");
+                dw[3] = m.EndDate == null ? "" : m.EndDate.Value.ToString("yyyy/MM/dd");
                 dw[4] = m.AssetNo;
                 dw[5] = m.AssetName;
                 dw[6] = m.Type;
@@ -2749,8 +2756,9 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[12] = m.InOut;
                 dw[13] = m.DealDes;
                 dw[14] = m.Cost;
-                dw[15] = m.EngNam;
-                dw[16] = m.ClsEmp;
+                dw[15] = m.EngNamNo;
+                dw[16] = m.EngNam;
+                dw[17] = m.ClsEmp;
                 dt.Rows.Add(dw);
             });
             //
@@ -2777,10 +2785,8 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<DoHrSumMonVModel> DoHrSumMon(ReportQryVModel v)
         {
-            /* Get login user. */
-            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(usr);
+            
+            var urLocation = v.Location;
             //
             List<DoHrSumMonVModel> mv = new List<DoHrSumMonVModel>();
             DoHrSumMonVModel dv;
@@ -3272,6 +3278,8 @@ namespace EDIS.Areas.BMED.Controllers
         /* 故障率 = 維修總件數/設備總數 */
         public List<MonthFailRateVModel> MonthFailRate(ReportQryVModel v)
         {
+            TempData["qry"] = JsonConvert.SerializeObject(v);
+
             List<MonthFailRateVModel> mv = new List<MonthFailRateVModel>();
             List<DepartmentModel> accdpts = new List<DepartmentModel>();
             List<DepartmentModel> delivdpts = new List<DepartmentModel>();
@@ -3286,84 +3294,82 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 assets = _context.BMEDAssets.Where(a => a.DisposeKind != "報廢")
                         .Where(a => a.AccDpt == v.AccDpt)
-                        .Where(a => a.DelivDpt == v.DelivDpt).ToList();
+                        .Where(a => a.DelivDpt == v.DelivDpt)
+                        .Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                        .ToList();
+
+                var count1 = assets.Count();
+                var count2 = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
+                    (a, r) => r).Count();
+
+                decimal num1 = decimal.Round(count1, 4);
+                decimal num2 = decimal.Round(count2, 4);
 
                 mv.Add(new MonthFailRateVModel
                 {
                     CustId = v.AccDpt,
                     CustNam = _context.Departments.Find(v.AccDpt).Name_C,
-                    PlantAmt = assets.Count(),
-                    RepairAmt = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
-                    (a, r) => r).Count(),
-                    FailRate = decimal.Round(RepairAmt / PlantAmt, 4).ToString("P")
+                    PlantAmt = count1,
+                    RepairAmt = count2,
+                    FailRate = decimal.Round(num2 / num1, 4).ToString("P")
                 });
                 return mv;
             }
             else if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                assets = _context.BMEDAssets.Where(a => a.DisposeKind != "報廢")
-                    .Where(a => a.AccDpt == v.AccDpt).ToList();
+                assets = _context.BMEDAssets
+                    .Where(a => a.DisposeKind != "報廢")
+                    .Where(a => a.AccDpt == v.AccDpt)
+                    .Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                    .ToList();
+
+                var count1 = assets.Count();
+
+                var count2 = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
+                    (a, r) => r).Count();
+
+                decimal num1 = decimal.Round(count1, 4);
+                decimal num2 = decimal.Round(count2, 4);
 
                 mv.Add(new MonthFailRateVModel
                 {
                     CustId = v.AccDpt,
                     CustNam = _context.Departments.Find(v.AccDpt).Name_C,
-                    PlantAmt = assets.Count(),
-                    RepairAmt = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
-                    (a, r) => r).Count(),
-                    FailRate = decimal.Round(RepairAmt / PlantAmt, 4).ToString("P")
+                    PlantAmt = count1,
+                    RepairAmt = count2,
+                    FailRate = decimal.Round(num2 / num1, 4).ToString("P")
                 });
                 return mv;
             }
             else if (!string.IsNullOrEmpty(v.DelivDpt))
             {
                 assets = _context.BMEDAssets.Where(a => a.DisposeKind != "報廢")
-                    .Where(a => a.DelivDpt == v.DelivDpt).ToList();
+                    .Where(a => a.DelivDpt == v.DelivDpt)
+                    .Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
+                    .ToList();
+
+                var count1 = assets.Count();
+                var count2 = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
+                    (a, r) => r).Count();
+
+                decimal num1 = decimal.Round(count1, 4);
+                decimal num2 = decimal.Round(count2, 4);
 
                 mv.Add(new MonthFailRateVModel
                 {
                     CustId = v.DelivDpt,
                     CustNam = _context.Departments.Find(v.AccDpt).Name_C,
-                    PlantAmt = assets.Count(),
-                    RepairAmt = assets.Join(repairs, a => a.AssetNo, r => r.AssetNo,
-                    (a, r) => r).Count(),
-                    FailRate = decimal.Round(RepairAmt / PlantAmt, 4).ToString("P")
+                    PlantAmt = count1,
+                    RepairAmt = count2,
+                    FailRate = decimal.Round(num2 / num1, 4).ToString("P")
                 });
                 return mv;
             }
             //
-            if (!string.IsNullOrEmpty(v.AssetClass1))
-            {
-                assets = assets.Where(a => a.AssetClass == v.AssetClass1).ToList();
-            }
-            if (!string.IsNullOrEmpty(v.AssetClass2))
-            {
-                assets = assets.Where(a => a.AssetClass == v.AssetClass2).ToList();
-            }
-            if (!string.IsNullOrEmpty(v.AssetClass3))
-            {
-                assets = assets.Where(a => a.AssetClass == v.AssetClass3).ToList();
-            }
+            var urLocation = v.Location;
             //
-
-            /* Get login user. */
-            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(usr);
-            //
+          
             
-
-            // Admin & 設備主管才可查詢全單位，其餘Role只可查詢自己單位
-            if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedMgr") 
-                || userManager.IsInRole(User, "MedAssetMgr"))
-            {
-                // Do nothing.
-            }
-            else
-            {
-                var ur = _context.AppUsers.Where(u => u.UserName == User.Identity.Name).ToList().FirstOrDefault();
-                v.AccDpt = ur.DptId;
-            }
             //計算時間區間
             DateTime startDate = DateTime.Now;
             DateTime endDate = DateTime.Now;
@@ -3389,6 +3395,7 @@ namespace EDIS.Areas.BMED.Controllers
 
             // Get assets by user's location.
             assets = GetAssetsByLoc(urLocation);
+            
             //var ass = _context.BMEDAssets.Join(_context.Departments, a => a.DelivDpt, d => d.DptId,
             //                                    (a, d) => new
             //                                    {
@@ -3459,9 +3466,9 @@ namespace EDIS.Areas.BMED.Controllers
             //                               .ToDictionary(o => o.Key, o => o.Select(x => x.repairDtl.EndDate.Value - x.repair.ApplyDate));
             //                               //repairDtl.EndDate.Value.AddDays(1) - o.repair.ApplyDate););
 
+            var dept = data.Select(d => d.dpt).Distinct();
 
-
-            foreach (var item in _context.Departments.ToList())
+            foreach (var item in dept.ToList())
             {
                 PlantAmt = datas.ContainsKey(item.DptId) == false ? 0 : datas[item.DptId];
                 RepairAmt = repairDocs.ContainsKey(item.DptId) == false ? 0 : repairDocs[item.DptId];
@@ -3577,6 +3584,7 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("故障原因");
             dt.Columns.Add("處理描述");
             dt.Columns.Add("維修方式");
+            dt.Columns.Add("工程師代號");
             dt.Columns.Add("工程師");
             dt.Columns.Add("目前關卡人員");
             dt.Columns.Add("維修總工時");
@@ -3586,6 +3594,9 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("關帳年月");
             dt.Columns.Add("處理狀況");
             dt.Columns.Add("放置地點");
+            dt.Columns.Add("[是][否]為器械");
+            dt.Columns.Add("[是][否]為資安事件");
+            dt.Columns.Add("資料別");
             List<MonthRepairVModel> mv = MonthRepair(v);
             mv.ForEach(m =>
             {
@@ -3603,14 +3614,18 @@ namespace EDIS.Areas.BMED.Controllers
                 dw[10] = m.DealDes;
                 dw[11] = m.InOut;
                 dw[12] = m.EngNam;
-                dw[13] = m.ClsNam;
-                dw[14] = m.Hour;
-                dw[15] = m.Cost;
-                dw[16] = m.Shares;
-                dw[17] = m.Amt;
-                dw[18] = m.ShutDateYm;
-                dw[19] = m.DealState;
-                dw[20] = m.PlaceLoc;
+                dw[13] = m.EngNam;
+                dw[14] = m.ClsNam;
+                dw[15] = m.Hour;
+                dw[16] = m.Cost;
+                dw[17] = m.Shares;
+                dw[18] = m.Amt;
+                dw[19] = m.ShutDateYm;
+                dw[20] = m.DealState;
+                dw[21] = m.PlaceLoc;
+                dw[22] = m.IsInstrument;
+                dw[23] = m.IsSecurity;
+                dw[24] = m.StockType;
                 dt.Rows.Add(dw);
             });
             //
@@ -3638,10 +3653,8 @@ namespace EDIS.Areas.BMED.Controllers
         {
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<MonthRepairVModel> mv = new List<MonthRepairVModel>();
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+
+            var urLocation = v.Location;
             //
             var data = _context.BMEDRepairs.AsQueryable();
             var repairDtls = _context.BMEDRepairDtls.AsQueryable();
@@ -3818,12 +3831,11 @@ namespace EDIS.Areas.BMED.Controllers
                 k.k.PlaceLoc,
                 k.k.Amt
             })
-            .GroupJoin(_context.BMEDRepairFlows.Where(f => f.Status == "?")
-            , k => k.DocId, kf => kf.DocId,
-            (k, kf) => new { k, kf })
-            .SelectMany(oi => oi.kf.DefaultIfEmpty(),
-            (k, kf) => new
-            {
+            .Join(_context.BMEDRepairFlows.Where(f => f.Status == "?" || f.Status == "2")
+            , k => k.DocId, 
+              kf => kf.DocId,
+             (k, kf) => new
+             {
                 repairV = k,
                 kf
             })
@@ -3832,26 +3844,84 @@ namespace EDIS.Areas.BMED.Controllers
             .SelectMany(ui => ui.u.DefaultIfEmpty(),
             (k, u) => new
             {
-                k.k.repairV.k.DocId,
-                k.k.repairV.k.AccDpt,
-                k.k.repairV.k.Name_C,
-                k.k.repairV.k.ApplyDate,
-                k.k.repairV.k.AssetNo,
+                k.k.repairV.DocId,
+                k.k.repairV.AccDpt,
+                k.k.repairV.Name_C,
+                k.k.repairV.ApplyDate,
+                k.k.repairV.AssetNo,
                 //k.k.Cname,
-                k.k.repairV.k.Cost,
-                k.k.repairV.k.EndDate,
-                k.k.repairV.k.TroubleDes,
-                k.k.repairV.k.FailFactor,
-                k.k.repairV.k.DealDes,
-                k.k.repairV.k.DealState,
-                k.k.repairV.k.InOut,
+                k.k.repairV.Cost,
+                k.k.repairV.EndDate,
+                k.k.repairV.TroubleDes,
+                k.k.repairV.FailFactor,
+                k.k.repairV.DealDes,
+                k.k.repairV.DealState,
+                k.k.repairV.InOut,
                 //k.k.Type,
                 //k.k.AssetClass,
-                k.k.repairV.k.UserId,
+                k.k.repairV.UserId,
                 u.FullName,
-                k.k.repairV.k.AssetName,
-                k.k.repairV.k.Hour,
-                k.k.repairV.k.PlantClass,
+                k.k.repairV.AssetName,
+                k.k.repairV.Hour,
+                k.k.repairV.PlantClass,
+                //kf.UserId
+            })
+            .GroupJoin(_context.BMEDRepairCosts, k => k.DocId, c => c.DocId,
+            (k, cost) => new { k, cost })
+            .SelectMany(c => c.cost.DefaultIfEmpty(),
+            (k, c) => new
+            {
+                k.k.DocId,
+                k.k.AccDpt,
+                k.k.Name_C,
+                k.k.ApplyDate,
+                k.k.AssetNo,
+                //k.k.Cname,
+                k.k.Cost,
+                k.k.EndDate,
+                k.k.TroubleDes,
+                k.k.FailFactor,
+                k.k.DealDes,
+                k.k.DealState,
+                k.k.InOut,
+                //k.k.Type,
+                //k.k.AssetClass,
+                k.k.UserId,
+                k.k.FullName,
+                k.k.AssetName,
+                k.k.Hour,
+                k.k.PlantClass,
+                StockType = c.StockType  == "2" ? "發票" : c.StockType == "0" ? "庫存":""
+                //kf.UserId
+            })
+            .GroupJoin(_context.BMEDRepairDtls, k => k.DocId, d => d.DocId,
+            (k, dtl) => new { k, dtl })
+            .SelectMany(d => d.dtl.DefaultIfEmpty(),
+            (k, d) => new
+            {
+                k.k.DocId,
+                k.k.AccDpt,
+                k.k.Name_C,
+                k.k.ApplyDate,
+                k.k.AssetNo,
+                //k.k.Cname,
+                k.k.Cost,
+                k.k.EndDate,
+                k.k.TroubleDes,
+                k.k.FailFactor,
+                k.k.DealDes,
+                k.k.DealState,
+                k.k.InOut,
+                //k.k.Type,
+                //k.k.AssetClass,
+                k.k.UserId,
+                k.k.FullName,
+                k.k.AssetName,
+                k.k.Hour,
+                k.k.PlantClass,
+                k.k.StockType,
+                d.IsInstrument,
+                d.IsSecurity
                 //kf.UserId
             })
             .GroupJoin(_context.AppUsers, k => k.UserId, u => u.Id,
@@ -3873,12 +3943,16 @@ namespace EDIS.Areas.BMED.Controllers
                InOut = k.k.InOut,
                TroubleDes = k.k.TroubleDes,
                Type = "",
-               EngNam = "(" + u.UserName + ")" + u.FullName,
+               EngNamNo = u.UserName,
+               EngNam =  u.FullName,
                ClsNam = k.k.FullName,
                AssetClass = "",
                Hour = k.k.Hour,
-               PlantClass = k.k.PlantClass
-           })
+               PlantClass = k.k.PlantClass,
+                IsInstrument = k.k.IsInstrument,
+                IsSecurity = k.k.IsSecurity,
+                StockType = k.k.StockType
+            })
             //.Where(m => m.AssetClass == (v.AssetClass1 == null ? (v.AssetClass2 == null ? v.AssetClass3 : v.AssetClass2) : v.AssetClass1))
             .GroupJoin(_context.BMEDFailFactors, m => m.FailFactor.ToString(), f => f.Id.ToString(),
             (m, f) => new { m, f })
@@ -3903,7 +3977,11 @@ namespace EDIS.Areas.BMED.Controllers
                 m.m.ClsNam,
                 m.m.AssetClass,
                 m.m.Hour,
-                m.m.PlantClass
+                m.m.PlantClass,
+                m.m.IsInstrument,
+                m.m.IsSecurity,
+                m.m.StockType,
+                m.m.EngNamNo
             })
             .GroupJoin(_context.BMEDDealStatuses, m => m.DealState, d => d.Id.ToString(),
             (m, d) => new { m, d })
@@ -3928,7 +4006,11 @@ namespace EDIS.Areas.BMED.Controllers
                 ClsNam = m.m.ClsNam,
                 AssetClass = m.m.AssetClass,
                 Hour = m.m.Hour,
-                PlantClass = m.m.PlantClass
+                PlantClass = m.m.PlantClass,
+                IsInstrument = m.m.IsInstrument,
+                IsSecurity = m.m.IsSecurity,
+                StockType = m.m.StockType,
+                EngNamNo = m.m.EngNamNo
             })
             .ToList();
 
@@ -4008,10 +4090,8 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<MonthKeepVModel> MonthKeep(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+
+            var urLocation = v.Location;
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<MonthKeepVModel> mv = new List<MonthKeepVModel>();
@@ -4200,9 +4280,46 @@ namespace EDIS.Areas.BMED.Controllers
             mv = mv.OrderBy(m => m.DocId).ToList();
             return mv;
         }
-        public IActionResult MonthFailRateExcel()
+        public IActionResult MonthFailRateExcel(ReportQryVModel v)
         {
-            return PartialView();
+            DataTable dt = new DataTable();
+            DataRow dw;
+            dt.Columns.Add("單位代號");
+            dt.Columns.Add("單位名稱");
+            dt.Columns.Add("故障率");
+            dt.Columns.Add("設備件數");
+            dt.Columns.Add("維修件數");
+           
+            List<MonthFailRateVModel> mv = MonthFailRate(v);
+            mv.ForEach(m =>
+            {
+                dw = dt.NewRow();
+                dw[0] = m.CustId;
+                dw[1] = m.CustNam;
+                dw[2] = m.FailRate;
+                dw[3] = m.PlantAmt;
+                dw[4] = m.RepairAmt;
+                dt.Rows.Add(dw);
+            });
+            //
+            ExcelPackage excel = new ExcelPackage();
+            var workSheet = excel.Workbook.Worksheets.Add("月故障率統計表");
+            workSheet.Cells[1, 1].LoadFromDataTable(dt, true);
+
+            // Generate the Excel, convert it into byte array and send it back to the controller.
+            byte[] fileContents;
+            fileContents = excel.GetAsByteArray();
+
+            if (fileContents == null || fileContents.Length == 0)
+            {
+                return NotFound();
+            }
+
+            return File(
+                fileContents: fileContents,
+                contentType: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                fileDownloadName: "MonthFailRate.xlsx"
+            );
         }
 
         public List<RepairKeepVModel> RepairKeep(ReportQryVModel v)
@@ -5054,7 +5171,7 @@ namespace EDIS.Areas.BMED.Controllers
                 dw = dt.NewRow();
                 dw[0] = m.DocId;
                 dw[1] = m.ApplyDate.ToString("yyyy/MM/dd");
-                dw[2] = m.CustNam;
+                dw[2] = m.AccDptNam;
                 //dw[3] = m.AssetNo;
                 dw[3] = m.AssetNam;
                 dw[4] = m.Type;
@@ -5087,10 +5204,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<RepeatFailVModel> RepeatFail(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RepeatFailVModel> mv = new List<RepeatFailVModel>();
             List<RepeatFailVModel> mv2 = new List<RepeatFailVModel>();
@@ -5103,6 +5217,14 @@ namespace EDIS.Areas.BMED.Controllers
 
             List<RepairDtlModel> rdtl = _context.BMEDRepairDtls.Where(d => d.EndDate >= v.Sdate)
                 .Where(d => d.EndDate <= v.Edate)
+                .Join(_context.BMEDRepairs,
+                        d => d.DocId,
+                        re => re.DocId,
+                        (d,re) => new { dtls = d,repait = re})
+                .Join(_context.BMEDAssets.Where(at => at.AssetNo != "99999"),
+                        d => d.repait.AssetNo,
+                        at => at.AssetNo,
+                        (d, at) => d.dtls)
                 .ToList();
 
             var rdtlF = rdtl.GroupJoin( _context.BMEDFailFactors,
@@ -5138,12 +5260,11 @@ namespace EDIS.Areas.BMED.Controllers
                                    rd => rd.AccDpt,
                                    (d, rd) => new { depart = d.Name_C, DocId = rd.DocId }
                             )
-                            
                             .GroupBy(x => x.DocId)
                             .ToDictionary(x => x.Key, x => x.Select( xo => xo.depart));
 
             //
-            var departA = _context.BMEDRepairs
+           var departA = _context.BMEDRepairs
                                     .GroupBy(rp => rp.AssetNo)
                                     .Select(g => g.First());
 
@@ -5151,9 +5272,9 @@ namespace EDIS.Areas.BMED.Controllers
                             .Join( departA,
                                    d => d.AssetNo,
                                    rd => rd.AssetNo,
-                                   (d, rd) => new { asset = d, repairs = rd }
+                                   (d, rd) => new { asset = d, DocId = rd.DocId }
                                   )
-                            .GroupBy(x => x.repairs.DocId)
+                            .GroupBy(x => x.DocId)
                             .ToDictionary(x => x.Key, x => x.Select(xo => xo.asset));
 
             //
@@ -5216,20 +5337,17 @@ namespace EDIS.Areas.BMED.Controllers
                 if (repairD.ContainsKey(rd.DocId) != false)
                 {
                     m.TroubleDes = repairD[rd.DocId].FirstOrDefault().TroubleDes;
-                    m.CustId = repairD[rd.DocId].FirstOrDefault().AccDpt;
-                    m.CustNam = repairO.ContainsKey(rd.DocId) == false ? null : repairO[rd.DocId].FirstOrDefault();
+                    m.AccDptNo = repairD[rd.DocId].FirstOrDefault().AccDpt;
                     //if (o != null)
                     //    m.CustNam = o.Name_C;
 
                     m.ApplyDate = repairD[rd.DocId].FirstOrDefault().ApplyDate;
                     m.AssetNo = repairD[rd.DocId].FirstOrDefault().AssetNo;
-                    a = repairA.ContainsKey(rd.DocId) == false ? null : repairA[rd.DocId].FirstOrDefault();
-                    if (a != null)
-                    {
-                        m.AssetNam = a.Cname;
-                        m.Type = a.Type;
-                    }
+                    
                 }
+                m.AccDptNam = repairO.ContainsKey(rd.DocId) == false ? null : repairO[rd.DocId].FirstOrDefault();
+                m.AssetNam = repairA.ContainsKey(rd.DocId) == false ? repairD[rd.DocId].FirstOrDefault().AssetName : repairA[rd.DocId].FirstOrDefault().Cname;
+
                 //p = _context.BMEDRepairEmps.Where(e => e.DocId == rd.DocId).ToList().FirstOrDefault();
 
                 m.EngNam = repairP.ContainsKey(rd.DocId) == false ? null : repairP[rd.DocId].FirstOrDefault();
@@ -5257,7 +5375,7 @@ namespace EDIS.Areas.BMED.Controllers
             }
             if (!string.IsNullOrEmpty(v.AccDpt))
             {
-                mv = mv.Where(vv => vv.CustId == v.AccDpt).ToList();
+                mv = mv.Where(vv => vv.AccDptNo == v.AccDpt).ToList();
             }
             return mv;
         }
@@ -6263,42 +6381,8 @@ namespace EDIS.Areas.BMED.Controllers
             //    new SqlParameter("@Edate",Convert.ToDateTime(Edate))
             //};
             string query = "";
-            if (v.Location == "分院") { 
-              query = @"use [BMEDDB]
-                    select * from (
-                    select x.AccDpt as '成本中心代號', x.CustNam as '成本中心名稱', 
-                    IIf(y.RepAmt is null,0,y.RepAmt) as '請修件數', x.keepcost as '管理/保養價值',
-                     IIf(z.零件支出 is null, 0, z.零件支出) as '零件支出', 
-                     (IIf(y.RepAmt is null,0,y.RepAmt)*50 + x.keepcost+ IIf(z.零件支出 is null, 0, z.零件支出)) as '合計', x.GroupId
-                    from (
-                    select a.AccDpt, c.Name_C CustNam, c.Loc GroupId, SUM(IIf(b.Cost is null, 0, b.Cost)) as keepcost
-                    from BMEDAssets as a join BMEDAssetKeeps as b
-                    on a.AssetNo = b.AssetNo left join Departments as c
-                    on a.AccDpt = c.DptId
-                    where a.AssetClass like '醫%' and c.Loc not in ('K','C','P','M','SN','G001','LEEH')
-                    group by a.AccDpt, c.Name_C, c.Loc
-                    ) as x left join
-                    (
-                    select Count(a.Docid) as RepAmt, a.AccDpt
-                    from BMEDRepairs as a join BMEDRepairFlows as c
-                    on a.Docid = c.Docid 
-                    where (a.ApplyDate >= '"+ Sdate+ @"')
-                    and c.Status in ('?','2')
-                    group by a.AccDpt
-                    ) as y
-                    on x.AccDpt = y.AccDpt left join
-                    (
-                    select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
-                    from BMEDRepairs as a join BMEDRepairDtls as c
-                    on a.Docid = c.Docid 
-                    where (c.EndDate  <= '" + Edate + @"')
-                    group by a.AccDpt) as z
-                    on x.AccDpt = z.AccDpt
-                    ) as w
-                    where w.成本中心代號 not in (select [成本中心代號] from [dbo].[排除部門單位])
-                    order by w.成本中心代號";
-            }
-            else if (v.Location == "總院")
+            
+            if (v.Location == "總院")
             {
                 query = @"use [BMEDDB]
                     select * from (
@@ -6320,6 +6404,41 @@ namespace EDIS.Areas.BMED.Controllers
                     where (a.ApplyDate >= '" + Sdate + @"')
                     and c.Status in ('?','2')
                     group by a.AccDpt) as y
+                    on x.AccDpt = y.AccDpt left join
+                    (
+                    select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
+                    from BMEDRepairs as a join BMEDRepairDtls as c
+                    on a.Docid = c.Docid 
+                    where (c.EndDate  <= '" + Edate + @"')
+                    group by a.AccDpt) as z
+                    on x.AccDpt = z.AccDpt
+                    ) as w
+                    where w.成本中心代號 not in (select [成本中心代號] from [dbo].[排除部門單位])
+                    order by w.成本中心代號";
+            }
+            else {
+                query = @"use [BMEDDB]
+                    select * from (
+                    select x.AccDpt as '成本中心代號', x.CustNam as '成本中心名稱', 
+                    IIf(y.RepAmt is null,0,y.RepAmt) as '請修件數', x.keepcost as '管理/保養價值',
+                     IIf(z.零件支出 is null, 0, z.零件支出) as '零件支出', 
+                     (IIf(y.RepAmt is null,0,y.RepAmt)*50 + x.keepcost+ IIf(z.零件支出 is null, 0, z.零件支出)) as '合計', x.GroupId
+                    from (
+                    select a.AccDpt, c.Name_C CustNam, c.Loc GroupId, SUM(IIf(b.Cost is null, 0, b.Cost)) as keepcost
+                    from BMEDAssets as a join BMEDAssetKeeps as b
+                    on a.AssetNo = b.AssetNo left join Departments as c
+                    on a.AccDpt = c.DptId
+                    where a.AssetClass like '醫%' and c.Loc in ('" + v.Location + @"')
+                    group by a.AccDpt, c.Name_C, c.Loc
+                    ) as x left join
+                    (
+                    select Count(a.Docid) as RepAmt, a.AccDpt
+                    from BMEDRepairs as a join BMEDRepairFlows as c
+                    on a.Docid = c.Docid 
+                    where (a.ApplyDate >= '" + Sdate + @"')
+                    and c.Status in ('?','2')
+                    group by a.AccDpt
+                    ) as y
                     on x.AccDpt = y.AccDpt left join
                     (
                     select a.AccDpt, Sum(IIf(c.Cost is null, 0, c.Cost)) as '零件支出'
@@ -6379,9 +6498,9 @@ namespace EDIS.Areas.BMED.Controllers
             dt.Columns.Add("管理/保養價值");
             dt.Columns.Add("零件支出");
             dt.Columns.Add("合計");
-           
 
             List<ReKeShCosCheckVModel> mv = ReKeShCosCheck(v);
+
             mv.ForEach(m =>
             {
                 dw = dt.NewRow();
@@ -6751,6 +6870,7 @@ namespace EDIS.Areas.BMED.Controllers
                                                         d => d.DptId,
                                                         (a, d) => a
                                                      )
+                                                .Where(a => a.DisposeKind != "報廢")
                                                 .ToList();
             }
             else
@@ -6759,6 +6879,7 @@ namespace EDIS.Areas.BMED.Controllers
 
                 bmedAssets = _context.BMEDAssets.Join(depar, a => a.DelivDpt, d => d.DptId,
                                 (a, d) => a )
+                              .Where(a => a.DisposeKind != "報廢")
                               .ToList();
             }
             return bmedAssets;

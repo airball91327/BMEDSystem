@@ -39,15 +39,26 @@ namespace EDIS.Areas.BMED.Controllers
             string stockno = fm["qtySTOCKNO"];
             string dname = fm["qtyDEPTNAME"];
             string brand = fm["qtyBRAND"];
+
             var emp = _context.BMEDRepairEmps.Where(e => e.DocId == docid).Select(e => e.UserId).FirstOrDefault();
+            if (emp == 0)
+            {
+               emp =  _context.BMEDKeepEmps.Where(e => e.DocId == docid).Select(e => e.UserId).FirstOrDefault();
+            }
             /* Get login user. */
             var ur = _userRepo.Find(u => u.Id == emp).FirstOrDefault();
 
             //List<DeptStockModel> dv = _context.BMEDDeptStocks.ToList();
-                List<DeptStockModel> dv = await GetERPDptStokAsync(ur.UserName);
+            List<DeptStockModel> dv = new List<DeptStockModel>();
+            if (emp != 0)
+            {
+               dv = await GetERPDptStokAsync(ur.UserName);
+            }
+            //var vd = dv.Where(d => d.StockNo.Contains("A0022A4")).ToList();
+            
             if (string.IsNullOrEmpty(stockno) && string.IsNullOrEmpty(dname) && string.IsNullOrEmpty(brand))
             {
-                dv = dv.Where(d => d.Qty > 0).ToList();
+                 dv = dv.Where(d => d.Qty > 0).ToList();
             }
             else
             {

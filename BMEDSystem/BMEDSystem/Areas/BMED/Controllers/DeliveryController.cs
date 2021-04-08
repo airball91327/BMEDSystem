@@ -1,12 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data;
-using System.Linq;
-using System.Net.Http;
-using System.Net.Http.Headers;
-using System.Text;
-using System.Threading.Tasks;
-using EDIS.Models;
+﻿using EDIS.Models;
 using EDIS.Models.Identity;
 using EDIS.Repositories;
 using EDIS.Services;
@@ -16,6 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Net.Http;
+using System.Net.Http.Headers;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -389,6 +388,27 @@ namespace EDIS.Areas.BMED.Controllers
             var u = _userRepo.Find(ur => ur.UserName == User.Identity.Name).FirstOrDefault();
             DepartmentModel c = _context.Departments.Find(u.DptId);
             VendorModel v = _context.BMEDVendors.Find(u.VendorId);
+            
+            r.DocId = GetID();
+            r.UserId = u.Id;
+            r.UserName = u.FullName;
+            c = _context.Departments.Find(u.DptId);
+            if (c != null)
+            {
+                r.Company = c.DptId == null ? "" : c.Name_C;
+                if (r.AccDpt == null)
+                {
+                    r.AccDpt = c.DptId == null ? "" : c.DptId;
+                    r.AccDptNam = c.DptId == null ? "" : c.Name_C;
+                }
+            }
+            r.Contact = u.Mobile;
+            r.ApplyDate = DateTime.Now;
+            r.PurchaseNo = id;
+            r.WartyMon = 0;
+            r.DelivDateR = DateTime.Now;
+            r.PurchaserId = 0;
+            r.EngId = 0;
             if (id != null)
             {
                 BuyEvaluateModel b = _context.BuyEvaluates.Find(id);
@@ -416,32 +436,12 @@ namespace EDIS.Areas.BMED.Controllers
                         }
                     }
                 }
+               
             }
-            r.DocId = GetID();
-            r.UserId = u.Id;
-            r.UserName = u.FullName;
-            c = _context.Departments.Find(u.DptId);
-            if (c != null)
-            {
-                r.Company = c.DptId == null ? "" : c.Name_C;
-                if (r.AccDpt == null)
-                {
-                    r.AccDpt = c.DptId == null ? "" : c.DptId;
-                    r.AccDptNam = c.DptId == null ? "" : c.Name_C;
-                }
-            }
-            r.Contact = u.Mobile;
-            r.ApplyDate = DateTime.Now;
-            r.PurchaseNo = id;
-            r.WartyMon = 0;
-            r.DelivDateR = DateTime.Now;
-            r.PurchaserId = 0;
-            if (r.EngId == null)
-            {
-                r.EngId = 0;
-            }
+
             _context.Deliveries.Add(r);
             _context.SaveChanges();
+
             List<SelectListItem> listItem = new List<SelectListItem>();
             List<SelectListItem> listItem2 = new List<SelectListItem>();
             List<SelectListItem> listItem3 = new List<SelectListItem>();
@@ -497,86 +497,105 @@ namespace EDIS.Areas.BMED.Controllers
         [HttpPost]
         public IActionResult Create(DeliveryModel delivery)
         {
-            if (ModelState.IsValid)
+            string msg = "";
+            try
             {
-                // Get Login User's details.
-                var ur = _userRepo.Find(usr => usr.UserName == User.Identity.Name).FirstOrDefault();
-
-                _context.Entry(delivery).State = EntityState.Modified;
-                DelivFlowModel rf = new DelivFlowModel();
-                rf.DocId = delivery.DocId;
-                rf.StepId = 1;
-                rf.UserId = ur.Id;
-                rf.Status = "1";
-                rf.Role = roleManager.GetRolesForUser(ur.Id).FirstOrDefault();
-                rf.Rtp = ur.Id;
-                rf.Rdt = null;
-                rf.Rtt = DateTime.Now;
-                rf.Cls = "申請者";
-                _context.DelivFlows.Add(rf);
-                //
-                rf = new DelivFlowModel();
-                rf.DocId = delivery.DocId;
-                rf.StepId = 2;
-                rf.Status = "?";
-                AppUserModel u;
-
-                u = _context.AppUsers.Find(Convert.ToInt32(delivery.DelivPson));
-                rf.UserId = u.Id;
-                rf.Role = roleManager.GetRolesForUser(u.Id).FirstOrDefault();
-                rf.Rtp = null;
-                rf.Rdt = null;
-                rf.Rtt = DateTime.Now;
-                rf.Cls = "得標廠商";
-                _context.DelivFlows.Add(rf);
-                //
-                List<AssetModel> ar = _context.BMEDAssets.Where(a => !string.IsNullOrEmpty(a.Docid))
-                                                         .Where(a => a.Docid == delivery.PurchaseNo).ToList();
-                VendorModel v;
-                u = _context.AppUsers.Find(Convert.ToInt32(delivery.UserDpt));
-                foreach (AssetModel a in ar)
+                if (ModelState.IsValid)
                 {
-                    v = _context.BMEDVendors.Where(vv => vv.UniteNo == delivery.VendorId).FirstOrDefault();
-                    if (v != null)
-                        a.VendorId = v.VendorId;
-                    a.DelivUid = u.Id;
-                    a.DelivDpt = u.DptId;
-                    _context.Entry(a).State = EntityState.Modified;
-                }
-                //
-                _context.SaveChanges();
-                //----------------------------------------------------------------------------------
-                // Mail
-                //----------------------------------------------------------------------------------
-                Tmail mail = new Tmail();
-                string body = "";
-                mail.from = new System.Net.Mail.MailAddress(ur.Email);
-                u = _context.AppUsers.Find(Convert.ToInt32(delivery.DelivPson));
-                mail.to = new System.Net.Mail.MailAddress(u.Email);
-                AppUserModel up = _context.AppUsers.Find(delivery.EngId);
-                if (up != null)
-                {
-                    if (!string.IsNullOrEmpty(up.Email))
-                        mail.cc = new System.Net.Mail.MailAddress(up.Email);
-                }
-                //
-                mail.message.Subject = "醫工智能保修系統[驗收案]：採購案號： " + delivery.PurchaseNo;
-                body += "<p>申請人：" + delivery.UserName + "</p>";
-                body += "<p>合約號碼：" + delivery.ContractNo + "</p>";
-                body += "<p>採購案號：" + delivery.PurchaseNo + "</p>";
-                body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'>處理案件</a></p>";
-                body += "<br/>";
-                body += "<p>若有任何問題，請與驗收工程師(" + _context.AppUsers.Find(delivery.EngId).FullName + ")聯絡</p>";
-                body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
-                mail.message.Body = body;
-                mail.message.IsBodyHtml = true;
-                mail.SendMail();
-                //----------------------------------------------------------------------------------
+                    // Get Login User's details.
+                    var ur = _userRepo.Find(usr => usr.UserName == User.Identity.Name).FirstOrDefault();
 
-                return RedirectToAction("Index", "Home", new { Area = "" });
+                    _context.Entry(delivery).State = EntityState.Modified;
+                    DelivFlowModel rf = new DelivFlowModel();
+                    rf.DocId = delivery.DocId;
+                    rf.StepId = 1;
+                    rf.UserId = ur.Id;
+                    rf.Status = "1";
+                    rf.Role = roleManager.GetRolesForUser(ur.Id).FirstOrDefault();
+                    rf.Rtp = ur.Id;
+                    rf.Rdt = null;
+                    rf.Rtt = DateTime.Now;
+                    rf.Cls = "申請者";
+                    _context.DelivFlows.Add(rf);
+                    //
+                    rf = new DelivFlowModel();
+                    rf.DocId = delivery.DocId;
+                    rf.StepId = 2;
+                    rf.Status = "?";
+                    AppUserModel u;
+
+                    u = _context.AppUsers.Find(Convert.ToInt32(delivery.DelivPson));
+                    rf.UserId = u.Id;
+                    rf.Role = roleManager.GetRolesForUser(u.Id).FirstOrDefault();
+                    rf.Rtp = null;
+                    rf.Rdt = null;
+                    rf.Rtt = DateTime.Now;
+                    rf.Cls = "得標廠商";
+                    _context.DelivFlows.Add(rf);
+                    //
+                    List<AssetModel> ar = _context.BMEDAssets.Where(a => !string.IsNullOrEmpty(a.Docid))
+                                                             .Where(a => a.Docid == delivery.PurchaseNo).ToList();
+                    VendorModel v;
+                    u = _context.AppUsers.Find(Convert.ToInt32(delivery.UserDpt));
+                    foreach (AssetModel a in ar)
+                    {
+                        v = _context.BMEDVendors.Where(vv => vv.UniteNo == delivery.VendorId).FirstOrDefault();
+                        if (v != null)
+                            a.VendorId = v.VendorId;
+                        a.DelivUid = u.Id;
+                        a.DelivDpt = u.DptId;
+                        _context.Entry(a).State = EntityState.Modified;
+                    }
+                    //
+                    var assets = AssetAdd(delivery.ContractNo).GetAwaiter().GetResult(); ;
+                    //
+                     _context.BMEDAssets.Add(assets);
+                     _context.SaveChanges();
+
+                    //----------------------------------------------------------------------------------
+                    // Mail
+                    //----------------------------------------------------------------------------------
+                    Tmail mail = new Tmail();
+                    string body = "";
+                    mail.from = new System.Net.Mail.MailAddress(ur.Email);
+                    u = _context.AppUsers.Find(Convert.ToInt32(delivery.DelivPson));
+                    mail.to = new System.Net.Mail.MailAddress(u.Email);
+                    AppUserModel up = _context.AppUsers.Find(delivery.EngId);
+                    if (up != null)
+                    {
+                        if (!string.IsNullOrEmpty(up.Email))
+                            mail.cc = new System.Net.Mail.MailAddress(up.Email);
+                    }
+                    //
+                    mail.message.Subject = "醫工智能保修系統[驗收案]：採購案號： " + delivery.PurchaseNo;
+                    body += "<p>申請人：" + delivery.UserName + "</p>";
+                    body += "<p>合約號碼：" + delivery.ContractNo + "</p>";
+                    body += "<p>採購案號：" + delivery.PurchaseNo + "</p>";
+                    body += "<p><a href='http://dms.cch.org.tw/BMED/Account/Login'>處理案件</a></p>";
+                    body += "<br/>";
+                    body += "<p>若有任何問題，請與驗收工程師(" + _context.AppUsers.Find(delivery.EngId).FullName + ")聯絡</p>";
+                    body += "<h3>此封信件為系統通知郵件，請勿回覆。</h3>";
+                    mail.message.Body = body;
+                    mail.message.IsBodyHtml = true;
+                    mail.SendMail();
+                    //----------------------------------------------------------------------------------
+
+                    return RedirectToAction("Index", "Home", new { Area = "" });
+                }
+                else
+                {
+                    foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                    {
+                        msg += error.ErrorMessage + Environment.NewLine;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                msg = ex.Message;
             }
 
-            return View(delivery);
+            return BadRequest(msg);
         }
 
         //
@@ -899,7 +918,65 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return BadRequest("查無資料");
             }
-            return Json(rv);
+
+            var first = rv.FirstOrDefault();
+            var ven = _context.BMEDVendors.Where(v => v.UniteNo == first.UNITE_NO).FirstOrDefault();
+            first.VENDOR_NO = ven.VendorId.ToString();
+            first.VENDOR_NAME = ven.VendorName;
+
+            if (first.PURCHASE_NO.Contains("-") == true) { 
+                first.PURCHASE_NO = first.PURCHASE_NO.Split(new char[] { '-' })[0];
+            }
+
+            return Json(first);
+        }
+
+        public async Task<AssetModel> AssetAdd(string ctn)
+        {
+            List<QryVendorData> rv = new List<QryVendorData>();
+            //
+            //var s = new { type, contract_no };//"[" + "{" + "type:" + type + "," + "contract_no:" + contract_no + "}" + "]";
+            var s = "[" + "{" + "type:" + "null" + "," + "contract_no:" + ctn + "}" + "]";//new { type, contract_no }.ToString().Replace("=", ":");//"[" + "{" + "type:" + type + "," + "contract_no:" + contract_no + "}" + "]";
+            // var s = "{"+"type:" + type + "," + "contract_no:" + contract_no+"}";
+            HttpClient client = new HttpClient();
+            //var str = JsonConvert.SerializeObject(s);
+            HttpContent content = new StringContent(s, Encoding.UTF8, "application/json");
+            client.BaseAddress = new Uri("https://api.cch.org.tw/HIS_WS_CONTRACT/");//
+            string url = "AssetApi/Get_Info"; //BmedWebApi
+            client.DefaultRequestHeaders.Accept.Clear();
+            client.DefaultRequestHeaders.Accept.Add(
+                new MediaTypeWithQualityHeaderValue("application/json"));
+            //HttpResponseMessage response = await client.GetAsync(url);
+            HttpResponseMessage response = await client.PostAsync(url, content);
+            string rstr = "";
+            if (response.IsSuccessStatusCode)
+            {
+                rstr = await response.Content.ReadAsStringAsync();
+                if (!string.IsNullOrEmpty(rstr))
+                {
+                    rv.AddRange(JsonConvert.DeserializeObject<List<QryVendorData>>(rstr));
+                }
+            }
+            client.Dispose();
+
+            AssetModel asset = new AssetModel();
+            rv.ForEach(r =>
+           {
+               asset.AssetNo = r.ASSET_NO;
+               asset.AssetClass = "醫療儀器";
+               asset.Cname = r.PLANT_NAME;
+               asset.AccDate = null;
+               asset.BuyDate = null;
+               asset.RelDate = null;
+               asset.Brand = r.BRAND;
+               asset.Type = r.MODEL;
+               asset.VendorId = Int32.Parse(r.VENDOR_NO);
+               asset.DisposeKind = "正常";
+               asset.DelivDpt = r.DELIV_DPT;
+               asset.AccDpt = r.DPT_COD;
+               asset.Rtt = DateTime.Now;
+           });
+            return asset;
         }
 
         protected override void Dispose(bool disposing) 

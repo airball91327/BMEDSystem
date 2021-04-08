@@ -146,6 +146,8 @@ namespace EDIS.Models
         public string DPT_COD { get; set; }//部門
 
         public string DPT_NAME { get; set; }//部門編號
+
+        public string UNITE_NO { get; set; }//統編
     }
 
 }

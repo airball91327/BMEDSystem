@@ -64,7 +64,7 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
 
             foreach (var item in keepFlow)
             {
-                if (item.Status != "?")
+                if (item.Status != "?" && item.Rtp != null)
                 {
                     if (item.UserId != item.Rtp)
                     {
