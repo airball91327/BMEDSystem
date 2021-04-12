@@ -1,5 +1,6 @@
 ﻿var onFailed = function (data) {
     alert(data.responseText);
+    $('#btnQry').attr('disabled', "false");
     $.Toast.hideToast();
 };
 $.fn.addItems = function (data) {
@@ -241,7 +242,7 @@ $(function () {
 function onSuccess() {
     $.Toast.hideToast();
     alert("已送出");
-
+    $('#btnQry').attr('disabled', "true"); //添加disabled属性
     var DocId = $("#DocId").val();
     var repType = $('input:radio[name="RepType"]:checked').val();
     /* Print confirm before submit. */

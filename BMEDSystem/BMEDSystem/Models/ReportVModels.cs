@@ -2892,9 +2892,9 @@ namespace EDIS.Models
         [Display(Name = "管理/保養價值")]
         public int? Keepcost { get; set; }
         [Display(Name = "零件支出")]
-        public decimal? Partexp { get; set; }
+        public int? Partexp { get; set; }
         [Display(Name = "合計")]
-        public decimal? Sum { get; set; }
+        public int? Sum { get; set; }
         
     }
 

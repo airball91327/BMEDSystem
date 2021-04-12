@@ -220,7 +220,7 @@
                 </div>
             </div>
         }
-        @if (UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))
+        @if ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr")) && Model.ReportClass != "滿意度調查統計表")
         {
             <div class="form-group">
                 @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })

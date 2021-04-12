@@ -49,6 +49,9 @@
                 @item.AssetNo 
             </td>
             <td style="text-align: right">
+                @Html.DisplayFor(modelItem => @item.AssetNam)
+            </td>
+            <td style="text-align: right">
                 @Html.DisplayFor(modelItem => item.DocId)
             </td>
             <td style="text-align: right">
@@ -69,7 +72,7 @@
             <td>
                 @Html.DisplayFor(modelItem => item.DealDes)
             </td>
-            <td>
+            <td  style="text-align: right">
                 @item.EndDate.ToString("yyyy/MM/dd")
             </td>
         </tr>

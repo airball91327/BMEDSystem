@@ -277,7 +277,7 @@ else
                             @Html.ActionLink("預覽", "Views", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
                         }
-                        @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" })
+                        @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" ,rel = "opener"})
                         @if (item.Flg == "?" && item.FlowUid == uid && item.FlowCls == "申請人")
                         {
                             @Html.Raw(" |")

@@ -1,5 +1,10 @@
 ﻿@model EDIS.Models.ReportQryVModel
 
+@using Microsoft.AspNetCore.Identity
+@using EDIS.Models.Identity
+
+@inject CustomUserManager UserManager
+
 @{
     Layout = "~/Views/Shared/_PassedLayout.cshtml";
 }
@@ -27,7 +32,7 @@
             success: function (data) {
 
                 window.location.hash = page;
-                   
+
                 $('#pnlREPORT').html(data);
 
                 $('#pnlREPORT .pagination li a').each(function (i, item) {
@@ -48,7 +53,7 @@
                 $.Toast.hideToast();
             }
         });
-    }; 
+    };
 </script>
 
 <h2>統計報表</h2>
@@ -83,6 +88,16 @@
                 @Html.ValidationMessageFor(model => model.SendYm, "", new { @class = "text-danger" })
             </div>
         </div>
+        @if (UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr"))
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-3">
+                    @Html.DropDownListFor(model => model.Location, ViewData["Location"] as SelectList, new { @class = "form-control" })
+                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
+                </div>
+            </div>
+        }
         @if (ViewData["UserLoc"].ToString() == "總院")
         {
             <div class="form-group">

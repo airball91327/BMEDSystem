@@ -101,6 +101,19 @@ namespace EDIS.Areas.BMED.Controllers
             ViewData["UserLoc"] = urLocation;
             ReportQryVModel pv = new ReportQryVModel();
             pv.ReportClass = rpname;
+
+            List<SelectListItem> listItem2 = new List<SelectListItem>();
+            
+            listItem2.Add(new SelectListItem { Text = "請選擇", Value = "" });
+            listItem2.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem2.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem2.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem2.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem2.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem2.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem2, "Value", "Text");
+
+            
             return View(pv);
         }
 
@@ -108,6 +121,30 @@ namespace EDIS.Areas.BMED.Controllers
         [HttpPost]
         public IActionResult FinishRateKeepIndex(ReportQryVModel v, int page = 1)
         {
+            /* Get login user. */
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+
+            /* Get login user's location. */
+            var loc = new DepartmentModel(_context).GetUserLocation(usr);
+
+            if (!string.IsNullOrEmpty(v.Location))
+            {
+                // Admin & 設備主管才可查詢全單位，其餘Role只可查詢自己單位
+                if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedMgr")
+                    || userManager.IsInRole(User, "MedAssetMgr"))
+                {
+                    // Do nothing.
+                }
+                else
+                {
+                    v.Location = loc;
+                }
+            }
+            else
+            {
+                v.Location = loc;
+            }
+
             var result = GetFinishRateKeep(v);
 
             TempData["qry"] = JsonConvert.SerializeObject(v);
@@ -116,10 +153,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         private List<FinishRateKeep> GetFinishRateKeep(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             var building = v.Building;
             var isProgress = v.IsProgress;
             //
@@ -244,7 +278,7 @@ namespace EDIS.Areas.BMED.Controllers
                 result.Add(frk);
             }
 
-            result.OrderBy(r => r.EngUserName);
+            result = result.OrderBy(r => r.EngUserName).ToList();
             return result;
         }
 
@@ -324,10 +358,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         private List<AssetKpScheVModel> AssetKpSche(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             TempData["qry2"] = JsonConvert.SerializeObject(v);
             List<AssetKpScheVModel> sv = new List<AssetKpScheVModel>();
@@ -895,7 +926,7 @@ namespace EDIS.Areas.BMED.Controllers
                             Value = new { success = false, error = "請輸入時間區間!" }
                         };
                     }
-                    return PartialView("RepairCost", RepairCost(v,page));
+                    return PartialView("RepairCost", RepairCost(v, page));
                 case "保養金額統計表":
                     if (v.Edate == null || v.Sdate == null)
                     {
@@ -904,7 +935,7 @@ namespace EDIS.Areas.BMED.Controllers
                             Value = new { success = false, error = "請輸入時間區間!" }
                         };
                     }
-                    return PartialView("KeepCost", KeepCost(v,page));
+                    return PartialView("KeepCost", KeepCost(v, page));
                 case "工作時數統計表":
                     if (v.Edate == null && v.Sdate == null)
                     {
@@ -1038,7 +1069,7 @@ namespace EDIS.Areas.BMED.Controllers
                             .AddMinutes(59)
                             .AddSeconds(59);
                     }
-                    return PartialView("AssetProperRate", AssetProperRate(v,page));
+                    return PartialView("AssetProperRate", AssetProperRate(v, page));
                 case "重複故障清單":
                     return PartialView("RepeatFail", RepeatFail(v));
                 case "維修保養零件統計表":
@@ -1287,10 +1318,8 @@ namespace EDIS.Areas.BMED.Controllers
         {
             TempData["qry"] = JsonConvert.SerializeObject(v);
             string[] status = new[] { "申請人", "驗收人","單位主管" };
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+
+            var urLocation = v.Location;
             /* Get assets by user's location. */
             var bmedAssets = GetAssetsByLoc(urLocation);
 
@@ -1545,10 +1574,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         private IPagedList<ProperRate> AssetProperRate(ReportQryVModel v, int page = 1)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
@@ -1715,10 +1741,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         private List<ProperRate> AssetProperRateAll(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+           var urLocation = v.Location;
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             var days = v.Edate.Value.Subtract(v.Sdate.Value).TotalDays;
@@ -1866,10 +1889,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<AssetKeepListVModel> AssetKeepList(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             TempData["qry2"] = JsonConvert.SerializeObject(v);
             List<AssetKeepListVModel> lst = new List<AssetKeepListVModel>();
@@ -2036,6 +2056,16 @@ namespace EDIS.Areas.BMED.Controllers
             ReportQryVModel pv = new ReportQryVModel();
             pv.ReportClass = rpname;
 
+            List<SelectListItem> listItem2 = new List<SelectListItem>();
+            listItem2.Add(new SelectListItem { Text = "請選擇", Value = "" });
+            listItem2.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem2.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem2.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem2.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem2.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem2.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem2, "Value", "Text");
+
             return View(pv);
         }
         public IActionResult Index3(string rpname)
@@ -2044,6 +2074,8 @@ namespace EDIS.Areas.BMED.Controllers
             pv.ReportClass = rpname;
             List<SelectListItem> listItem = new List<SelectListItem>();
             List<SelectListItem> listItem2 = new List<SelectListItem>();
+            List<SelectListItem> listItem3 = new List<SelectListItem>();
+
             SelectListItem li;
             /* 處理工程師查詢的下拉選單 */
             var engs = roleManager.GetUsersInRole("MedEngineer").ToList();
@@ -2072,12 +2104,45 @@ namespace EDIS.Areas.BMED.Controllers
                 });
             ViewData["ACCDPT"] = new SelectList(listItem2, "Value", "Text");
             ViewData["DELIVDPT"] = new SelectList(listItem2, "Value", "Text");
+            
+            listItem3.Add(new SelectListItem { Text = "請選擇", Value = "" });
+            listItem3.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem3.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem3.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem3.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem3.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem3.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem3, "Value", "Text");
+
             return View(pv);
         }
         [HttpPost]
         public IActionResult Index3(ReportQryVModel v)
         {
             TempData["qry2"] = v;
+            /* Get login user. */
+            var usr = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
+
+            /* Get login user's location. */
+            var loc = new DepartmentModel(_context).GetUserLocation(usr);
+
+            if (!string.IsNullOrEmpty(v.Location))
+            {
+                // Admin & 設備主管才可查詢全單位，其餘Role只可查詢自己單位
+                if (userManager.IsInRole(User, "Admin") || userManager.IsInRole(User, "MedMgr")
+                    || userManager.IsInRole(User, "MedAssetMgr"))
+                {
+                    // Do nothing.
+                }
+                else
+                {
+                    v.Location = loc;
+                }
+            }
+            else
+            {
+                v.Location = loc;
+            }
             switch (v.ReportClass)
             {
                 case "儀器設備保養清單":
@@ -2350,10 +2415,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
         private List<RpKpHistoryVModel> RpKpHistory(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<RpKpHistoryVModel> sv = new List<RpKpHistoryVModel>();
             List<RpKpHistoryVModel> sv2 = new List<RpKpHistoryVModel>();
@@ -3047,7 +3109,7 @@ namespace EDIS.Areas.BMED.Controllers
              .ToDictionary(x => x.Key, x => x.GroupBy(j => j.AssetNo));
 
 
-
+            
 
             foreach (var g in rt)
             {
@@ -3197,6 +3259,7 @@ namespace EDIS.Areas.BMED.Controllers
                 mv.Add(dv);
             }
             //
+            mv = mv.OrderBy(m => m.FullName).ToList();
             return mv;
         }
         public IActionResult DoHrSumMonExcel(ReportQryVModel v)
@@ -3217,11 +3280,23 @@ namespace EDIS.Areas.BMED.Controllers
             sheet.Cells[1, 6].Value = "五日完修率";
             sheet.Cells[1, 7].Value = "五日完修率(高風險)";
             sheet.Cells[1, 8].Value = "自修率";
-            sheet.Cells[1, 9].Value = "重複故障率";
+            sheet.Cells[1, 9].Value = "月重複故障率";
+            sheet.Cells[1, 10].Value = "三個月維修總數";
+            sheet.Cells[1, 11].Value = "三個月重複故障率";
+
             //Data
             int startPos1 = 2;
             int startPos2 = 3;
             int startPos3 = 4;
+            int Sum = doHrSums.Count();
+            int CasesSum = 0;
+            decimal? HoursSum = 0;
+            int OverFiveSum = 0;
+            decimal OverFiveRateSum = 0;
+            decimal OverFiveRateHighSum = 0;
+            decimal SelfRateSum = 0;
+            decimal Fail1MRateSum = 0;
+
             foreach (var item in doHrSums)
             {
                 sheet.Cells[startPos1, 1].Value = item.FullName;
@@ -3229,36 +3304,120 @@ namespace EDIS.Areas.BMED.Controllers
                 sheet.Cells[startPos1 + 1, 2].Value = "維修";
                 sheet.Cells[startPos1 + 2, 2].Value = "保養";
                 sheet.Cells[startPos1, 3].Value = item.Hours;
+                HoursSum += (item.Hours == null ? 0 : item.Hours);
                 //sheet.Cells[startPos1, 4].Value = 0;
                 sheet.Cells[startPos1, 4].Value = item.Cases;
+                CasesSum += item.Cases;
                 //sheet.Cells[startPos1, 6].Value = item.Costs;
                 sheet.Cells[startPos1, 5].Value = item.OverFive + item.OverFiveKeep;
+                OverFiveSum += (item.OverFive + item.OverFiveKeep);
                 sheet.Cells[startPos1, 6].Value = item.OverFiveRate;
+                OverFiveRateSum += item.OverFiveRate;
                 sheet.Cells[startPos1, 7].Value = item.OverFiveRateHigh;
+                OverFiveRateHighSum += item.OverFiveRateHigh;
                 sheet.Cells[startPos1, 8].Value = item.SelfRate;
+                SelfRateSum += item.SelfRate;
                 sheet.Cells[startPos1, 9].Value = item.Fail1MRate;
+                Fail1MRateSum += item.Fail1MRate;
+                sheet.Cells[startPos1, 10].Value = item.Case3M;
+                sheet.Cells[startPos1, 11].Value = item.Fail3MRate;
                 startPos1 += 3;
             }
+
+            //總計
+
+            startPos1++;
+
+            sheet.Cells[startPos1, 3].Value = "工作時數";
+
+            sheet.Cells[startPos1, 4].Value = "件數";
+
+            sheet.Cells[startPos1, 5].Value = "超過五日件數";
+
+            sheet.Cells[startPos1, 6].Value = "五日完成率";
+
+            sheet.Cells[startPos1, 7].Value = "五日完成率(高風險)";
+
+            sheet.Cells[startPos1, 8].Value ="自修率";
+
+            sheet.Cells[startPos1, 9].Value = "重複故障率";
+
+
+            startPos1++;
+
+                sheet.Cells[startPos1, 1].Value = "合計";
+
+                sheet.Cells[startPos1, 3].Value = HoursSum;
+
+                sheet.Cells[startPos1, 4].Value = CasesSum;
+
+                sheet.Cells[startPos1, 5].Value = OverFiveSum;
+
+                sheet.Cells[startPos1, 6].Value = Decimal.Round(OverFiveRateSum / Sum, 2);
+
+                sheet.Cells[startPos1, 7].Value = Decimal.Round(OverFiveRateHighSum / Sum, 2);
+
+                sheet.Cells[startPos1, 8].Value = Decimal.Round(SelfRateSum / Sum, 2);
+
+                sheet.Cells[startPos1, 9].Value = Decimal.Round(Fail1MRateSum / Sum, 2);
+
+            decimal? HoursRSum = 0;
+            int RCasesSum = 0;
+            int OverFiveRSum = 0;
 
             foreach (var item in doHrSums)
             {
                 sheet.Cells[startPos2, 3].Value = item.HoursR;
+                HoursRSum += (item.HoursR == null ? 0 : item.HoursR);
                 //sheet.Cells[startPos2, 4].Value = 0;
                 sheet.Cells[startPos2, 4].Value = item.RCases;
+                RCasesSum += item.RCases;
                 //sheet.Cells[startPos2, 6].Value = item.Costs;
                 sheet.Cells[startPos2, 5].Value = item.OverFive;
                 startPos2 += 3;
+                OverFiveRSum += item.OverFive;
             }
+
+            decimal? HoursKSum = 0;
+            int KCasesSum = 0;
+            int OverFiveKeepSum = 0;
 
             foreach (var item in doHrSums)
             {
                 sheet.Cells[startPos3, 3].Value = item.HoursK;
-               // sheet.Cells[startPos3, 4].Value = 0;
+                HoursKSum += (item.HoursK == null ? 0 : item.HoursK);
+                // sheet.Cells[startPos3, 4].Value = 0;
                 sheet.Cells[startPos3, 4].Value = item.KCases;
-               // sheet.Cells[startPos3, 6].Value = item.Costs;
+                KCasesSum += item.KCases;
+                // sheet.Cells[startPos3, 6].Value = item.Costs;
                 sheet.Cells[startPos3, 5].Value = item.OverFiveKeep;
+                OverFiveKeepSum += item.OverFiveKeep;
                 startPos3 += 3;
             }
+
+            //維修總計
+            startPos1+=2;
+
+            sheet.Cells[startPos1, 2].Value = "維修";
+
+            sheet.Cells[startPos1, 3].Value = HoursRSum;
+
+            sheet.Cells[startPos1, 4].Value = RCasesSum;
+
+            sheet.Cells[startPos1, 5].Value = OverFiveRSum;
+
+            //保養總計
+            startPos1 ++;
+
+            sheet.Cells[startPos1, 2].Value = "保養";
+
+            sheet.Cells[startPos1, 3].Value = HoursKSum;
+
+            sheet.Cells[startPos1, 4].Value = KCasesSum;
+
+            sheet.Cells[startPos1, 5].Value = OverFiveKeepSum;
+
+
 
             // Generate the Excel, convert it into byte array and send it back to the controller.
             byte[] fileContents;
@@ -4324,10 +4483,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepairKeepVModel> RepairKeep(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             // Get departments by location.
             var departments = GetDepartmentsByLoc(urLocation);
             //
@@ -4517,10 +4673,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public IPagedList<RepairKeepVModel> RepairCost(ReportQryVModel v, int page = 1)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation =v.Location;
             //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
@@ -4686,10 +4839,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepairKeepVModel> RepairCostAll(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
@@ -4824,10 +4974,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public IPagedList<RepairKeepVModel> KeepCost(ReportQryVModel v, int page = 1)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
@@ -5007,10 +5154,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepairKeepVModel> KeepCostAll(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RepairKeepVModel> mv = new List<RepairKeepVModel>();
             RepairKeepVModel m;
@@ -5154,6 +5298,7 @@ namespace EDIS.Areas.BMED.Controllers
         {
             DataTable dt = new DataTable();
             DataRow dw;
+            dt.Columns.Add("財產編號");
             dt.Columns.Add("表單編號");
             dt.Columns.Add("請修日期");
             dt.Columns.Add("單位名稱");
@@ -5169,17 +5314,18 @@ namespace EDIS.Areas.BMED.Controllers
             mv.ForEach(m =>
             {
                 dw = dt.NewRow();
-                dw[0] = m.DocId;
-                dw[1] = m.ApplyDate.ToString("yyyy/MM/dd");
-                dw[2] = m.AccDptNam;
+                dw[0] = m.AssetNo;
+                dw[1] = m.DocId;
+                dw[2] = m.ApplyDate.ToString("yyyy/MM/dd");
+                dw[3] = m.AccDptNam;
                 //dw[3] = m.AssetNo;
-                dw[3] = m.AssetNam;
-                dw[4] = m.Type;
-                dw[5] = m.TroubleDes;
-                dw[6] = m.FailFactor;
-                dw[7] = m.DealDes;
-                dw[8] = m.EndDate.ToString("yyyy/MM/dd");
-                dw[9] = m.EngNam;
+                dw[4] = m.AssetNam;
+                dw[5] = m.Type;
+                dw[6] = m.TroubleDes;
+                dw[7] = m.FailFactor;
+                dw[8] = m.DealDes;
+                dw[9] = m.EndDate.ToString("yyyy/MM/dd");
+                dw[10] = m.EngNam;
                 dt.Rows.Add(dw);
             });
             //
@@ -5250,12 +5396,12 @@ namespace EDIS.Areas.BMED.Controllers
                             .ToDictionary(x => x.Key, x => x.Select(xo => xo.repairs));
 
             //
-            var departO = _context.BMEDRepairs
-                                    .GroupBy(rp => rp.AccDpt)
-                                    .Select(g => g.First());
+            //var departO = _context.BMEDRepairs
+            //                        .GroupBy(rp => rp.AccDpt)
+            //                        .Select(g => g.First());
 
             var repairO = _context.Departments
-                            .Join( departO,
+                            .Join( repairU,
                                    d => d.DptId,
                                    rd => rd.AccDpt,
                                    (d, rd) => new { depart = d.Name_C, DocId = rd.DocId }
@@ -5343,11 +5489,11 @@ namespace EDIS.Areas.BMED.Controllers
 
                     m.ApplyDate = repairD[rd.DocId].FirstOrDefault().ApplyDate;
                     m.AssetNo = repairD[rd.DocId].FirstOrDefault().AssetNo;
-                    
+                    m.AssetNam = repairA.ContainsKey(rd.DocId) == false ? repairD[rd.DocId].FirstOrDefault().AssetName : repairA[rd.DocId].FirstOrDefault().Cname;
+
                 }
                 m.AccDptNam = repairO.ContainsKey(rd.DocId) == false ? null : repairO[rd.DocId].FirstOrDefault();
-                m.AssetNam = repairA.ContainsKey(rd.DocId) == false ? repairD[rd.DocId].FirstOrDefault().AssetName : repairA[rd.DocId].FirstOrDefault().Cname;
-
+                
                 //p = _context.BMEDRepairEmps.Where(e => e.DocId == rd.DocId).ToList().FirstOrDefault();
 
                 m.EngNam = repairP.ContainsKey(rd.DocId) == false ? null : repairP[rd.DocId].FirstOrDefault();
@@ -5384,10 +5530,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepKeepStokVModel> RepKeepStok(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RepKeepStokVModel> mv = new List<RepKeepStokVModel>();
             List<Cust> cv;
@@ -5625,10 +5768,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RpKpStokBdVModel> RpKpStokBd(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             List<RpKpStokBdVModel> sv = new List<RpKpStokBdVModel>();
             List<RpKpStokBdVModel> sv2 = new List<RpKpStokBdVModel>();
@@ -5842,10 +5982,7 @@ namespace EDIS.Areas.BMED.Controllers
         }
         public List<StokCostVModel> StokCost(ReportQryVModel v)
         {
-            /* Get login user. */
-            var ur = _userRepo.Find(u => u.UserName == this.User.Identity.Name).FirstOrDefault();
-            /* Get login user's location. */
-            var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
+            var urLocation = v.Location;
             //
             TempData["qry"] = JsonConvert.SerializeObject(v);
             List<StokCostVModel> sv = new List<StokCostVModel>();
@@ -6471,8 +6608,8 @@ namespace EDIS.Areas.BMED.Controllers
                     rc.CustNam = reader.GetString(1);
                     rc.RepAmt = reader.GetInt32(2);
                     rc.Keepcost = reader.GetInt32(3);
-                    rc.Partexp = reader.GetDecimal(4);
-                    rc.Sum = reader.GetDecimal(5);
+                    rc.Partexp = reader.GetDecimal(4) <= 0 ? 0 : (int)Math.Round(reader.GetDecimal(4), 0, MidpointRounding.AwayFromZero);
+                    rc.Sum = reader.GetDecimal(5) <= 0 ? 0 : (int)Math.Round(reader.GetDecimal(5), 0, MidpointRounding.AwayFromZero);
 
                     mv.Add(rc);
                 }
