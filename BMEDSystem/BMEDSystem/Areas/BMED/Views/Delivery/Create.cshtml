@@ -10,7 +10,7 @@
 
 <h2>驗收單/新增</h2>
 
-<form asp-action="Create" data-ajax="true"
+<form asp-action="CreateAsync" data-ajax="true"
       data-ajax-method="POST"
       data-ajax-begin="$.Toast.showToast({
       'title':'作業進行中，請稍待...',
@@ -100,7 +100,7 @@
         <div class="editor-label">
             <label asp-for="BudgetId" class="control-title"></label>
         </div>
-        <div class="editor-field">
+        <div class="editor-field" id="Budget">
             <input asp-for="BudgetId" class="form-control" />
             <span asp-validation-for="BudgetId" class="text-danger"></span>
         </div>
@@ -376,13 +376,23 @@
                     data: { type:"",contract_no: keynam },
                     dataType: "json",
                     success: function (data) {
-                        console.log(data);
+                        //console.log(data);
                         if (data != null) {
-                            $("#ContractNo").val(data.contracT_NO);
-                            $("#VendorId").val(data.vendoR_No);
-                            $("#VendorNam").val(data.vendoR_NAME);
-                            $("#VendorNamErrorMsg").html(data.vendoR_NAME);
-                            $("#BudgetId").val(data.purchasE_NO);
+                            $("#ContractNo").val(data.first.contracT_NO);
+                            $("#VendorId").val(data.first.vendoR_No);
+                            $("#VendorNam").val(data.first.vendoR_NAME);
+                            $("#VendorNamErrorMsg").html(data.first.vendoR_NAME);
+                            $("#BudgetId").remove();
+                            //$("#BudgetId").val(data.first.purchasE_NO);
+                             $('#Budget').append("<select id='BudgetId' name='BudgetId' data-val='true' data-val-required='此為必填選項' class='form-control'><select>");
+                            var jsdata = JSON.parse(data.purchase);
+                            var appenddata;
+                                //appenddata += "<option value = ''>請選擇</option>";
+                            $.each(jsdata, function (key, value) {
+                                appenddata += "<option value = '" + value.Text + "'>" + value.Value + " </option>";
+                                });
+                            $('#BudgetId').html(appenddata)
+                            //$("#BudgetId").val(data.purchasE_NO);
                         }
                     },
                     error: function (error) {

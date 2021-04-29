@@ -31,8 +31,12 @@ $(function () {
     /* Get engineers. */
         var assetName = $('#AssetNo option:selected').text().split("(", 1);
         $("#AssetName").val(assetName);
-        if ($(this).val() == "99999")
+        if ($(this).val() == "99999") {
             $("#AssetName").val('');
+            $("#DptEmp").show();
+        } else {
+            $("#DptEmp").hide();
+        }
         $.ajax({
             url: '../Repair/GetAssetEngId',
             type: "POST",
@@ -226,6 +230,50 @@ $(function () {
             }
         });
     });
+
+    $("#DptQryBtn").click(function () {
+        var queryStr = $("#DptQry").val();
+        var AssetNo = $("#AssetNo").val();
+        //if (AssetNo == 99999) { 
+            $.ajax({
+                url: '../Repair/QueryDpt',
+                type: "GET",
+                data: { QueryStr: queryStr},
+                success: function (data) {
+                    var select = $('#EmpDpt');
+                    $('option', select).remove();
+                    select.addItems(data);
+                }
+            });
+        //}
+    });
+
+    $('#EmpDpt').change(function () {
+        /* Get engineers. */
+        var assetName = $('#EmpDpt option:selected').text().split("(", 1);
+        var dpt = $('#EmpDpt option:selected').val().split("(", 1);
+        //$("#AssetName").val(assetName);
+        //if ($(this).val() == "99999")
+        //    $("#AssetName").val('');
+        $.ajax({
+            url: '../Repair/GetDptEngId',
+            type: "POST",
+            dataType: "json",
+            data: {
+               Dpt: dpt
+            },
+            async: false,
+            success: function (data) {
+                $('#EngId').val(data.engId);
+                $('#EngName').val(data.fullName);
+                //var select = $('#EngId');
+                //$('option', select).remove();
+                //select.addItems(data);
+                //console.log(data + ";" + select.val()); // ForDebug
+            }
+        });
+    });
+
     $('#modalFILES').on('hidden.bs.modal', function () {
         var docid = $("#DocId").val();
         $.ajax({

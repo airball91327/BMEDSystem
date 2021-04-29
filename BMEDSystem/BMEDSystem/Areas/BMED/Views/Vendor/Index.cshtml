@@ -1,0 +1,104 @@
+﻿@model EDIS.Models.VendorModel
+
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewBag.Title = "廠商資料列表";
+}
+
+<script src="~/js/BMED/Report.js" asp-append-version="true"></script>
+
+<script>
+      function BMEDVendorAsSubmit() {
+            /* Refresh repair form. */
+            var strArray = window.location.href.split("/");
+            var strArray2 = strArray[strArray.length - 1].split("#");
+            var page = strArray2[strArray2.length - 1];
+
+            fetchPageVendor(page);
+        };
+    
+
+    var fetchPageVendor = function (page) {
+        var pagedPartialUrl = '@Url.Action("Index", "Vendor", new { Area = "BMED" })';
+        var NAME = $('#qtyNAME').val();
+        var UNITENO = $('#qtyUNITENO').val();
+        $.Toast.showToast({
+            'title': '作業進行中，請稍待...',
+            'icon': 'loading',
+            'duration': 0
+        })
+        $.ajax({
+            url:pagedPartialUrl,
+            type: "POST",
+            data: "name="+ NAME+"&uniteno="+UNITENO + "&page=" + page,
+            success: function (data) {
+                    if (data.success === false)
+                    {
+                        alert(data.error);
+                    }
+
+                    window.location.hash = page;
+
+                    $('#pnlVendorLIST').html(data);
+
+                    $('#pnlVendorLIST .pagination li a').each(function (i, item) {
+                        var hyperLinkUrl = $(item).attr('href');
+                        if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+                            var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+                            $(item).attr('href', '#').click(function (event) {
+                                event.preventDefault();
+                                $(event.target).attr('href');
+                                fetchPageRATE(pageNumber);
+                            });
+                        }
+                    });
+                    $.Toast.hideToast();
+            },
+            error: function (data) {
+                    console.log(data);
+                    alert("error");
+                    $.Toast.hideToast();
+                }
+        });
+
+    };
+</script>
+
+<h2>廠商列表</h2>
+
+<form asp-action="Index" asp-controller="Vendor" asp-area="BMED" data-ajax="true" id="frmVendorLIST"
+      data-ajax-update="#pnlVendorLIST" data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'查詢中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-success="smgREPORT"
+      data-ajax-failure="onFailed"
+      data-ajax-complete="$.Toast.hideToast()">
+
+    <div class="form-horizontal">
+        <div class="form-group">
+            <div class="form-inline">
+                @Html.Label("qtyNAME", "關鍵字", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-2">
+                    @Html.TextBox("qtyNAME", "", new { @class = "form-control" })
+                </div>
+                @Html.Label("qtyUNITENO", "統一編號", htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-2">
+                    @Html.TextBox("qtyUNITENO", "", new { @class = "form-control" })
+                </div>
+            </div>
+        </div>
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="button" value="查詢" class="btn btn-default" onclick="fetchPageVendor(1)" />
+            </div>
+        </div>
+    </div>
+</form>
+
+
+<div id="pnlVendorLIST" style="margin-top: 40px">
+    @*@Html.Action("List")*@
+</div>

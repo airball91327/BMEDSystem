@@ -50,7 +50,7 @@
     });
     // Use ajax to fetch page.
     var fetchPage = function (page) {
-        var pagedPartialUrl = '@Url.Action("GetRepKeeoQryList", "Search", new { Area = "BMED" })';
+        var pagedPartialUrl = '@Url.Action("GetRepKeepQryList", "Search", new { Area = "BMED" })';
         var s = $('#repSearchForm').serialize();
         $.Toast.showToast({
             'title': '作業進行中，請稍待...',
@@ -94,7 +94,7 @@
 <h4>醫療儀器</h4>
 <hr />
 
-<form asp-controller="Search" asp-action="GetRepKeeoQryList" asp-area="BMED" data-ajax="true"
+<form asp-controller="Search" asp-action="GetRepKeepQryList" asp-area="BMED" data-ajax="true"
       data-ajax-update="#pnlREPLIST" data-ajax-method="POST" id="repSearchForm"
       data-ajax-begin="$.Toast.showToast({
       'title':'查詢中，請稍待...',

@@ -27,6 +27,7 @@
         -webkit-transform: scale(2); /* Safari and Chrome */
         -o-transform: scale(2); /* Opera */
     }
+
     .ui-autocomplete {
         margin: 0;
         padding: 0;
@@ -34,13 +35,10 @@
         border: solid 1px #ccc;
         background-color: #fff;
         width: auto;
-        overflow:scroll;
-        overflow-x:hidden;
-        height:100px;
+        overflow: scroll;
+        overflow-x: hidden;
+        height: 100px;
     }
-    
-
-    
 </style>
 
 <script type="text/javascript">
@@ -50,7 +48,7 @@
                 minLength: 1,
                 source: function (request, response) {
                     $.ajax({
-                        url: '@Url.Action("QueryAssets","FindInKey")', 
+                        url: '@Url.Action("QueryAssets","FindInKey")',
                         type: "POST",
                         dataType: "json",
                         data: {
@@ -110,7 +108,8 @@
             var EngCode = $("#BMEDqtyEngCode").val();
             var TicketNo = $("#BMEDqtyTicketNo").val();
             var Vendor = $("#BMEDqtyVendor").val();
-            var ClsUser = $("#BMEDqtyClsUser").val();
+            var ClsUser = $("#ClsUsers").val();
+            var Loc = $('#BMEDqtyLoc').val();
             if ($("#BMEDqtySearchAllDoc").is(':checked') == true) {
                 SearchAllDoc = true;
             }
@@ -137,7 +136,9 @@
                     SearchAllDoc: SearchAllDoc,
                     EngCode: EngCode,
                     TicketNo: TicketNo,
-                    Vendor: Vendor
+                    Vendor: Vendor,
+                    Loc: Loc,
+                    ClsUser: ClsUser
                 }
                 @*success: function (response, textStatus, jqXHR) {
 
@@ -160,6 +161,12 @@
                 }
             });
         });
+         $("#BMEDqtySearchAllDoc").click(function () {
+            if ($(this).is(':checked') == true) {
+                $('#BMEDqtyFLOWTYPE option[value=請選擇]').attr('selected', 'selected');
+            }
+         });
+        
     });
     function BMEDRepReSubmit() {
         /* Refresh repair form. */
@@ -216,6 +223,7 @@
         });
 
     };
+       
 </script>
 
 
@@ -250,8 +258,8 @@
                     @*<input asp-for="BMEDqtyACCDPT" id="ACCDPT" class="form-control"  type="text">*@
 
                     <input type="text" placeholder="輸入成本中心代號查詢" class="form-control" id="AssetAccDptQry" />
-                    <button type="button" class="btn btn-default" id="AssetQryBtn"  data-request-url="@Url.Action("QueryAssets", "FindInKey")">查詢</button>
-                    <select asp-for="BMEDqtyACCDPT" asp-items="@ViewData["DefaultAssets"] as SelectList"  class="form-control" id="AssetNo">
+                    <button type="button" class="btn btn-default" id="AssetQryBtn" data-request-url="@Url.Action("QueryAssets", "FindInKey")">查詢</button>
+                    <select asp-for="BMEDqtyACCDPT" asp-items="@ViewData["DefaultAssets"] as SelectList" class="form-control" id="AssetNo">
                         <option disabled selected>請選擇</option>
                     </select>
                     <span style="color:red" id="AssetNoErrorMsg"></span>
@@ -271,12 +279,12 @@
                 <div class="form-group">
                     <label for="BMEDqtyDPTID" class="control-title">申請部門</label>
                     @*<select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList" class="form-control BMEDcombobox">
-                        <option value="">請選擇</option>
-                    </select>*@
+                            <option value="">請選擇</option>
+                        </select>*@
                     <input type="text" placeholder="輸入部門代號查詢" class="form-control" id="ApplyDptQry" />
                     @*@Html.TextBoxFor(model => model.BMEDqtyDateType,htmlAttributes: new { @class="form-control",@placeholder="輸入部門代號查詢"})*@
-                    <button type="button"  class="btn btn-default" id="ApplyDptQryBtn" data-request-url="@Url.Action("QueryAssets", "FindInKey")">查詢</button>
-                    <select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList"  class="form-control" id="ApplyDpt">
+                    <button type="button" class="btn btn-default" id="ApplyDptQryBtn" data-request-url="@Url.Action("QueryAssets", "FindInKey")">查詢</button>
+                    <select asp-for="BMEDqtyDPTID" asp-items="@ViewData["BMEDApplyDpt"] as SelectList" class="form-control" id="ApplyDpt">
                         <option disabled selected>請選擇</option>
                     </select>
                     <span style="color:red" id="ApplyDptErrorMsg"></span>
@@ -298,11 +306,11 @@
                 <div class="form-group">
                     <label for="BMEDqtyEngCode" class="control-title">負責工程師</label>
                     @*<select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList" class="form-control BMEDcombobox">
-                        <option value="">請選擇</option>
-                    </select>*@
+                            <option value="">請選擇</option>
+                        </select>*@
                     <input type="text" placeholder="輸入工程師代號查詢" class="form-control" id="EngCodeQry" />
                     <button type="button" class="btn btn-default" id="EngCodeQryBtn" data-request-url="@Url.Action("QueryEngCode", "FindInKey")">查詢</button>
-                    <select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList"  class="form-control" id="EngCode">
+                    <select asp-for="BMEDqtyEngCode" asp-items="@ViewData["BMEDEngs"] as SelectList" class="form-control" id="EngCode">
                         <option disabled selected>請選擇</option>
                     </select>
                     <span style="color:red" id="EngCodeErrorMsg"></span>
@@ -322,56 +330,72 @@
                 <div class="form-group">
                     <label for="BMEDqtyClsUser" class="control-title">目前關卡人員</label>
                     @*<select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList" class="form-control BMEDcombobox">
-                        <option value="">請選擇</option>
-                    </select>*@
+                            <option value="">請選擇</option>
+                        </select>*@
                     <input type="text" placeholder="輸入員工代號查詢" class="form-control" id="ClsUserDptQry" />
                     <button type="button" class="btn btn-default" id="ClsUserQryBtn" data-request-url="@Url.Action("QueryClsUser", "FindInKey")">查詢</button>
-                    <select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList"  class="form-control" id="ClsUsers">
+                    <select asp-for="BMEDqtyClsUser" asp-items="@ViewData["BMEDClsUsers"] as SelectList" class="form-control" id="ClsUsers">
                         <option disabled selected>請選擇</option>
                     </select>
                     <span style="color:red" id="ClsUserNoErrorMsg"></span>
                 </div>
             </div>
         </div>
-        @if (user.DptId == "8420" || user.DptId == "7084" ||
-           UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
-        {
-            <div class="row">
-                <div class=form-inline>
+        <div class="row">
+            <div class=form-inline>
+                @if (UserManager.IsInRole(User, "MedAssetMgr"))
+                {
+
+                    <div class="form-group">
+                        <label for="BMEDqtyLoc" class="control-title">院區</label>
+                        <select asp-for="BMEDqtyLoc" asp-items="@ViewData["Location"] as SelectList" class="form-control">
+                            <option value="">請選擇</option>
+                        </select>
+                    </div>
+                }
+                @if (user.DptId == "8420" || user.DptId == "7084" ||
+                        UserManager.IsInRole(User, "MedEngineer")) /* Only MedEngineer can search all engineer docs. */
+                {
+
+
                     <div class="form-group">
                         <label class="control-title">查詢所有<br />工程師案件</label>
-                        <input type="checkbox" asp-for="BMEDqtySearchAllDoc" style="margin: 7px 0px 0px 7px;" />
+                        <input type="checkbox" asp-for="BMEDqtySearchAllDoc" name="BMEDqtySearchAllDoc" style="margin: 7px 0px 0px 7px;" />
                     </div>
-                </div>
-            </div>
-        }
-        <div class="row">
-            <div class=form-inline>
-                <div class="form-group">
-                    <label for="qtyApplyDateFrom" class="control-title">日期查詢</label>
-                    <span>
-                        <select asp-for="BMEDqtyDateType" asp-items="@ViewData["BMEDDateType"] as SelectList" class="form-control-s"></select>
-                    </span>
-                    <input asp-for="BMEDqtyApplyDateFrom" class="form-control" />
-                    <span> ~ </span>
-                    <input asp-for="BMEDqtyApplyDateTo" class="form-control" />
-                </div>
+
+
+                }
+
             </div>
         </div>
-        <div class="row">
-            <div class=form-inline>
-                <div class="form-group col-md-offset-1 col-md-1">
-                    <div>
-                        <input id="BMEDbtnQTY" type="submit" value="查詢" class="btn btn-default btn-group-justified" />
+                <div class="row">
+                    <div class=form-inline>
+                        <div class="form-group">
+                            <label for="qtyApplyDateFrom" class="control-title">日期查詢</label>
+                            <span>
+                                <select asp-for="BMEDqtyDateType" asp-items="@ViewData["BMEDDateType"] as SelectList" class="form-control-s"></select>
+                            </span>
+                            <input asp-for="BMEDqtyApplyDateFrom" class="form-control" />
+                            <span> ~ </span>
+                            <input asp-for="BMEDqtyApplyDateTo" class="form-control" />
+                        </div>
                     </div>
                 </div>
-                <div class="form-group">
-                    <div>
-                        <input type="button" class="btn btn-primary" id="BMEDexportExcelBtn" value="匯出Excel" />
+                <div class="row">
+                    <div class=form-inline>
+                        <div class="form-group col-md-offset-1 col-md-1">
+                            <div>
+                                <input id="BMEDbtnQTY" type="submit" value="查詢" class="btn btn-default btn-group-justified" />
+                            </div>
+                        </div>
+                        <div class="form-group"  style="padding-left:50px;">
+                            <div>
+                                <input type="button" class="btn btn-primary" id="BMEDexportExcelBtn" value="匯出Excel" />
+                            </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
+           
     </div>
 </form>
 

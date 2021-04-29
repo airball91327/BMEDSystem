@@ -62,6 +62,10 @@ namespace EDIS.Models
 
         [Display(Name = "問卷名稱")]
         public string Qname { get; set; }
+
+        [Display(Name = "管理類別")]
+        public string Manage { get; set; }
+        
     }
     //
     public class UserHour
@@ -1599,8 +1603,10 @@ namespace EDIS.Models
         public string EngNam { get; set; }
         [Display(Name = "工程師代碼")]
         public string EngNamNo { get; set; }
-        [Display(Name = "現在關卡")]
+        [Display(Name = "現在關卡人員")]
         public string ClsEmp { get; set; }
+        [Display(Name = "現在關卡人員代碼")]
+        public string ClsEmpNo { get; set; }
         public string AssetClass { get; set; }
 
         private readonly ApplicationDbContext db;

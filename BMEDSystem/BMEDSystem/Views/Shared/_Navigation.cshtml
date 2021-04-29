@@ -248,24 +248,43 @@
                                         </ul>
                                     </li>
                                     }
-                                    @*<li class="@Html.IsSelected(controller: "FailFactors", area: "BMED")">
-            <a href="#">故障原因選單<span class="fa arrow"></span></a>
-            <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "FailFactors", area: "BMED", cssClass: "in")">
-                <li>
-                    <a href="@Url.Action("Index", "FailFactors", new { Area = "BMED" })">故障原因選單列表</a>
-                </li>
-            </ul>
-        </li>*@
+                                    <li class="@Html.IsSelected(controller: "FailFactors", area: "BMED")">
+                                        <a href="#">故障原因選單<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "FailFactors", area: "BMED", cssClass: "in")">
+                                            <li>
+                                                <a href="@Url.Action("Index", "FailFactors", new { Area = "BMED" })">故障原因選單列表</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="@Html.IsSelected(controller: "DeviceSortCode", area: "BMED")">
+                                        <a href="#">設備分類碼<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "DeviceSortCode", area: "BMED", cssClass: "in")">
+                                            <li>
+                                                <a href="@Url.Action("Index", "DeviceSortCode", new { Area = "BMED" })">分類碼列表</a>
+                                                <a href="@Url.Action("Create", "DeviceSortCode", new { Area = "BMED" })">新增分類碼</a>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li class="@Html.IsSelected(controller: "Vendor", area: "BMED")">
+                                        <a href="#">廠商資料<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "Vendor", area: "BMED", cssClass: "in")">
+                                            <li>
+                                                <a href="@Url.Action("Index", "Vendor", new { Area = "BMED" })">廠商資料列表</a>
+                                                <a href="@Url.Action("Create", "Vendor", new { Area = "BMED" })">新增廠商資料</a>
+
+                                            </li>
+                                        </ul>
+                                    </li>
                                     @if (UserManager.IsInRole(User, "Admin"))
                                     {
-                                        <li class="@Html.IsSelected(controller: "AppUser", area: "")">
-                                            <a href="#">人員管理<span class="fa arrow"></span></a>
-                                            <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "AppUser", area: "", cssClass: "in")">
-                                                <li>
-                                                    <a href="@Url.Action("Index", "AppUser", new { Area = "" })">使用者一覽</a>
-                                                </li>
-                                            </ul>
-                                        </li>
+                                    <li class="@Html.IsSelected(controller: "AppUser", area: "")">
+                                        <a href="#">人員管理<span class="fa arrow"></span></a>
+                                        <ul class="nav nav-third-level collapse @Html.IsSelected(controller: "AppUser", area: "", cssClass: "in")">
+                                            <li>
+                                                <a href="@Url.Action("Index", "AppUser", new { Area = "" })">使用者一覽</a>
+                                            </li>
+                                        </ul>
+                                    </li>
                                     }
                                 </ul>
                             </li>

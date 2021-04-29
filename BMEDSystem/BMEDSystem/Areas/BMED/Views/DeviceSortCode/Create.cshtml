@@ -1,0 +1,71 @@
+﻿@model EDIS.Models.DeviceSortCode
+@{
+    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    ViewBag.Title = "新增類別碼";
+}
+
+<h2>新增</h2>
+
+
+<form asp-action="Create" asp-controller="DeviceSortCode" asp-area="BMED" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'查詢中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-success="onSuccess()"
+      data-ajax-failure="onFailed"
+      data-ajax-complete="$.Toast.hideToast()">
+
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h4>設備分類選單</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+        <div class="form-group">
+            @Html.LabelFor(model => model.M_code, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.M_code, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.M_code, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.M_name, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.M_name, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.M_name, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Status, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.RadioButton("Status", "Y")有效
+                @Html.RadioButton("Status", "N")無效
+                @Html.ValidationMessageFor(model => model.Status, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="確定送出" class="btn btn-default" id="btnQry" />
+            </div>
+        </div>
+    </div>
+</form>
+
+<script>
+    var onFailed = function (data) {
+            alert(data.responseText);
+            $('#btnQry').removeAttr('disabled');
+            $.Toast.hideToast();
+        };
+    function onSuccess() {
+        $.Toast.hideToast();
+        alert("成功新增");
+        $('#btnQry').attr('disabled', 'true'); //添加disabled属性
+       location.href = '@Url.Action("Index", "DeviceSortCode", new { Area = "BMED" })';
+    }
+</script>

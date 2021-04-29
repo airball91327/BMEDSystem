@@ -1,13 +1,18 @@
-﻿@model IEnumerable<EDIS.Models.AssetKpScheVModel>
-@using Newtonsoft.Json
+﻿@model X.PagedList.IPagedList<EDIS.Models.AssetKpScheVModel>
+
+@using Newtonsoft.Json;
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
 @{
-    Layout = null;
-    var qry2 = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry2"].ToString());
+        Layout = null;
+        var qry2 = JsonConvert.DeserializeObject<ReportQryVModel>(TempData["qry2"].ToString());
 }
+
 <style type="text/css">
     .Sche {
         font-size: 2em;
-        color:red;
+        color: red;
     }
 
     .hdtitle {
@@ -16,8 +21,8 @@
 
     .docid {
         margin-top: 5px;
-        color:green;
-        text-decoration:underline;
+        color: green;
+        text-decoration: underline;
     }
 
     .table-hover > tbody > tr:hover {
@@ -32,146 +37,192 @@
 <p>
     <a class="btn btn-default" href="@Url.Action("AssetKpScheExcel", qry2)">匯出Excel</a>
 </p>
-<table class="table table-bordered table-hover"  style="display:block; overflow-x:auto;">
+<table class="table table-bordered table-hover" style="display:block; overflow-x:auto;">
     <tr>
         <th>
-            @Html.DisplayNameFor(model => model.AssetNo)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetNo)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.AssetName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().AssetName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.DelivDptName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().DelivDptName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Brand)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Brand)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Type)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Type)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.EngName)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EngName)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Jan)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Jan)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Feb)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Feb)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Mar)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Mar)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Apr)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Apr)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.May)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().May)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Jun)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Jun)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Jul)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Jul)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Aug)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Aug)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Sep)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Sep)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Oct)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Oct)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Nov)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Nov)
         </th>
         <th>
-            @Html.DisplayNameFor(model => model.Dec)
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Dec)
         </th>
     </tr>
 
     @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetNo)</p>
-            </td>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetName)</p>
-            </td>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.DelivDptName)</p>
-            </td>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.Brand)</p>
-            </td>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.Type)</p>
-            </td>
-            <td>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.EngName)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Jan)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JanDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JanDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JanEDate)</p>           
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Feb)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.FebDocId })" target="_blank">@Html.DisplayFor(modelItem => item.FebDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.FebEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Mar)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MarDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MarDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.MarEDate)</p>
-            </td>
-            <td>
-                <p class="Sche"> @Html.DisplayFor(modelItem => item.Apr)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AprDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AprDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AprEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.May)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MayDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MayDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.MayEDate)</p>
-            </td>
-            <td>
-                <p class="Sche"> @Html.DisplayFor(modelItem => item.Jun)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JunDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JunDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JunEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Jul)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JulDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JulDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.JulEDate)</p>
-            </td>
-            <td>
-                <p class="Sche"> @Html.DisplayFor(modelItem => item.Aug)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AugDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AugDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.AugEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Sep)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.SepDocId })" target="_blank">@Html.DisplayFor(modelItem => item.SepDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.SepEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Oct)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.OctDocId })" target="_blank">@Html.DisplayFor(modelItem => item.OctDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.OctEDate)</p>
-            </td>
-            <td>
-                <p class="Sche"> @Html.DisplayFor(modelItem => item.Nov)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.NovDocId })" target="_blank">@Html.DisplayFor(modelItem => item.NovDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.NovEDate)</p>
-            </td>
-            <td>
-                <p class="Sche">@Html.DisplayFor(modelItem => item.Dec)</p>
-                <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DecDocId })" target="_blank">@Html.DisplayFor(modelItem => item.DecDocId)</a>
-                <p class="hdtitle">@Html.DisplayFor(modelItem => item.DecEDate)</p>
-            </td>
-        </tr>
-    }
+        {
+    <tr>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetNo)</p>
+        </td>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.AssetName)</p>
+        </td>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.DelivDptName)</p>
+        </td>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.Brand)</p>
+        </td>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.Type)</p>
+        </td>
+        <td>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.EngName)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Jan)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JanDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JanDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.JanEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Feb)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.FebDocId })" target="_blank">@Html.DisplayFor(modelItem => item.FebDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.FebEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Mar)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MarDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MarDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.MarEDate)</p>
+        </td>
+        <td>
+            <p class="Sche"> @Html.DisplayFor(modelItem => item.Apr)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AprDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AprDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.AprEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.May)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.MayDocId })" target="_blank">@Html.DisplayFor(modelItem => item.MayDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.MayEDate)</p>
+        </td>
+        <td>
+            <p class="Sche"> @Html.DisplayFor(modelItem => item.Jun)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JunDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JunDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.JunEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Jul)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.JulDocId })" target="_blank">@Html.DisplayFor(modelItem => item.JulDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.JulEDate)</p>
+        </td>
+        <td>
+            <p class="Sche"> @Html.DisplayFor(modelItem => item.Aug)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.AugDocId })" target="_blank">@Html.DisplayFor(modelItem => item.AugDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.AugEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Sep)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.SepDocId })" target="_blank">@Html.DisplayFor(modelItem => item.SepDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.SepEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Oct)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.OctDocId })" target="_blank">@Html.DisplayFor(modelItem => item.OctDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.OctEDate)</p>
+        </td>
+        <td>
+            <p class="Sche"> @Html.DisplayFor(modelItem => item.Nov)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.NovDocId })" target="_blank">@Html.DisplayFor(modelItem => item.NovDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.NovEDate)</p>
+        </td>
+        <td>
+            <p class="Sche">@Html.DisplayFor(modelItem => item.Dec)</p>
+            <a class="docid" href="@Url.Action("Views", "Keep", new { Area = "BMED", id = item.DecDocId })" target="_blank">@Html.DisplayFor(modelItem => item.DecDocId)</a>
+            <p class="hdtitle">@Html.DisplayFor(modelItem => item.DecEDate)</p>
+        </td>
+    </tr>
+        }
 
 </table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index3", new { page = page, ReportClass = "設備保養排程年報" }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+
+<script>
+    // Use ajax to fetch page.
+    var fetchPage = function (page) {
+        var pagedPartialUrl3 = '@Url.Action("Index3", "Report", new { Area = "BMED" })';
+        var s = $('#BMEReportForm3').serialize();
+        $.Toast.showToast({
+        'title': '查詢中，請稍待...',
+        'icon': 'loading',
+        'duration': 0
+        })
+        $.ajax({
+        url: pagedPartialUrl3,
+        type: "POST",
+        data: s + "&page=" + page + "&ReportClass=設備保養排程年報",
+        success: function (data) {
+
+        window.location.hash = page;
+
+        $('#pnlREPORT').html(data);
+
+        $('#pnlREPORT .pagination li a').each(function (i, item) {
+        var hyperLinkUrl = $(item).attr('href');
+        if (typeof hyperLinkUrl !== 'undefined' && hyperLinkUrl !== false) {
+        var pageNumber = $(item).attr('href').replace(pagedPartialUrl + '?page=', '');
+        $(item).attr('href', '#').click(function (event) {
+        event.preventDefault();
+        $(event.target).attr('href');
+        fetchPage(pageNumber);
+        });
+        }
+        });
+        $.Toast.hideToast();
+        },
+        error: function (data) {
+        alert(data.responseText);
+        $.Toast.hideToast();
+        }
+        });
+        };
+        </script>

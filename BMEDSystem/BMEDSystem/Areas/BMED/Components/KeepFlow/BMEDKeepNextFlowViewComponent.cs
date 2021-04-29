@@ -55,15 +55,15 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
             }
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
 
-            //額外流程控管
-            if (keepDtl.IsCharged == "Y" && keepDtl.NotInExceptDevice == "N")   //有費用 & 非統包
-            {
-                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
-                if (itemToRemove != null)
-                {
-                    listItem.Remove(itemToRemove);
-                }
-            }
+            //額外流程控管 04/16
+            //if (keepDtl.IsCharged == "Y" && keepDtl.NotInExceptDevice == "N")   //有費用 & 非統包
+            //{
+            //    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+            //    if (itemToRemove != null)
+            //    {
+            //        listItem.Remove(itemToRemove);
+            //    }
+            //}
             if (keepDtl.NotInExceptDevice == "N")    //非統包
             {
                 var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
@@ -86,6 +86,18 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
                 }
             }
 
+            //Add New
+            //有統包 有費用 關卡工程師
+            //if (keepDtl.NotInExceptDevice == "Y" && keepFlow.Cls.Contains("工程師") && keepDtl.IsCharged == "Y")  
+            //{
+            //    listItem.Add(new SelectListItem { Text = "賀康經辦", Value = "賀康經辦" });
+            //    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
+            //    if (itemToRemove != null)
+            //    {
+            //        listItem.Remove(itemToRemove);
+            //    }
+            //}
+
             /* Insert values. */
             AssignModel assign = new AssignModel();
             assign.DocId = id;
@@ -103,6 +115,15 @@ namespace EDIS.Areas.BMED.Components.KeepFlow
                 if (keepFlow.Cls == "驗收人" && keepDtl.IsCharged == "Y")  //有費用 & 關卡於驗收人，下一關只可給工程師
                 {
                     var itemToRemove = listItem.SingleOrDefault(r => r.Value == "結案");
+                    if (itemToRemove != null)
+                    {
+                        listItem.Remove(itemToRemove);
+                    }
+                }
+                if (keepFlow.Cls == "驗收人")
+                {
+                    //2021/04/28 去除申請人
+                    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "申請人");
                     if (itemToRemove != null)
                     {
                         listItem.Remove(itemToRemove);

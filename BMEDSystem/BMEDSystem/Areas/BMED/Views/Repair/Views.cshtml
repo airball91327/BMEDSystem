@@ -5,7 +5,7 @@
 @inject CustomRoleManager RoleManager
 
 @{
-    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
     ViewBag.Title = "預覽/請修";
 
     if (TempData["SendMsg"] != null)
@@ -56,7 +56,8 @@
 </div>
 
 <div>
-    <a class="btn btn-default" href="@Url.Action("Index", "Home", new { Area = "" } )">回到簽核列表</a>
+    @*<a class="btn btn-default" onclick="window.close()">回到簽核列表</a>*@
+    <input type="button" value="關閉" class="btn btn-default" onclick="window.close()" />
     <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "Repair", new { Area = "BMED", DocId = Model.DocId } )" target="_blank">列印</a>
     <a class="btn btn-primary" href="@Url.Action("PrintRepairDoc", "Repair", new { Area = "BMED", DocId = Model.DocId, printType = 1 } )" target="_blank">一頁式列印</a>
 </div>

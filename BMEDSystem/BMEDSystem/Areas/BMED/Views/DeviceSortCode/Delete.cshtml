@@ -1,0 +1,78 @@
+﻿@model EDIS.Models.DeviceSortCode
+
+@{
+    ViewBag.Title = "類別碼 | 刪除";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
+}
+
+<h2>刪除</h2>
+
+<form asp-action="Delete" asp-controller="DeviceSortCode" asp-area="BMED" data-ajax="true"
+      data-ajax-method="POST"
+      data-ajax-begin="$.Toast.showToast({
+      'title':'作業進行中，請稍待...',
+      'icon':'loading',
+      'duration':0
+      })"
+      data-ajax-failure="onDeleteFailed"
+      data-ajax-success="onDeleteSuccess()">
+    <h4>廠商資料</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.M_code)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.M_code)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.M_name)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.M_name)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Status)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Status)
+        </dd>
+    </dl>
+
+    <div class="row">
+        <div style="padding-left: 115px">
+            <input id="btnDeleteQry" type="submit" value="確定刪除" class="btn btn-default" />
+        </div>
+    </div>
+</form>
+
+<script>
+    var onDeleteFailed = function (data) {
+            alert(data.responseText);
+            $('#btnDeleteQry').attr('disabled', "false");
+            $.Toast.hideToast();
+    };
+
+    function onDeleteSuccess() {
+        var homeHref = '@Url.Action("Index", "DeviceSortCode", new { Area = "BMED" })'
+        $.Toast.hideToast();
+        alert("成功刪除");
+        $('#btnDeleteQry').attr('disabled', "true"); //添加disabled属性
+        /* window.close(), 當前非彈出視窗在最新版本的chrome和firefox裡不能關閉，而在IE中是可以關閉的
+         * 非彈出視窗，即是指（opener=null 及 非window.open()開啟的視窗,比如URL直接輸入的瀏覽器窗體， 或由其它程式呼叫產生的瀏覽器視窗）
+         */
+        if (window.opener === null) {
+            location.replace(homeHref);
+        }
+        else {
+            window.opener.location = "javascript:BMEDDeviceSortAsSubmit();";//This will call ReSubmit() function on parent window.
+            //opener.location.reload();//This will refresh parent window.
+            window.close();
+        }
+    }
+</script>

@@ -9,7 +9,6 @@ namespace EDIS.Models
     public partial class VendorModel
     {
         [Key]
-        [DatabaseGeneratedAttribute(DatabaseGeneratedOption.Identity)]
         [Display(Name = "廠商編號")]
         public int VendorId { get; set; }
         [Required]
@@ -33,14 +32,20 @@ namespace EDIS.Models
         public string TaxZipCode { get; set; }
         [Display(Name = "聯絡人姓名")]
         public string Contact { get; set; }
+        [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^\(?([0-9]{3})\)?[-. ]?([0-9]{3})[-. ]?([0-9]{4})$", ErrorMessage = "Not a valid phone number")]
         [Display(Name = "聯絡人電話")]
         public string ContactTel { get; set; }
         [DataType(DataType.EmailAddress)]
         [Display(Name = "聯絡人Email")]
         public string ContactEmail { get; set; }
         [Display(Name = "開始日期")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         public DateTime? StartDate { get; set; }
         [Display(Name = "結束日期")]
+        [DataType(DataType.Date)]
+        [DisplayFormat(DataFormatString = "{0:yyyy/MM/dd}")]
         public DateTime? EndDate { get; set; }
         [Display(Name = "狀態")]
         public string Status { get; set; }

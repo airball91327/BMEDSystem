@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using EDIS.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using PagedList.Core;
+using X.PagedList;
 
 namespace EDIS.Areas.BMED.Controllers
 {
+    [Area("BMED")]
+    [Authorize]
+
     public class DeviceSortCodeController : Controller
     {
         private readonly ApplicationDbContext _context;
@@ -22,17 +26,32 @@ namespace EDIS.Areas.BMED.Controllers
 
         public IActionResult Index()
         {
-            return View(_context.BMEDDeviceSortCodes.Take(pageSize).ToList());
+            if (_context.BMEDDeviceSortCodes.Take(pageSize) != null)
+            {
+                return View();
+            }
+            else
+                return View(_context.BMEDDeviceSortCodes.Take(pageSize).ToList());
         }
 
         [HttpPost]
         public IActionResult Index(string name,int page = 1)
         {
             List<DeviceSortCode> dev = new List<DeviceSortCode>();
-            if (!String.IsNullOrEmpty(name))
+
+            if (!string.IsNullOrEmpty(name))
             {
                 dev = _context.BMEDDeviceSortCodes.Where(d => name.Contains(d.M_name)).ToList();
             }
+            else
+            {
+                dev = _context.BMEDDeviceSortCodes.ToList();
+            }
+
+            //if (dev.Count() <= 0)
+            //{
+            //    return PartialView(dev);
+            //}
             //
             var pageCount = dev.ToPagedList(page, pageSize).PageCount;
             pageCount = pageCount == 0 ? 1 : pageCount; // If no page.
@@ -42,20 +61,20 @@ namespace EDIS.Areas.BMED.Controllers
         }
 
         // GET: 
-        public IActionResult Details(int? id)
+        public IActionResult Details(string id)
         {
             if (id == null)
             {
                 return StatusCode(404);
             }
 
-            FailFactorModel failFactor = _context.BMEDFailFactors.Find(id);
+            DeviceSortCode deviceSort = _context.BMEDDeviceSortCodes.Find(id);
 
-            if (failFactor == null)
+            if (deviceSort == null)
             {
                 return BadRequest("無資料");
             }
-            return View(failFactor);
+            return View(deviceSort);
         }
 
         // GET: MedEngMgt/FailFactors/Create
@@ -68,90 +87,115 @@ namespace EDIS.Areas.BMED.Controllers
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        public ActionResult Create(FailFactorModel failFactor)
+        public ActionResult Create(DeviceSortCode deviceSort)
         {
-            if (ModelState.IsValid)
-            {
-                _context.BMEDFailFactors.Add(failFactor);
-                _context.SaveChanges();
-                return Ok(failFactor);
-            }
-            else
-            {
-                var msg = "";
-                foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+            var msg = "";
+
+            try
+            { 
+                if (ModelState.IsValid)
                 {
-                    msg += error.ErrorMessage + Environment.NewLine;
+                    var sortcode = _context.BMEDDeviceSortCodes.Where(d => d.M_code == deviceSort.M_code).FirstOrDefault();
+                    if ( sortcode != null )
+                    {
+                        msg = "此分類碼已存在";
+                    }
+                    else { 
+                        _context.BMEDDeviceSortCodes.Add(deviceSort);
+                        _context.SaveChanges();
+                        return Ok(deviceSort);
+                    }
                 }
-                throw new Exception(msg);
+                else
+                {
+                    foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                    {
+                        msg += error.ErrorMessage + Environment.NewLine;
+                    }
+                }
             }
+            catch (Exception e)
+            {
+                msg = e.Message;
+            }
+
+             return BadRequest(msg);
         }
 
         // GET: MedEngMgt/FailFactors/Edit/5
-        public ActionResult Edit(int? id)
+        public ActionResult Edit(string id)
         {
             if (id == null)
             {
                 return new StatusCodeResult(404);
             }
-            FailFactorModel failFactor = _context.BMEDFailFactors.Find(id);
-            if (failFactor == null)
+            DeviceSortCode deviceClass = _context.BMEDDeviceSortCodes.Find(id);
+            if (deviceClass == null)
             {
                 return BadRequest("無資料");
             }
-            return View(failFactor);
+            return View(deviceClass);
         }
 
         // POST: MedEngMgt/FailFactors/Edit/5
         // 若要免於過量張貼攻擊，請啟用想要繫結的特定屬性，如需
         // 詳細資訊，請參閱 http://go.microsoft.com/fwlink/?LinkId=317598。
         [HttpPost]
-        public ActionResult Edit(FailFactorModel failFactor)
+        public ActionResult Edit(DeviceSortCode deviceClass)
         {
-            if (ModelState.IsValid)
-            {
-                _context.Entry(failFactor).State = EntityState.Modified;
-                _context.SaveChanges();
-                return Json(true);
-            }
-            else
-            {
-                var msg = "";
-                foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+            var msg = "";
+            try { 
+                if (ModelState.IsValid)
                 {
-                    msg += error.ErrorMessage + Environment.NewLine;
+                    _context.Entry(deviceClass).State = EntityState.Modified;
+                    _context.BMEDDeviceSortCodes.Update(deviceClass);
+                    _context.SaveChanges();
+                    return Json(true);
                 }
-                throw new Exception(msg);
+                else
+                {
+                    foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                    {
+                        msg += error.ErrorMessage + Environment.NewLine;
+                    }
+                
+                }
             }
+            catch (Exception e)
+            {
+                msg = e.Message;
+            }
+            return BadRequest(msg);
         }
 
         // GET: MedEngMgt/FailFactors/Delete/5
-        public IActionResult Delete(int? id)
+        public IActionResult Delete(string id)
         {
             if (id == null)
             {
                 return new StatusCodeResult(404);
             }
-            FailFactorModel failFactor = _context.BMEDFailFactors.Find(id);
-            if (failFactor == null)
+            DeviceSortCode deviceClass = _context.BMEDDeviceSortCodes.Find(id);
+            if (deviceClass == null)
             {
                 return BadRequest("無資料");
             }
-            return View(failFactor);
+            return View(deviceClass);
         }
 
         // POST: MedEngMgt/FailFactors/Delete/5
         [HttpPost, ActionName("Delete")]
-        public IActionResult DeleteConfirmed(int id)
+        public IActionResult DeleteConfirmed(string id)
         {
-            FailFactorModel failFactor = _context.BMEDFailFactors.Find(id);
-            if (failFactor == null)
+            DeviceSortCode deviceClass = _context.BMEDDeviceSortCodes.Find(id);
+            if (deviceClass == null)
             {
                 return BadRequest("資料錯誤");
             }
-            _context.BMEDFailFactors.Remove(failFactor);
+            _context.BMEDDeviceSortCodes.Remove(deviceClass);
             _context.SaveChanges();
-            return Json(true);
+
+            return RedirectToAction(nameof(Index));
         }
     }
 }

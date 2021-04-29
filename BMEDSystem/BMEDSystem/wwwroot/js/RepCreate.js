@@ -15,10 +15,12 @@ $.fn.addItems = function (data) {
 
 };
 
+
+
 $(function () {
 
     SetEngsDropDown();
-
+    
     /* Prevent submit for pressing Enter. */
     $('input').keypress(function (e) {
         code = e.keyCode ? e.keyCode : e.which; // in case of browser compatibility
@@ -331,6 +333,27 @@ function onSuccess() {
     }  
 }
 
+function onSuccessAgain() {
+    $.Toast.hideToast();
+    alert("已送出");
+
+    var DocId = $("#DocId").val();
+    var repType = $('input:radio[name="RepType"]:checked').val();
+    /* Print confirm before submit. */
+    var r = confirm("是否列印?");
+    if (r == true) {
+        window.printRepairDoc(DocId);
+    }
+
+    var isMobile = $("#isMobile").val();
+    if (isMobile == 'Y') {
+        location.href = '../Mobile/Repair/Index';
+    }
+    else {
+        window.close();
+    }
+}
+
 function getAssetName() {
     var AssetNo = $("#AssetNo").val();
     $.ajax({
@@ -475,3 +498,4 @@ function SetEngsDropDown() {
         }
     });
 }
+

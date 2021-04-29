@@ -266,17 +266,31 @@
                 </div>
             </div>
         </div>
-        @if (user.DptId == "8420" || user.DptId == "7084") /* Only MedEngineer can search all engineer docs. */
-        {
-            <div class="row">
-                <div class=form-inline>
+        <div class="row">
+            <div class=form-inline>
+                @if (UserManager.IsInRole(User, "MedAssetMgr"))
+                {
+
+                    <div class="form-group">
+                        <label for="BMEDqtyLoc" class="control-title">院區</label>
+                        <select asp-for="BMEDqtyLoc" asp-items="@ViewData["Location"] as SelectList" class="form-control">
+                            <option value="">請選擇</option>
+                        </select>
+                    </div>
+                }
+                @if (user.DptId == "8420" || user.DptId == "7084") /* Only MedEngineer can search all engineer docs. */
+                {
+
+
                     <div class="form-group">
                         <label class="control-title">查詢所有<br />工程師案件</label>
                         <input type="checkbox" asp-for="BMEDKqtySearchAllDoc" style="margin: 7px 0px 0px 7px;" />
                     </div>
-                </div>
+
+
+                }
             </div>
-        }
+        </div>
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -297,7 +311,7 @@
                         <input id="BMEDbtnQTY" type="submit" value="查詢" class="btn btn-default btn-group-justified" />
                     </div>
                 </div>
-                <div class="form-group">
+                <div class="form-group"  style="padding-left:50px;">
                     <div>
                         <input type="button" class="btn btn-primary" id="BMEDkeepExportExcelBtn" value="匯出Excel" />
                     </div>

@@ -19,9 +19,9 @@
         <th style="width: 100px; text-align: right">
             @Html.DisplayNameFor(model => model.DocId)
         </th>
-        <th style="width: 100px; text-align: right">
+        @*<th style="width: 100px; text-align: right">
             @Html.DisplayNameFor(model => model.ApplyDate)
-        </th>
+        </th>*@
         <th style="text-align: right">
             @Html.DisplayNameFor(model => model.AccDptNo)
         </th>
@@ -54,9 +54,9 @@
             <td style="text-align: right">
                 @Html.DisplayFor(modelItem => item.DocId)
             </td>
-            <td style="text-align: right">
+            @*<td style="text-align: right">
                 @item.ApplyDate.ToString("yyyy/MM/dd")
-            </td>
+            </td>*@
             <td style="text-align: right">
                 @Html.DisplayFor(modelItem => item.AccDptNo)
             </td>

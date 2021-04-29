@@ -143,8 +143,55 @@
                 }
             });
         });
-    });
 
+        $("a[name='RepEdit']").click(function (event) {
+            event.preventDefault();
+            var id = $(this).attr('docid');
+            var typ = $(this).attr('doctyp');
+            var url = $(this).attr('href');
+            $.ajax({
+                url: '@Url.Action("IsConfirm","Repair")',
+                type: "POST",
+                dataType: "json",
+                data: { id : id, doctyp : typ },
+                success: function (data) {
+                    var tempwindow = window.open('_blank', 'rel=opener');
+                    tempwindow.location = url;
+                    //e.returnValue = true;
+                    
+                },
+                error: function (data) {
+                    alert(data.responseText);
+                    $('#btnQry').attr('disabled', "false");
+                }
+            });
+        });
+
+    });
+    function getQueryVariable(variable)
+    {
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+    }
+
+    //function onSuccessEdit(data) {
+    //    //var url = $('a').data('request-url');
+    //    $.Toast.hideToast();
+    //    var tempwindow=window.open('_blank', 'rel=opener');
+    //    tempwindow.location = url;
+    //    //alert($(this).attr('asp-route-doctyp'));
+    //    //window.open(url, '_blank', 'rel=opener')
+    //    //window.open();
+    //}
+    @*$(function () {
+        
+
+    });*@
 </script>
 <script src="~/js/Rel.js"></script>
 
@@ -257,7 +304,16 @@ else
                     <td width="100px">
                         @if (item.Flg == "?" && item.FlowUid == uid)
                         {
-                            @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                            @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId , doctyp = item.DocType}, new { docid = item.DocId,doctyp = item.DocType, target = "_blank" ,name = "RepEdit"})
+                            @*<a asp-action="IsConfirm" asp-controller="Repair" asp-area="BMED" asp-route-doctyp="@item.DocType" asp-route-id="@item.DocId" data-ajax="true"
+                               data-request-url="@Url.Action( "Edit", "Repair",new { id=@item.DocId})"
+                               data-ajax-method="POST"
+                               data-ajax-failure="onFailed"
+                               data-ajax-success="onSuccessEdit(data)"
+                               
+                               >
+                                編輯
+                            </a>*@
                             @Html.Raw(" |")
                             if (item.FlowCls == "驗收人" && item.IsCharged == "N" && !item.DealState.Contains("報廢"))
                             {
@@ -269,7 +325,15 @@ else
                                  (item.Flg == "?" && item.FlowCls.Contains("工程師") && dptid == "8420") ||
                                   item.Flg == "?" && item.FlowCls.Contains("工程師") && isEng) //其他工程師案件
                         {
-                            @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
+                            @Html.ActionLink("編輯", "Edit", "Repair", new { Area = "BMED", id = item.DocId,doctyp=item.DocType }, new { docid = item.DocId,doctyp = item.DocType, target = "_blank" ,name = "RepEdit"})
+                            @*<a asp-action="IsConfirm" asp-controller="Repair" asp-area="BMED" asp-route-doctyp="@item.DocType" asp-route-id="@item.DocId" 
+                               data-request-url="@Url.Action( "Edit", "Repair",new { id=@item.DocId})"
+                               data-ajax="true"
+                               data-ajax-method="POST"
+                               data-ajax-failure="onFailed"
+                               data-ajax-success="onSuccessEdit()">
+                                編輯
+                            </a>*@
                             @Html.Raw(" |")
                         }
                         else
@@ -277,7 +341,7 @@ else
                             @Html.ActionLink("預覽", "Views", "Repair", new { Area = "BMED", id = item.DocId }, new { target = "_blank" })
                             @Html.Raw(" |")
                         }
-                        @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank" ,rel = "opener"})
+                        @Html.ActionLink("列印", "PrintRepairDoc", "Repair", new { Area = "BMED", DocId = item.DocId }, new { target = "_blank", rel = "opener" })
                         @if (item.Flg == "?" && item.FlowUid == uid && item.FlowCls == "申請人")
                         {
                             @Html.Raw(" |")

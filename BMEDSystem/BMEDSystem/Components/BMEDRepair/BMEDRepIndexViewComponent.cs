@@ -120,6 +120,15 @@ namespace EDIS.Components.BMEDRepair
             {
                 ViewData["BMEDClsUsers"] = new SelectList(dptMemberList, "Value", "Text");
             }
+            List<SelectListItem> listItem6 = new List<SelectListItem>();
+            listItem6.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem6.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem6.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem6.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem6.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem6.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem6, "Value", "Text");
+
 
             QryRepListData data = new QryRepListData();
 

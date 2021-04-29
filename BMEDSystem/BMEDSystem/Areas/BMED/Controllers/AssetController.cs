@@ -233,6 +233,58 @@ namespace EDIS.Areas.BMED.Controllers
             return PartialView(asset);
         }
 
+        // 4/19 Add
+        // GET: BMED/Asset/Copy
+        public ActionResult CreateCopy(string id)
+        {
+            var asset = _context.BMEDAssets.Find(id);
+            if (asset == null)
+            {
+                return StatusCode(404);
+            }
+
+            List<SelectListItem> listItem = new List<SelectListItem>();
+            _context.Departments.ToList().ForEach(d =>
+            {
+                listItem.Add(new SelectListItem { Text = d.Name_C, Value = d.DptId });
+            });
+            ViewData["DelivDpt"] = new SelectList(listItem, "Value", "Text", "");
+
+            List<SelectListItem> listItem2 = new List<SelectListItem>();
+            listItem2.Add(new SelectListItem { Text = "", Value = "" });
+            ViewData["DelivUid"] = new SelectList(listItem2, "Value", "Text", "");
+
+            ViewData["AccDpt"] = new SelectList(listItem, "Value", "Text", "");
+
+            List<SelectListItem> listItem3 = new List<SelectListItem>();
+            listItem3.Add(new SelectListItem { Text = "正常", Value = "正常" });
+            listItem3.Add(new SelectListItem { Text = "報廢", Value = "報廢" });
+            ViewData["DisposeKind"] = new SelectList(listItem3, "Value", "Text", "");
+            //
+            List<SelectListItem> listItem4 = new List<SelectListItem>();
+            _context.BMEDDeviceClassCodes.ToList()
+                .ForEach(d =>
+                {
+                    listItem4.Add(new SelectListItem { Text = d.M_name, Value = d.M_code });
+                });
+            ViewData["BmedNo"] = new SelectList(listItem4, "Value", "Text", "");
+            //
+            // Get MedEngineers to set dropdownlist.
+            var s = roleManager.GetUsersInRole("MedEngineer").ToList();
+            List<SelectListItem> listItem5 = new List<SelectListItem>();
+            foreach (string l in s)
+            {
+                AppUserModel u = _context.AppUsers.Where(ur => ur.UserName == l).FirstOrDefault();
+                if (u != null)
+                {
+                    listItem5.Add(new SelectListItem { Text = u.FullName + "(" + u.UserName + ")", Value = u.Id.ToString() });
+                }
+            }
+            ViewData["AssetEngId"] = new SelectList(listItem5, "Value", "Text", "");
+
+            return View(asset);
+        }
+
         // GET: BMED/Asset/Create
         public ActionResult Create()
         {
@@ -783,29 +835,44 @@ namespace EDIS.Areas.BMED.Controllers
         {
             DataTable dt = new DataTable();
             DataRow dw;
-            dt.Columns.Add("類別");
+            dt.Columns.Add("院區");
+            //dt.Columns.Add("設備編號");
             dt.Columns.Add("財產編號");
+            dt.Columns.Add("合約編號");
+            dt.Columns.Add("財產立帳日.驗收日(取得日期)");
+            dt.Columns.Add("購入日");
             dt.Columns.Add("設備名稱");
-            dt.Columns.Add("成本中心代碼");
+            dt.Columns.Add("部門代號");
+            dt.Columns.Add("部門名稱");
+            dt.Columns.Add("保管人代號");
+            dt.Columns.Add("保管人名稱");
+            dt.Columns.Add("存放地點");
+            dt.Columns.Add("成本中心");
             dt.Columns.Add("成本中心名稱");
-            dt.Columns.Add("保管部門代碼");
-            dt.Columns.Add("保管部門名稱");
-            dt.Columns.Add("保管人員");
-            dt.Columns.Add("工程師名稱");
+            dt.Columns.Add("英文名稱");
             dt.Columns.Add("廠牌");
             dt.Columns.Add("規格");
             dt.Columns.Add("型號");
-            dt.Columns.Add("廠商名稱");
-            dt.Columns.Add("廠商統編");
             dt.Columns.Add("製造號碼");
+            dt.Columns.Add("廠商");
+            dt.Columns.Add("廠商(統編)");
+            dt.Columns.Add("廠商負責人");
+            dt.Columns.Add("E-mail");
+            //dt.Columns.Add("閒置等級");
+            dt.Columns.Add("財產種類");
             dt.Columns.Add("財產狀況");
             dt.Columns.Add("成本(取得金額)");
-            dt.Columns.Add("保養週期");
+            //dt.Columns.Add("專責單位代碼");
+            //dt.Columns.Add("專責單位名稱");
+            dt.Columns.Add("設備工程師代碼");
+            dt.Columns.Add("設備工程師名稱");
             dt.Columns.Add("保養起始月");
             dt.Columns.Add("保養方式");
-            dt.Columns.Add("維修工程師(保養用)");
-            dt.Columns.Add("購入日(取得日期)");
-            dt.Columns.Add("院區");
+            dt.Columns.Add("保養金額之最大值");
+            dt.Columns.Add("保養週期");
+            dt.Columns.Add("WORDPAD保養單");
+            dt.Columns.Add("備註");
+
 
             List<AssetModel> mv = QryAsset(v);
 
@@ -848,29 +915,42 @@ namespace EDIS.Areas.BMED.Controllers
             .ForEach(m =>
             {
                 dw = dt.NewRow();
-                dw[0] = m.asset.AssetClass;
+                dw[0] = m.asset.Location;
                 dw[1] = m.asset.AssetNo;
-                dw[2] = m.asset.Cname;
-                dw[3] = m.asset.AccDpt;
-                dw[4] = m.asset.AccDptName;
-                dw[5] = m.asset.DelivDpt;
-                dw[6] = m.asset.DelivDptName;
-                dw[7] = m.asset.DelivEmp;
-                dw[8] = m.user.FullName;
-                dw[9] = m.asset.Brand;
-                dw[10] = m.asset.Standard;
-                dw[11] = m.asset.Type;
-                dw[12] = m.vendor == null ? "" : m.vendor.VendorName;
-                dw[13] = m.vendor == null ? "" : m.vendor.UniteNo;
-                dw[14] = m.asset.MakeNo;
-                dw[15] = m.asset.DisposeKindC;
-                dw[16] = m.asset.Cost;
-                dw[17] = m.assetkeep == null ? null : m.assetkeep.Cycle;
-                dw[18] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
-                dw[19] = m.assetkeep == null ? "" : m.assetkeep.InOut;
-                dw[20] = m.assetkeep == null ? "" : m.assetkeep.KeepEngName;
-                dw[21] = m.asset.BuyDate == null ? "" : m.asset.BuyDate.Value.ToString("yyyy/MM/dd");
-                dw[22] = m.asset.Location;
+                dw[2] = m.assetkeep == null ? null : m.assetkeep.ContractNo;
+                dw[3] = m.asset.AccDate;
+                dw[4] = m.asset.BuyDate;
+                dw[5] = m.asset.Cname;
+                dw[6] = m.asset.DelivDpt;
+                dw[7] = m.asset.DelivDptName;
+                dw[8] = m.asset.DelivUid;
+                dw[9] = m.asset.DelivEmp;
+                dw[10] = m.asset.LeaveSite;
+                dw[11] = m.asset.AccDpt;
+                dw[12] = m.asset.AccDptName;
+                dw[13] = m.asset.Ename;
+                dw[14] = m.asset.Brand;
+                dw[15] = m.asset.Standard;
+                dw[16] = m.asset.Type;
+                dw[17] = m.asset.MakeNo;
+                dw[18] = m.vendor == null ? (int?)null : m.vendor.VendorId;
+                dw[19] = m.vendor == null ? null : m.vendor.Contact;
+                dw[20] = m.vendor == null ? null : m.vendor.UniteNo;
+                dw[21] = m.vendor == null ? "" : m.vendor.ContactEmail;
+                //dw[21] = "";
+                dw[22] = m.asset.AssetClass;
+                dw[23] = m.asset.DisposeKindC;
+                dw[24] = m.asset.Cost == null ? (int?)null : Convert.ToInt32(m.asset.Cost);
+                //dw[25] = "";
+                //dw[26] = "";
+                dw[25] = m.asset.AssetEngId;
+                dw[26] = m.asset.AssetEngName;
+                dw[27] = m.assetkeep == null ? null : m.assetkeep.KeepYm;
+                dw[28] = m.assetkeep == null ? null : m.assetkeep.InOut;
+                dw[29] = m.assetkeep == null ? null : m.assetkeep.Cost;
+                dw[30] = m.assetkeep == null ? null : m.assetkeep.Cycle;
+                dw[31] = m.assetkeep == null ? null : m.assetkeep.FormatId;
+                dw[32] = m.asset.Note;
                 dt.Rows.Add(dw);
             });
             //

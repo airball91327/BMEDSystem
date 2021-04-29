@@ -128,6 +128,16 @@ namespace EDIS.Components.BMEDKeep
                 ViewData["BMEDClsUsers"] = new SelectList(dptMemberList, "Value", "Text");
             }
 
+            List<SelectListItem> listItem7 = new List<SelectListItem>();
+            listItem7.Add(new SelectListItem { Text = "總院", Value = "總院" });
+            listItem7.Add(new SelectListItem { Text = "二林", Value = "L" });
+            listItem7.Add(new SelectListItem { Text = "員林", Value = "B" });
+            listItem7.Add(new SelectListItem { Text = "南投", Value = "N" });
+            listItem7.Add(new SelectListItem { Text = "鹿基", Value = "U" });
+            listItem7.Add(new SelectListItem { Text = "雲基", Value = "T" });
+            ViewData["Location"] = new SelectList(listItem7, "Value", "Text");
+
+
             QryKeepListData data = new QryKeepListData();
 
             return View(data);

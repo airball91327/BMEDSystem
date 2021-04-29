@@ -290,6 +290,7 @@
                             <br />
                         }
                         @Html.ActionLink("預覽", "Details", new { id = item.AssetNo }, new { target = "_blank" })
+                        @Html.ActionLink("複製新增", "CreateCopy", new { id = item.AssetNo })
                     </td>
                 </tr>
             }

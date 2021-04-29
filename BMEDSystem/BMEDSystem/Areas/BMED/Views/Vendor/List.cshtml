@@ -1,0 +1,138 @@
+﻿@model X.PagedList.IPagedList<EDIS.Models.VendorModel>
+
+@using X.PagedList.Mvc.Core;
+@using X.PagedList.Mvc.Common;
+
+@{
+    Layout = null;
+}
+
+<style type="text/css">
+    .Sche {
+        font-size: 2em;
+        color: red;
+    }
+
+    .hdtitle {
+        margin-top: 5px;
+    }
+
+    .docid {
+        margin-top: 5px;
+        color: green;
+        text-decoration: underline;
+    }
+
+    .table-hover > tbody > tr:hover {
+        background-color: cornflowerblue;
+    }
+
+    td {
+        min-width: 90px;
+        text-align: center;
+    }
+</style>
+
+
+@*<p>
+        <a class="btn btn-default" href="@Url.Action("AssetKpScheExcel", qry2)">匯出Excel</a>
+    </p>*@
+
+<table class="table" style="display:block; overflow-x:auto;">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().VendorName)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Address)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Tel)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Fax)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Email)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().UniteNo)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().StartDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().EndDate)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Status)
+        </th>
+        @*<th>
+            @Html.DisplayNameFor(model => model.FirstOrDefault().Kind)
+        </th>*@
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.VendorName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Address)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tel)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Fax)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.UniteNo)
+            </td>
+            @*<td>
+                    @Html.DisplayFor(modelItem => item.TaxAddress)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.TaxZipCode)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Contact)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactTel)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.ContactEmail)
+                </td>*@
+            <td>
+                @Html.DisplayFor(modelItem => item.StartDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.EndDate)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Status)
+            </td>
+            @*<td>
+                @Html.DisplayFor(modelItem => item.Kind)
+            </td>*@
+            <td style="min-width:120px !important;">
+                @Html.ActionLink("修改", "Edit", new { id = item.VendorId }, new { target = "_blank", rel = "opener" }) |
+                @Html.ActionLink("預覽", "Details", new { id = item.VendorId }, new { target = "_blank", rel = "opener" }) |
+                @Html.ActionLink("刪除", "Delete", new { id = item.VendorId }, new { target = "_blank", rel = "opener" })
+            </td>
+        </tr>
+    }
+
+</table>
+
+<div>
+    @Html.PagedListPager(Model,
+     page => Url.Action("Index", new { page = page }), PagedListRenderOptions.ClassicPlusFirstAndLast)
+</div>
+

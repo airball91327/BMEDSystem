@@ -56,15 +56,15 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 listItem.Add(new SelectListItem { Text = "設備主管", Value = "設備主管" });
             }
 
-            //額外流程控管
-            if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "N")   //有費用 & 非統包
-            {
-                var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
-                if (itemToRemove != null)
-                {
-                    listItem.Remove(itemToRemove);
-                }
-            }
+            //額外流程控管 04/16
+            //if (repairDtl.IsCharged == "Y" && repairDtl.NotInExceptDevice == "N")   //有費用 & 非統包
+            //{
+            //    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "驗收人");  //移除驗收人關卡，只醫工主管可結案
+            //    if (itemToRemove != null)
+            //    {
+            //        listItem.Remove(itemToRemove);
+            //    }
+            //}
             if (repairDtl.NotInExceptDevice == "N" || repairDtl.DealState == 4)    //非統包 or 報廢
             {
                 var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
@@ -102,6 +102,19 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                     listItem.Remove(itemToRemove);
                 }
             }
+
+            //Add New
+            //有統包 有費用 關卡工程師
+            //if (repairDtl.NotInExceptDevice == "Y" && repairFlow.Cls.Contains("工程師") && repairDtl.IsCharged == "Y")
+            //{
+            //    listItem.Add(new SelectListItem { Text = "賀康經辦", Value = "賀康經辦" });
+            //    var itemToRemove = listItem.SingleOrDefault(r => r.Value == "賀康主管");  //移除賀康主管關卡
+            //    if (itemToRemove != null)
+            //    {
+            //        listItem.Remove(itemToRemove);
+            //    }
+            //}
+
             //
             listItem.Add(new SelectListItem { Text = "其他", Value = "其他" });
             /* Insert values. */
@@ -123,11 +136,17 @@ namespace EDIS.Areas.BMED.Components.RepairFlow
                 {
                     if (repairDtl.IsCharged == "Y" || repairDtl.DealState == 4)
                     {
-                        var itemToRemove = listItem.SingleOrDefault(r => r.Value == "結案");
-                        if (itemToRemove != null)
+                        var itemToRemove1 = listItem.SingleOrDefault(r => r.Value == "結案");
+                        if (itemToRemove1 != null)
                         {
-                            listItem.Remove(itemToRemove);
+                            listItem.Remove(itemToRemove1);
                         }
+                    }
+                    //2021/04/28 去除申請人
+                    var itemToRemove2 = listItem.SingleOrDefault(r => r.Value == "申請人");
+                    if (itemToRemove2 != null)
+                    {
+                        listItem.Remove(itemToRemove2);
                     }
                 }
                 //無費用時單位主管可結案

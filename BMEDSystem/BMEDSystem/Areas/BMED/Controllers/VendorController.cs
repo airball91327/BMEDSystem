@@ -9,6 +9,9 @@ using EDIS.Models;
 using Microsoft.AspNetCore.Authorization;
 using EDIS.Models.Identity;
 using EDIS.Areas.WebService.Models;
+using Microsoft.AspNetCore.Http;
+using X.PagedList;
+using EDIS.Repositories;
 
 namespace EDIS.Areas.BMED.Controllers
 {
@@ -17,16 +20,41 @@ namespace EDIS.Areas.BMED.Controllers
     public class VendorController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly IRepository<DocIdStore, string[]> _dsRepo;
+        private int pageSize = 50;
 
-        public VendorController(ApplicationDbContext context)
+        public VendorController(ApplicationDbContext context,
+                                IRepository<DocIdStore, string[]> dsRepo)
         {
             _context = context;
+            _dsRepo = dsRepo;
         }
 
         // GET: Vendor
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            return View(await _context.BMEDVendors.ToListAsync());
+            return View();//await _context.BMEDVendors.ToListAsync()
+        }
+
+        [HttpPost]
+        public ActionResult Index(string name,string uniteno, int page = 1)
+        {
+            string qname = name;
+            string uno = uniteno;
+            List<VendorModel> mv = new List<VendorModel>();
+            var vt = _context.BMEDVendors.AsQueryable();
+            if (!string.IsNullOrEmpty(qname))
+            {
+                vt = vt.Where(v => v.VendorName.Contains(qname));
+            }
+            if (!string.IsNullOrEmpty(uno))
+            {
+                vt = vt.Where(v => v.UniteNo == uno);
+            }
+            mv = vt.ToList();
+            var vts =  mv.ToPagedList(page, pageSize);
+
+            return PartialView("List",vts);
         }
 
         // GET: Vendor/Details/5
@@ -50,7 +78,9 @@ namespace EDIS.Areas.BMED.Controllers
         // GET: Vendor/Create
         public IActionResult Create()
         {
-            return View();
+            VendorModel ven = new VendorModel();
+            ven.VendorId = Convert.ToInt32(GetID());
+            return View(ven);
         }
 
         // POST: Vendor/Create
@@ -60,13 +90,28 @@ namespace EDIS.Areas.BMED.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("VendorId,VendorName,Address,Tel,Fax,Email,UniteNo,TaxAddress,TaxZipCode,Contact,ContactTel,ContactEmail,StartDate,EndDate,Status,Kind")] VendorModel vendorModel)
         {
-            if (ModelState.IsValid)
+            var msg = "";
+            try
             {
-                _context.Add(vendorModel);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    _context.BMEDVendors.Add(vendorModel);
+                    await _context.SaveChangesAsync();
+                    return Ok(vendorModel);
+                }
+                else
+                {
+                    foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                    {
+                        msg += error.ErrorMessage + Environment.NewLine;
+                    }
+                }
             }
-            return View(vendorModel);
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+            return BadRequest(msg);
         }
 
         // GET: Vendor/Edit/5
@@ -74,13 +119,14 @@ namespace EDIS.Areas.BMED.Controllers
         {
             if (id == null)
             {
-                return NotFound();
+                return StatusCode(404);
             }
 
             var vendorModel = await _context.BMEDVendors.SingleOrDefaultAsync(m => m.VendorId == id);
+            
             if (vendorModel == null)
             {
-                return NotFound();
+                return BadRequest("查無資料!");
             }
             return View(vendorModel);
         }
@@ -92,32 +138,37 @@ namespace EDIS.Areas.BMED.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("VendorId,VendorName,Address,Tel,Fax,Email,UniteNo,TaxAddress,TaxZipCode,Contact,ContactTel,ContactEmail,StartDate,EndDate,Status,Kind")] VendorModel vendorModel)
         {
-            if (id != vendorModel.VendorId)
+            var vendor =  _context.BMEDVendors.Where(m => m.VendorId == id);
+            var msg = "";
+            if (vendor == null)
             {
-                return NotFound();
+                return StatusCode(404);
             }
 
-            if (ModelState.IsValid)
+            try
             {
-                try
+                if (ModelState.IsValid)
                 {
-                    _context.Update(vendorModel);
+                    _context.Entry(vendorModel).State = EntityState.Modified;
+                    _context.BMEDVendors.Update(vendorModel);
                     await _context.SaveChangesAsync();
+                    return Ok(vendorModel);
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!VendorModelExists(vendorModel.VendorId))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                  foreach (var error in ViewData.ModelState.Values.SelectMany(modelState => modelState.Errors))
+                  {
+                     msg += error.ErrorMessage + Environment.NewLine;
+                  }
                 }
-                return RedirectToAction(nameof(Index));
             }
-            return View(vendorModel);
+
+            catch (Exception ex)
+            {
+                msg = ex.Message;
+            }
+
+            return BadRequest(msg);
         }
 
         // GET: Vendor/Delete/5
@@ -269,6 +320,47 @@ namespace EDIS.Areas.BMED.Controllers
             if (vv.Count > 0)
                 return "";
             return "*此廠商尚未建檔";
+        }
+
+        public string GetID()
+        {
+            string did = "";
+            try
+            {
+                DocIdStore ds = new DocIdStore();
+                ds.DocType = "廠商資料";
+                string s = _dsRepo.Find(x => x.DocType == "廠商資料").Select(x => x.DocId).Max();
+                int yymmdd = (System.DateTime.Now.Year - 1911) * 1000 + (System.DateTime.Now.Month) * 100 + System.DateTime.Now.Day ;
+                if (!string.IsNullOrEmpty(s))
+                {
+                    did = s;
+                }
+                if (did != "")
+                {
+                    if (Convert.ToInt64(did) / 1000 == yymmdd)
+                        did = Convert.ToString(Convert.ToInt64(did) + 1);
+                    else
+                        did = Convert.ToString(yymmdd * 1000 + 1);
+                    ds.DocId = did;
+                    _dsRepo.Update(ds);
+                }
+                else
+                {
+                    did = Convert.ToString(yymmdd * 1000 + 1);
+                    ds.DocId = did;
+                    // 二次確認資料庫內沒該資料才新增。
+                    var dataIsExist = _dsRepo.Find(x => x.DocType == "廠商資料");
+                    if (dataIsExist.Count() == 0)
+                    {
+                        _dsRepo.Create(ds);
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                RedirectToAction("Create", "Repair", new { Area = "BMED" });
+            }
+            return did;
         }
 
         protected override void Dispose(bool disposing)

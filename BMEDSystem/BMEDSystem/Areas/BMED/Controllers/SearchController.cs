@@ -434,7 +434,7 @@ namespace EDIS.Areas.BMED.Controllers
         /// <returns></returns>
         // POST: BMED/Search/GetRepQryList
         [HttpPost]
-        public IActionResult GetRepKeeoQryList(QryRepKeepListData qdata, int page = 1)
+        public IActionResult GetRepKeepQryList(QryRepKeepListData qdata, int page = 1)
         {
             TempData["qry"] = JsonConvert.SerializeObject(qdata);
             List<RepKeepSearchListViewModel> rv = new List<RepKeepSearchListViewModel>();
@@ -480,6 +480,7 @@ namespace EDIS.Areas.BMED.Controllers
 
         public List<RepKeepSearchListViewModel> GetQryRepData(QryRepKeepListData qdata)
         {
+            TempData["qry"] = JsonConvert.SerializeObject(qdata);
             string docid = qdata.BMEDqtyDOCID;
             string ano = qdata.BMEDqtyASSETNO;
             string acc = qdata.BMEDqtyACCDPT;
@@ -1276,6 +1277,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyUserId = qdata.BMEDqtyUserId;
             string qtyClsUser = qdata.BMEDqtyClsUser;
             string qtyLoc = qdata.BMEDqtyLoc;
+            int? qtyDay = qdata.BMEDqtyDay;
             DateTime applyDateFrom = DateTime.Now;
             DateTime applyDateTo = DateTime.Now;
             /* Dealing search by date. */
@@ -1450,7 +1452,7 @@ namespace EDIS.Areas.BMED.Controllers
                         DealState = j.statuse.Title,
                         DealDes = j.flow.rf.repdtl.DealDes,
                         Cost = j.flow.rf.repdtl.Cost,
-                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Days = j.flow.rf.repdtl.EndDate == null ? (int?)null : DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
                         Flg = j.flow.rf.flow.Status,
                         FlowUid = j.flow.rf.flow.UserId,
                         FlowCls = j.flow.rf.flow.Cls,
@@ -1506,7 +1508,7 @@ namespace EDIS.Areas.BMED.Controllers
                         DealState = j.statuse.Title,
                         DealDes = j.flow.rf.repdtl.DealDes,
                         Cost = j.flow.rf.repdtl.Cost,
-                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Days = j.flow.rf.repdtl.EndDate == null ? (int?)null : DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
                         Flg = j.flow.rf.flow.Status,
                         FlowUid = j.flow.rf.flow.UserId,
                         FlowCls = j.flow.rf.flow.Cls,
@@ -1567,7 +1569,7 @@ namespace EDIS.Areas.BMED.Controllers
                         DealState = j.statuse.Title,
                         DealDes = j.flow.rf.repdtl.DealDes,
                         Cost = j.flow.rf.repdtl.Cost,
-                        Days = DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Days = j.flow.rf.repdtl.EndDate == null ? (int?)null : DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
                         Flg = j.flow.rf.flow.Status,
                         FlowUid = j.flow.rf.flow.UserId,
                         FlowCls = j.flow.rf.flow.Cls,
@@ -1590,6 +1592,10 @@ namespace EDIS.Areas.BMED.Controllers
             if (!string.IsNullOrEmpty(qtyClsUser))   //目前關卡人員
             {
                 rv = rv.Where(r => r.FlowUid == Convert.ToInt32(qtyClsUser)).ToList();
+            }
+            if (!string.IsNullOrEmpty(qtyDay.ToString()))   //天數
+            {
+                rv = rv.Where(r => r.Days >= qtyDay &&　r.Days != null).ToList();
             }
 
             /* If no search result. */
@@ -1919,6 +1925,65 @@ namespace EDIS.Areas.BMED.Controllers
                     }));
                         break;
                 }
+            }
+            else
+            {
+                var ss = new[] { "?", "2" };
+
+                var repairFlows3 = rps.Join(_context.BMEDRepairFlows.Where(f => ss.Contains(f.Status)), r => r.DocId, f => f.DocId,
+                            (r, f) => new { repair = r, flow = f });
+
+                repairFlows3.Join(_context.BMEDRepairDtls, m => m.repair.DocId, d => d.DocId,
+                    (m, d) => new
+                    {
+                        repair = m.repair,
+                        flow = m.flow,
+                        repdtl = d
+                    })
+                    .Join(_context.Departments, j => j.repair.AccDpt, d => d.DptId,
+                    (j, d) => new
+                    {
+                        repair = j.repair,
+                        flow = j.flow,
+                        repdtl = j.repdtl,
+                        dpt = d
+                    })
+                     .Join(_context.AppUsers,
+                            j => j.flow.UserId,
+                            u => u.Id,
+                            (j, u) => new { rf = j, ur = u }
+                            )
+                    .Join(_context.BMEDDealStatuses,
+                            j => j.rf.repdtl.DealState,
+                            f => f.Id,
+                            (j, f) => new { flow = j, statuse = f }
+                            )
+                    .ToList()
+                    .ForEach(j => rv.Add(new RepairSearchListVModel
+                    {
+                        DocType = "請修",
+                        RepType = j.flow.rf.repair.RepType,
+                        DocId = j.flow.rf.repair.DocId,
+                        ApplyDate = j.flow.rf.repair.ApplyDate,
+                        PlaceLoc = j.flow.rf.repair.PlaceLoc,
+                        ApplyDpt = j.flow.rf.repair.DptId,
+                        AccDpt = j.flow.rf.repair.AccDpt,
+                        AccDptName = j.flow.rf.dpt.Name_C,
+                        TroubleDes = j.flow.rf.repair.TroubleDes,
+                        DealState = j.statuse.Title,
+                        DealDes = j.flow.rf.repdtl.DealDes,
+                        Cost = j.flow.rf.repdtl.Cost,
+                        Days = j.flow.rf.repdtl.EndDate == null ? (int?)null : DateTime.Now.Subtract(j.flow.rf.repair.ApplyDate).Days,
+                        Flg = j.flow.rf.flow.Status,
+                        FlowUid = j.flow.rf.flow.UserId,
+                        FlowCls = j.flow.rf.flow.Cls,
+                        FlowUidName = j.flow.ur.FullName,
+                        EndDate = j.flow.rf.repdtl.EndDate,
+                        CloseDate = j.flow.rf.repdtl.CloseDate,
+                        IsCharged = j.flow.rf.repdtl.IsCharged,
+                        IsPurchase = j.flow.rf.repair.IsPurchased,
+                        repdata = j.flow.rf.repair
+                    }));
             }
             if (!string.IsNullOrEmpty(qtyDealStatus))   //處理狀態
             {
@@ -2279,6 +2344,7 @@ namespace EDIS.Areas.BMED.Controllers
             {
                 return PartialView("KeepQryList", kv.ToPagedList(page, pageSize));
             }
+            //var kpss = kps.ToList();
 
             kps.Join(keepFlows, k => k.DocId, f => f.DocId,
                 (k, f) => new

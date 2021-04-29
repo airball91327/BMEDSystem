@@ -147,5 +147,7 @@ namespace EDIS.Areas.FORMS.Models
         public string Application { get; set; }
         [Display(Name = "審核內容")]
         public string Content { get; set; }
+        [Display(Name = "流程提示")]
+        public string Hint { get; set; }
     }
 }

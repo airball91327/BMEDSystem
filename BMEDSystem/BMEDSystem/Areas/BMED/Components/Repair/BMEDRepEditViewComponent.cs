@@ -32,8 +32,11 @@ namespace EDIS.Areas.BMED.Components.Repair
 
             /* Get and set value for NotMapped fields. */
             repair.DptName = _context.Departments.Find(repair.DptId).Name_C;
+            repair.DptName = repair.DptName + "(" + repair.DptId + ")";
             repair.AccDptName = _context.Departments.Find(repair.AccDpt).Name_C;
             repair.CheckerName = _context.AppUsers.Find(repair.CheckerId).FullName;
+            repair.UserName = repair.UserName + "(" + repair.UserId + ")";
+
 
             if (repair.AssetNo != null)
             {

@@ -84,6 +84,9 @@ namespace EDIS.Areas.FORMS.Components.OutsideBmed
             assign.item5 = of.item5;
             assign.item6 = of.item6;
             assign.item7 = of.item7;
+
+            assign.Hint = "申請者→申請單位主管→醫工承辦(施曉婷)→醫工部工程師→醫工部主管→結案";
+
             return View(assign);
         }
 

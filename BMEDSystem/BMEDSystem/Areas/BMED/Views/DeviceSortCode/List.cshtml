@@ -5,12 +5,10 @@
 
 @{
     ViewBag.Title = "列表/設備分類編碼";
-    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    Layout = "";
 }
 
-<p>
-    @Html.ActionLink("新增", "Create")
-</p>
+
 
 @if (Model.Count() <= 0)
 {
@@ -44,8 +42,10 @@ else
                 <td>
                     @Html.DisplayFor(modelItem => item.Status)
                 </td>
-                <td>
-                    @Html.ActionLink("修改", "Edit", new { id = item.M_code }, new { target = "_blank", rel = "opener" })
+                 <td style="min-width:120px !important;">
+                    @Html.ActionLink("修改", "Edit", new { id = item.M_code }, new { target = "_blank", rel = "opener" }) |
+                    @Html.ActionLink("預覽", "Details", new { id = item.M_code }, new { target = "_blank", rel = "opener" }) |
+                    @Html.ActionLink("刪除", "Delete", new { id = item.M_code }, new { target = "_blank", rel = "opener" })
                 </td>
             </tr>
         }

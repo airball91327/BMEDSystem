@@ -77,6 +77,8 @@ namespace EDIS.Areas.BMED.Controllers
             keep.AssetNo = "";
             keep.EngId = 0;
             keep.Loc = "總院";
+            keep.Src = "M";
+
             //
             if (userDpt != null)
             {
@@ -237,7 +239,6 @@ namespace EDIS.Areas.BMED.Controllers
                     //keep.AccDpt = at.AccDpt;
                     keep.SentDate = DateTime.Now;
                     keep.Cycle = kp == null ? 0 : (kp.Cycle == null ? 0 : kp.Cycle.Value);
-                    keep.Src = "M";
                     _context.Entry(keep).State = EntityState.Modified;
                     //
                     KeepDtlModel dl = new KeepDtlModel();
@@ -429,6 +430,7 @@ namespace EDIS.Areas.BMED.Controllers
             string qtyVendor = qdata.BMEDKqtyVendor;
             string qtyClsUser = qdata.BMEDKqtyClsUser;
             string qtyInOut = qdata.BMEDKInOut;
+            string qtyLoc = qdata.BMEDqtyLoc;
 
             //至少輸入一個搜尋條件
             if (docid == null && ano == null && acc == null && aname == null && ftype == "請選擇" &&
@@ -489,11 +491,21 @@ namespace EDIS.Areas.BMED.Controllers
             /* Get login user's location. */
             var urLocation = new DepartmentModel(_context).GetUserLocation(ur);
             //
+            if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
+            {
+                if (!string.IsNullOrEmpty(qtyLoc))
+                {
+                    urLocation = qtyLoc;
+                }
+            }
             // 依照院區搜尋Keep主檔
             var kps = _context.BMEDKeeps.Where(r => r.Loc == urLocation);
             if (userManager.IsInRole(User, "MedAssetMgr")) //賀康主管不做院區篩選
             {
-                kps = _context.BMEDKeeps;
+                if (string.IsNullOrEmpty(qtyLoc))
+                {
+                    kps = _context.BMEDKeeps;
+                }   
             }
             if (!string.IsNullOrEmpty(docid))   //表單編號
             {
@@ -1171,6 +1183,7 @@ namespace EDIS.Areas.BMED.Controllers
             return PartialView("Update", keep);
         }
 
+        [AllowAnonymous]
         // GET: BMED/Keep/Views
         public IActionResult Views(string id)
         {
@@ -1436,6 +1449,9 @@ namespace EDIS.Areas.BMED.Controllers
                     break;
                 case "設備工程師":
                     s = roleManager.GetUsersInRole("MedEngineer").ToList();
+                    break;
+                case "賀康經辦":
+                    s = roleManager.GetUsersInRole("MedAssetDoTo").ToList();
                     break;
                 default:
                     break;

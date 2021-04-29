@@ -6,7 +6,55 @@
 }
 <script src="~/js/BMED/RepCreate.js" asp-append-version="true"></script>
 
+<script>
+    $(document).ready(function () {
+        HasAssetNo();
+        IsAccDpt();
+    });
 
+    function IsAccDpt() {
+        var accdpt = @Model.AccDpt;
+        var dptId = @Model.DptId;
+        if (accdpt == dptId) {
+            document.getElementById("LocType1").checked = true;
+            document.getElementById("LocType2").checked = false;
+            $("#AccDpt").attr("readonly", "readonly");
+            $("#AccDptName").attr("readonly", "readonly");
+        }
+        else {
+            //alert("空!");
+            document.getElementById("LocType1").checked = false;
+            document.getElementById("LocType2").checked = true;
+            $("#divLocations").show();
+            $("#AccDpt").removeAttr("readonly");
+            $("#AccDptName").removeAttr("readonly");
+        }
+    }
+
+    function HasAssetNo() {
+        var assetno = @Model.AssetNo;
+        if (assetno != "" && assetno != "undefined") {
+            // alert(assetno);
+            //$('#checkbox1').prop('checked', true);
+            document.getElementById("checkbox1").checked = true;
+            document.getElementById("checkbox2").checked = false;
+            $("#rowAssetNo").show();
+            $("#rowAssetAccDate").show();
+            //$('#checkbox2').prop('checked', false);
+        }
+        else {
+            // alert("空!");
+            //$('#checkbox1').prop('checked', false);
+            //$('#checkbox2').prop('checked', true);
+            document.getElementById("checkbox1").checked = false;
+            document.getElementById("checkbox2").checked = true;
+            $("#rowAssetNo").hide();
+            $("#rowAssetAccDate").hide();
+        }
+    }
+
+    
+</script>
 
 <style>
     /* Style the scale of checkbox. */
@@ -16,6 +64,7 @@
         -webkit-transform: scale(1.5); /* Safari and Chrome */
         -o-transform: scale(1.5); /* Opera */
     }
+
     .requiredTag {
         color: red;
     }
@@ -42,7 +91,7 @@
       'duration':0
       })"
       data-ajax-failure="onFailed"
-      data-ajax-success="onSuccess()">
+      data-ajax-success="onSuccessAgain()">
     <div class="container">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         @Html.HiddenFor(model => model.UserId)
@@ -52,6 +101,7 @@
                 <div class=form-group>
                     <label asp-for="DocId" class="control-title"></label>
                     <input asp-for="DocId" class="form-control" readonly />
+                    @*@Html.EditorFor(model => model.DocId, new { htmlAttributes = new { @class = "form-control", @readonly = "readonly" } })*@
                     <span asp-validation-for="DocId" class="text-danger"></span>
                 </div>
             </div>
@@ -118,11 +168,11 @@
                     </label>
                 </div>
                 @*<div class="radio">
-                    <label>
-                        <input type="radio" name="LocType" id="LocType3" value="其他單位">
-                        其他單位
-                    </label>
-                </div>*@
+                        <label>
+                            <input type="radio" name="LocType" id="LocType3" value="其他單位">
+                            其他單位
+                        </label>
+                    </div>*@
             </div>
         </div>
         <div class="row">
@@ -140,8 +190,8 @@
             <div class=form-inline>
                 <div class="form-group">
                     <label class="control-title">有無財編</label>
-                    <input type="radio" value="Y" name="hasAssetNo" style="margin: 7px 0px 0px 7px;" checked><span>   有</span>
-                    <input type="radio" value="N" name="hasAssetNo" style="margin: 7px 0px 0px 7px;"><span>   無</span>
+                    <input type="radio" value="Y" name="hasAssetNo" style="margin: 7px 0px 0px 7px;" id="checkbox1"><span>   有</span>
+                    <input type="radio" value="N" name="hasAssetNo" style="margin: 7px 0px 0px 7px;" id="checkbox2"><span>   無</span>
                 </div>
             </div>
         </div>
@@ -153,7 +203,7 @@
                         <input type="text" placeholder="輸入財編或關鍵字查詢" class="form-control" id="AssetQry" />
                         <button type="button" class="btn btn-default" id="AssetQryBtn">查詢</button>
                         <select asp-for="AssetNo" asp-items="@ViewData["DefaultAssets"] as SelectList" class="form-control" id="AssetNo">
-                            <option disabled selected>請選擇</option>
+                            @*<option disabled selected>請選擇</option>*@
                         </select>
                         <span class="requiredTag">*</span>
                         <span asp-validation-for="AssetNo" class="text-danger"></span>
@@ -248,31 +298,19 @@
             </div>
         </div>
         @*<div class="row" id="DptMgr">
-            <div class=form-inline>
-                <div class="form-group">
-                    <label asp-for="DptMgrId" class="control-title"></label>
-                    <input type="text" placeholder="輸入code或關鍵字查詢" class="form-control" id="DptMgrQry" />
-                    <button type="button" class="btn btn-default" id="MgrQryBtn">查詢</button>
-                    <select asp-for="DptMgrId" class="form-control" id="DptMgrId">
-                        <option disabled selected>請選擇</option>
-                    </select>
-                    <span asp-validation-for="DptMgrId" class="text-danger"></span>
-                    <span style="color:#ff6161">*需簽至單位主任，再轉工程師</span>
+                <div class=form-inline>
+                    <div class="form-group">
+                        <label asp-for="DptMgrId" class="control-title"></label>
+                        <input type="text" placeholder="輸入code或關鍵字查詢" class="form-control" id="DptMgrQry" />
+                        <button type="button" class="btn btn-default" id="MgrQryBtn">查詢</button>
+                        <select asp-for="DptMgrId" class="form-control" id="DptMgrId">
+                            <option disabled selected>請選擇</option>
+                        </select>
+                        <span asp-validation-for="DptMgrId" class="text-danger"></span>
+                        <span style="color:#ff6161">*需簽至單位主任，再轉工程師</span>
+                    </div>
                 </div>
-            </div>
-        </div>*@
-        <div class="row">
-            <div class=form-inline id="DptEmp">
-                <div class="form-group">
-                    <label  class="control-title">保管部門</label>
-                    <input type="text" placeholder="輸入部門代號或關鍵字查詢" class="form-control" id="DptQry" />
-                    <button type="button" class="btn btn-default" id="DptQryBtn">查詢</button>
-                    <select asp-items="@ViewData["AccDpt"] as SelectList" class="form-control" id="EmpDpt">
-                        <option disabled selected>請選擇</option>
-                    </select>
-                </div>
-            </div>
-        </div>
+            </div>*@
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -283,16 +321,16 @@
             </div>
         </div>
         @*<div class="row">
-            <div class=form-inline>
-                <div class="form-group">
-                    <label asp-for="PrimaryEngId" class="control-title"></label>
-                    <select asp-for="PrimaryEngId" asp-items="@ViewData["AllEngs"] as SelectList" class="form-control" id="PrimaryEngId">
-                        <option value=0>無</option>
-                    </select>
-                    <span asp-validation-for="PrimaryEngId" class="text-danger"></span>
+                <div class=form-inline>
+                    <div class="form-group">
+                        <label asp-for="PrimaryEngId" class="control-title"></label>
+                        <select asp-for="PrimaryEngId" asp-items="@ViewData["AllEngs"] as SelectList" class="form-control" id="PrimaryEngId">
+                            <option value=0>無</option>
+                        </select>
+                        <span asp-validation-for="PrimaryEngId" class="text-danger"></span>
+                    </div>
                 </div>
-            </div>
-        </div>*@
+            </div>*@
         <div class="row">
             <div class=form-inline>
                 <div class="form-group">
@@ -333,14 +371,10 @@
     </div>
 </form>
 <div>
-    <a asp-action="Index" asp-controller="Home" asp-area="">回到列表</a>
+    <input value="回到列表" type="button" class="btn btn-default" onclick="window.close();"/>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
 
 }
-
-<script>
-    $("#DptEmp").hide();
-</script>

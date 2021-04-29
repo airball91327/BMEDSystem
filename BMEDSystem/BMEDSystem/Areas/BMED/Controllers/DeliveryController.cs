@@ -495,7 +495,7 @@ namespace EDIS.Areas.BMED.Controllers
         //
         // POST: /Delivery/Create
         [HttpPost]
-        public IActionResult Create(DeliveryModel delivery)
+        public async Task<IActionResult> CreateAsync(DeliveryModel delivery)
         {
             string msg = "";
             try
@@ -547,11 +547,71 @@ namespace EDIS.Areas.BMED.Controllers
                         _context.Entry(a).State = EntityState.Modified;
                     }
                     //
-                    var assets = AssetAdd(delivery.ContractNo).GetAwaiter().GetResult(); ;
+                    //AssetAdd(delivery.ContractNo, delivery.BudgetId);//.GetAwaiter().GetResult(); 
                     //
-                     _context.BMEDAssets.Add(assets);
-                     _context.SaveChanges();
-
+                    if(!string.IsNullOrEmpty(delivery.ContractNo) && !string.IsNullOrEmpty(delivery.BudgetId)) { 
+                        List<QryVendorData> rv = new List<QryVendorData>();
+                        var s = "[" + "{" + "type:" + "null" + "," + "contract_no:" + delivery.ContractNo + "}" + "]";//new { type, contract_no }.ToString().Replace("=", ":");//"[" + "{" + "type:" + type + "," + "contract_no:" + contract_no + "}" + "]";
+                                                                                                      // var s = "{"+"type:" + type + "," + "contract_no:" + contract_no+"}";
+                        HttpClient client = new HttpClient();
+                        //var str = JsonConvert.SerializeObject(s);
+                        HttpContent content = new StringContent(s, Encoding.UTF8, "application/json");
+                        client.BaseAddress = new Uri("https://api.cch.org.tw/HIS_WS_CONTRACT/");//
+                        string url = "AssetApi/Get_Info"; //BmedWebApi
+                        client.DefaultRequestHeaders.Accept.Clear();
+                        client.DefaultRequestHeaders.Accept.Add(
+                            new MediaTypeWithQualityHeaderValue("application/json"));
+                        //HttpResponseMessage response = await client.GetAsync(url);
+                        HttpResponseMessage response = await client.PostAsync(url, content);
+                        string rstr = "";
+                        if (response.IsSuccessStatusCode)
+                        {
+                            rstr = await response.Content.ReadAsStringAsync();
+                            if (!string.IsNullOrEmpty(rstr))
+                            {
+                                rv.AddRange(JsonConvert.DeserializeObject<List<QryVendorData>>(rstr));
+                            }
+                        }
+                        client.Dispose();
+                        if (rv.Where(r => r.CONTRACT_NO.Contains("Error")).Count() > 0 || rv == null || rv.Count() <= 0)
+                        {
+                            
+                        }
+                        else { 
+                            rv = rv.Where(r => r.PURCHASE_NO == delivery.BudgetId)
+                                .GroupJoin(_context.BMEDAssets,
+                                        r => r.ASSET_NO,
+                                        a => a.AssetNo,
+                                        (r,a) => new { r,a})
+                                .SelectMany(x => x.a.DefaultIfEmpty(),(r,a) => new { vendor = r.r, a})
+                                .Where(x => x.a == null)
+                                .Select(x => x.vendor)
+                                .ToList();
+                            if (rv.Count > 0) { 
+                                AssetModel asset = new AssetModel();
+                                rv.ForEach(r =>
+                                {
+                                    asset.AssetNo = r.ASSET_NO;
+                                    asset.AssetClass = "醫療儀器";
+                                    asset.Cname = r.PLANT_NAME;
+                                    asset.AccDate = null;
+                                    asset.BuyDate = null;
+                                    asset.RelDate = null;
+                                    asset.Brand = r.BRAND;
+                                    asset.Type = r.MODEL;
+                                    asset.VendorId = Int32.Parse(r.VENDOR_NO);
+                                    asset.DisposeKind = "正常";
+                                    asset.DelivDpt = r.DELIV_DPT;
+                                    asset.AccDpt = r.DPT_COD;
+                                    asset.Rtt = DateTime.Now;
+                                    _context.BMEDAssets.Add(asset);
+                                });
+                            }
+                        }
+                    }
+                    //_context.BMEDAssets.Add(assets);
+                    //_context.SaveChanges();
+                    await _context.SaveChangesAsync();
                     //----------------------------------------------------------------------------------
                     // Mail
                     //----------------------------------------------------------------------------------
@@ -914,7 +974,7 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             client.Dispose();
-            if (rv.Where(r => r.CONTRACT_NO.Contains("Error")).Count() > 0 || rv == null)
+            if (rv.Where(r => r.CONTRACT_NO.Contains("Error")).Count() > 0 || rv == null || rv.Count() <= 0)
             {
                 return BadRequest("查無資料");
             }
@@ -924,14 +984,28 @@ namespace EDIS.Areas.BMED.Controllers
             first.VENDOR_NO = ven.VendorId.ToString();
             first.VENDOR_NAME = ven.VendorName;
 
-            if (first.PURCHASE_NO.Contains("-") == true) { 
-                first.PURCHASE_NO = first.PURCHASE_NO.Split(new char[] { '-' })[0];
-            }
+            List<SelectListItem> listItem = new List<SelectListItem>();
+            SelectListItem li;
+            rv.Select(r => r.PURCHASE_NO).Distinct().ToList().ForEach(d =>
+            {
+                li = new SelectListItem();
+                li.Text = d;
+                li.Value = d;
+                listItem.Add(li);
 
-            return Json(first);
+            });
+            //if (first.PURCHASE_NO.Contains("-") == true) { 
+            //    first.PURCHASE_NO = first.PURCHASE_NO.Split(new char[] { '-' })[0];
+            //}
+            s = JsonConvert.SerializeObject(listItem);
+            return Json(new
+            {
+                first = first,
+                purchase = s
+            });
         }
 
-        public async Task<AssetModel> AssetAdd(string ctn)
+        public async void AssetAdd(string ctn,string bud)
         {
             List<QryVendorData> rv = new List<QryVendorData>();
             //
@@ -958,10 +1032,10 @@ namespace EDIS.Areas.BMED.Controllers
                 }
             }
             client.Dispose();
-
+            rv = rv.Where(r => r.PURCHASE_NO == bud).ToList();
             AssetModel asset = new AssetModel();
-            rv.ForEach(r =>
-           {
+            rv.ForEach(r => 
+            {
                asset.AssetNo = r.ASSET_NO;
                asset.AssetClass = "醫療儀器";
                asset.Cname = r.PLANT_NAME;
@@ -975,8 +1049,9 @@ namespace EDIS.Areas.BMED.Controllers
                asset.DelivDpt = r.DELIV_DPT;
                asset.AccDpt = r.DPT_COD;
                asset.Rtt = DateTime.Now;
-           });
-            return asset;
+            });
+            //asset.AddRange();
+            //return asssetList;
         }
 
         protected override void Dispose(bool disposing) 

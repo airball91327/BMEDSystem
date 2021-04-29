@@ -2,7 +2,7 @@
 
 @{
     ViewBag.Title = "新增/最新消息";
-    Layout = "~/Views/Shared/_PassedLayout.cshtml";
+    Layout = "~/Views/Shared/_LayoutNtitle.cshtml";
 }
 
 
@@ -25,7 +25,7 @@
 
 <script>
     function onSuccess(data) {
-        var homeHref = "@Url.Action("Index","News",new { Area=""})";
+        var homeHref = "@Url.Action("Index2","News",new { Area=""})";
         $("#btnGO").attr("disabled", false);
         if (data.success == false) {
         alert(data.error);
@@ -33,11 +33,11 @@
     else {
         alert("送出成功!");
 
-        /* window.close(), 當前非彈出視窗在最新版本的chrome和firefox裡不能關閉，而在IE中是可以關閉的 
+        /* window.close(), 當前非彈出視窗在最新版本的chrome和firefox裡不能關閉，而在IE中是可以關閉的
          * 非彈出視窗，即是指（opener=null 及 非window.open()開啟的視窗,比如URL直接輸入的瀏覽器窗體， 或由其它程式呼叫產生的瀏覽器視窗）
          */
         if (window.opener == null) {
-           
+
             location.replace(homeHref);
         }
         else {
@@ -121,16 +121,16 @@
 
         <div class="row">
             <div style="padding-left: 115px">
-                <input id ="btnGO" type="submit" value="確定送出" class="btn btn-default" />
+                <input id="btnGO" type="submit" value="確定送出" class="btn btn-default" />
             </div>
         </div>
 
     </div>
 </form>
 
-@*<div>
-    <a asp-action="Index" asp-controller="News" asp-area="">回到列表</a>
-</div>*@
+<div>
+    <a asp-action="Index2" asp-controller="News" asp-area="">回到列表</a>
+</div>
 
 <div>
     @section Scripts {

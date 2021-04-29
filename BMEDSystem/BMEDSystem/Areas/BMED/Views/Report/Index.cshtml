@@ -107,7 +107,7 @@
                 }
             });
 
-    };
+        };
 
 
 
@@ -147,19 +147,30 @@
                 <input name="AssetClass3" id="AssetClass3" type="checkbox" value="資訊設備" />資訊設備
             </div>
         </div>
+        @if (Model.ReportClass == "超過五日案件清單")
+        {
+            <div class="form-group">
+                @Html.LabelFor(model => model.Manage, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    <input name="Manage" id="Manage1" type="radio" value="" checked = "checked"/>全部
+                    <input name="Manage" id="Manage2" type="radio" value="固資" />固資
+                    <input name="Manage" id="Manage3" type="radio" value="列管" />列管
+                </div>
+            </div>
+        }
 
         @if (Model.ReportClass == "月維修清單" || Model.ReportClass == "月保養清單")
         {
-            <div class="form-group">
-                @Html.LabelFor(model => model.DateType, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    <select asp-for="DateType" class="form-control">
-                        <option value="申請日">申請日</option>
-                        <option value="完工日">完工日</option>
-                    </select>
-                    @Html.ValidationMessageFor(model => model.DateType, "", new { @class = "text-danger" })
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.DateType, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <select asp-for="DateType" class="form-control">
+                    <option value="申請日">申請日</option>
+                    <option value="完工日">完工日</option>
+                </select>
+                @Html.ValidationMessageFor(model => model.DateType, "", new { @class = "text-danger" })
             </div>
+        </div>
         }
 
         <div class="form-group">
@@ -181,13 +192,13 @@
         </div>
         @if (Model.ReportClass != "分攤費用清單")
         {
-            <div class="form-group">
-                @Html.LabelFor(model => model.AccDpt, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-3">
-                    @Html.DropDownListFor(model => model.AccDpt, ViewData["ACCDPT"] as SelectList, new { @class = "form-control combobox" })
-                    @Html.ValidationMessageFor(model => model.AccDpt, "", new { @class = "text-danger" })
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.AccDpt, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.AccDpt, ViewData["ACCDPT"] as SelectList, new { @class = "form-control combobox" })
+                @Html.ValidationMessageFor(model => model.AccDpt, "", new { @class = "text-danger" })
             </div>
+        </div>
         }
         <div id="pnlASSETNO" class="form-group">
             @Html.LabelFor(model => model.AssetNo, htmlAttributes: new { @class = "control-label col-md-2" })
@@ -198,47 +209,47 @@
         </div>
         @if (Model.ReportClass == "零件帳務清單")
         {
-            <div class="form-group">
-                @Html.LabelFor(model => model.StockName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.StockName, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入關鍵字" } })
-                    @Html.ValidationMessageFor(model => model.StockName, "", new { @class = "text-danger" })
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.StockName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.StockName, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入關鍵字" } })
+                @Html.ValidationMessageFor(model => model.StockName, "", new { @class = "text-danger" })
             </div>
-            <div class="form-group">
-                @Html.LabelFor(model => model.VendorName, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.VendorName, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入關鍵字" } })
-                    @Html.ValidationMessageFor(model => model.VendorName, "", new { @class = "text-danger" })
-                </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.VendorName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.VendorName, new { htmlAttributes = new { @class = "form-control", placeholder = "請輸入關鍵字" } })
+                @Html.ValidationMessageFor(model => model.VendorName, "", new { @class = "text-danger" })
             </div>
-            <div class="form-group">
-                @Html.LabelFor(model => model.VendorUniteNo, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-10">
-                    @Html.EditorFor(model => model.VendorUniteNo, new { htmlAttributes = new { @class = "form-control" } })
-                    @Html.ValidationMessageFor(model => model.VendorUniteNo, "", new { @class = "text-danger" })
-                </div>
+        </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.VendorUniteNo, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.VendorUniteNo, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.VendorUniteNo, "", new { @class = "text-danger" })
             </div>
+        </div>
         }
         @if ((UserManager.IsInRole(User, "MedAssetMgr") || UserManager.IsInRole(User, "MedMgr")) && Model.ReportClass != "滿意度調查統計表")
         {
-            <div class="form-group">
-                @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-3">
-                    @Html.DropDownListFor(model => model.Location, ViewData["Location"] as SelectList, new { @class = "form-control" })
-                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Location, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.Location, ViewData["Location"] as SelectList, new { @class = "form-control" })
+                @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
             </div>
+        </div>
         }
         @if (Model.ReportClass == "滿意度調查統計表")
         {
-            <div class="form-group">
-                @Html.LabelFor(model => model.Qname, htmlAttributes: new { @class = "control-label col-md-2" })
-                <div class="col-md-3">
-                    @Html.DropDownListFor(model => model.Qname, ViewData["Qname"] as SelectList, new { @class = "form-control combobox" })
-                    @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
-                </div>
+        <div class="form-group">
+            @Html.LabelFor(model => model.Qname, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-3">
+                @Html.DropDownListFor(model => model.Qname, ViewData["Qname"] as SelectList, new { @class = "form-control combobox" })
+                @Html.ValidationMessageFor(model => model.Location, "", new { @class = "text-danger" })
             </div>
+        </div>
         }
         <div class="form-group">
             <div class="col-md-offset-2 col-md-10">

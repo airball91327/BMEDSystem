@@ -58,6 +58,7 @@ namespace EDIS.Models
         public string BMEDqtyVendor { get; set; }
         public string BMEDqtyClsUser { get; set; }
         public string BMEDqtyLoc { get; set; }
+        public int? BMEDqtyDay { get; set; }
     }
 
     public class QryRepResignListData
